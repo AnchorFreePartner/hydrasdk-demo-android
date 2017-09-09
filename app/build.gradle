@@ -1,0 +1,48 @@
+apply plugin: 'com.android.application'
+
+ext {
+    androidBuildToolsVersion = "26.0.1"
+    androidSupportLibraryVersion = "26.0.2"
+}
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion androidBuildToolsVersion
+
+    defaultConfig {
+        applicationId "com.northghost.hydraclient"
+        minSdkVersion 15
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "BASE_HOST", "\"https://backend.northghost.com\""
+        buildConfigField "String", "BASE_CARRIER_ID", "\"afdemo\""
+        buildConfigField "String", "BASE_OAUTH_METHOD", "\"anonymous\""
+
+        buildConfigField "String", "SHARED_PREFS", "\"NORTHGHOST_SHAREDPREFS\""
+        buildConfigField "String", "STORED_HOST_URL_KEY", "\"com.northghost.afvclient.STORED_HOST_KEY\""
+        buildConfigField "String", "STORED_CARRIER_ID_KEY", "\"com.northghost.afvclient.CARRIER_ID_KEY\""
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile 'com.github.AnchorFreePartner.hydra-sdk-android:hydrasdk:0.19.3'
+
+    compile "com.android.support:appcompat-v7:${androidSupportLibraryVersion}"
+    compile "com.android.support:cardview-v7:${androidSupportLibraryVersion}"
+    compile "com.android.support:recyclerview-v7:${androidSupportLibraryVersion}"
+
+    compile 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+}
