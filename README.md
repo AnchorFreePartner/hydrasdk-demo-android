@@ -20,12 +20,13 @@ Minimum Android SDK version 15
     }
 ```
 
-2. Add the dependency:
+2. Add the dependency. VERSION_NAME is a version from JitPack badge: [![](https://jitpack.io/v/AnchorFreePartner/hydra-sdk-android.svg)](https://jitpack.io/#AnchorFreePartner/hydra-sdk-android)
+
 
 ```groovy
 dependencies {
 
-    compile 'com.github.AnchorFreePartner.hydra-sdk-android:hydrasdk:0.19.3'
+    compile 'com.github.AnchorFreePartner.hydra-sdk-android:hydrasdk:VERSION_NAME'
 
 }
 ```
