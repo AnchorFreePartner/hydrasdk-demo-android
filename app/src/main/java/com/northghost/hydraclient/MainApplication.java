@@ -31,8 +31,45 @@ public class MainApplication extends Application {
                 .enableConnectionLost()
                 .build();
 
-        HydraSdk.init(this, clientInfo, notificationConfig);
         HydraSdk.setLoggingEnabled(true);
+        Logger.setLogDelegate(new LogDelegate() {
+            @Override
+            public void d(String s, String s1) {
+                Log.d(s, s1);
+            }
+
+            @Override
+            public void v(String s, String s1) {
+                Log.v(s, s1);
+            }
+
+            @Override
+            public void i(String s, String s1) {
+                Log.i(s, s1);
+            }
+
+            @Override
+            public void e(String s, String s1) {
+                Log.e(s, s1);
+            }
+
+            @Override
+            public void w(String s, String s1) {
+                Log.w(s, s1);
+            }
+
+            @Override
+            public void w(String s, String s1, Throwable throwable) {
+                Log.w(s, s1, throwable);
+            }
+
+            @Override
+            public void e(String s, String s1, Throwable throwable) {
+                Log.e(s, s1, throwable);
+            }
+        });
+
+        HydraSdk.init(this, clientInfo, notificationConfig);
     }
 
     public void setNewHostAndCarrier(String hostUrl, String carrierId) {

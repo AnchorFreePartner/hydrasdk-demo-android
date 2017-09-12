@@ -61,7 +61,7 @@ public abstract class UIActivity extends AppCompatActivity {
         public void run() {
             updateUI();
             checkRemainingTraffic();
-            mUIHandler.postDelayed(mUIUpdateRunnable, 1000);
+            mUIHandler.postDelayed(mUIUpdateRunnable, 10000);
         }
     };
 
