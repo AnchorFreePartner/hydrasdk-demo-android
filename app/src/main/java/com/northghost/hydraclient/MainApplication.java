@@ -24,6 +24,7 @@ public class MainApplication extends Application {
         ClientInfo clientInfo = ClientInfo.newBuilder()
                 .baseUrl(prefs.getString(BuildConfig.STORED_HOST_URL_KEY, BuildConfig.BASE_HOST))
                 .carrierId(prefs.getString(BuildConfig.STORED_CARRIER_ID_KEY, BuildConfig.BASE_CARRIER_ID))
+                .checkCaptive(false)
                 .build();
 
         NotificationConfig notificationConfig = NotificationConfig.newBuilder()
