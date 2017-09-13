@@ -1,5 +1,7 @@
 [![](https://jitpack.io/v/AnchorFreePartner/hydra-sdk-android.svg)](https://jitpack.io/#AnchorFreePartner/hydra-sdk-android)
 
+GitHub project: https://github.com/AnchorFreePartner/hydrasdk-demo-android
+
 # Anchorfree Hydra VPN SDK demo for Android
 This is a demo application for Android with basic usage of Hydra VPN SDK.
 
