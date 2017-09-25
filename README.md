@@ -5,11 +5,11 @@ GitHub project: https://github.com/AnchorFreePartner/hydrasdk-demo-android
 # Anchorfree Hydra VPN SDK demo for Android
 This is a demo application for Android with basic usage of Hydra VPN SDK.
 
-## Compatibility
+# Compatibility
 
 Minimum Android SDK version 15
 
-## Installation
+# Installation
 
 1. Add the JitPack repository to your root gradle.build file:
 
@@ -33,22 +33,22 @@ dependencies {
 }
 ```
 
-## Set VPN process name
+# Set VPN process name
 
 Add this string resource to your source file
 ```groovy
 <string name="vpn_process_name" translatable="false">my.custom.vpn.process.name</string>
 ```
-## Set Up VPN content provider authorities
+# Set Up VPN content provider authorities
 
 Add this string resource to your source file
 ```groovy
 <string name="vpn_provider_authorities" translatable="false">%e.g your package name%</string>
 ```
 
-# Usage and core classes
+## Usage and core classes
 
-## Set Up
+# Set Up
 
 To set up sdk you should call init() method with your specific details.
 
@@ -103,7 +103,7 @@ Example of login:
 AuthMethod also can be: anonymous, custom OAuth, github, facebook, twitter, firebase.  
 Appropriate OAuth AccessToken must be provided.
 
-## Connection to VPN
+# Connection to VPN
 
 ```java
     HydraSdk.startVPN(country, new Callback<ServerCredentials>() {
@@ -133,7 +133,7 @@ Appropriate OAuth AccessToken must be provided.
 
 VPN can be started with country from provided list, or null for default value.
 
-## Change country
+# Change country
 Getting server list:
 
 ```java
@@ -152,7 +152,7 @@ Getting server list:
 
 In order to set new country you must reconnect to Hydra Sdk.
 
-## Example of error handling
+# Example of error handling
 
 ```java
     private void handleError(HydraException e) {
