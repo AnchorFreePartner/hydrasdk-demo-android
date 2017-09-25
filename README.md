@@ -46,7 +46,8 @@ Add this string resource to your source file
 <string name="vpn_provider_authorities" translatable="false">%e.g your package name%</string>
 ```
 
-## Usage and core classes
+
+Usage and core classes
 
 # Set Up
 
@@ -72,7 +73,7 @@ public class MyApplication extends Application {
 Note: HydraSdk is a singleton, and must be initialized before accessing its methods, 
 otherwise NotInitializedException will be thrown.
 
-## Authentication
+# Authentication
 
 Anchorfree Partner VPN Backend supports OAuth authentication with a partner's OAuth server, this is a primary authentication method. 
 
