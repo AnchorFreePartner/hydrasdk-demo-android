@@ -28,7 +28,7 @@ Minimum Android SDK version 15
 ```groovy
 dependencies {
 
-    compile 'com.github.AnchorFreePartner.hydra-sdk-android:hydrasdk:VERSION_NAME'
+    compile 'com.github.AnchorFreePartner:hydra-sdk-android:VERSION_NAME'
 
 }
 ```

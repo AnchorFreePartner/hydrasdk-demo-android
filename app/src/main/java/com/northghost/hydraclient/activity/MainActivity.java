@@ -1,8 +1,8 @@
 package com.northghost.hydraclient.activity;
 
 import android.util.Log;
-import com.anchorfree.hydrasdk.Callback;
-import com.anchorfree.hydrasdk.CompletableCallback;
+import com.anchorfree.hydrasdk.callbacks.Callback;
+import com.anchorfree.hydrasdk.callbacks.CompletableCallback;
 import com.anchorfree.hydrasdk.HydraSdk;
 import com.anchorfree.hydrasdk.api.ApiCallback;
 import com.anchorfree.hydrasdk.api.ApiRequest;
@@ -11,6 +11,8 @@ import com.anchorfree.hydrasdk.api.data.Country;
 import com.anchorfree.hydrasdk.api.data.ServerCredentials;
 import com.anchorfree.hydrasdk.api.response.RemainingTraffic;
 import com.anchorfree.hydrasdk.api.response.User;
+import com.anchorfree.hydrasdk.callbacks.TrafficListener;
+import com.anchorfree.hydrasdk.callbacks.VpnStateListener;
 import com.anchorfree.hydrasdk.exceptions.ApiException;
 import com.anchorfree.hydrasdk.exceptions.ApiHydraException;
 import com.anchorfree.hydrasdk.exceptions.CaptivePortalErrorException;
@@ -21,9 +23,8 @@ import com.anchorfree.hydrasdk.exceptions.NetworkException;
 import com.anchorfree.hydrasdk.exceptions.RequestException;
 import com.anchorfree.hydrasdk.exceptions.SystemPermissionsErrorException;
 import com.anchorfree.hydrasdk.exceptions.VPNException;
-import com.anchorfree.hydrasdk.vpnservice.TrafficListener;
 import com.anchorfree.hydrasdk.vpnservice.VPNState;
-import com.anchorfree.hydrasdk.vpnservice.VpnStateListener;
+
 import com.northghost.hydraclient.MainApplication;
 import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.dialog.RegionChooserDialog;
