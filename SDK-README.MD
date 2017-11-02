@@ -67,9 +67,18 @@ android {
 
 -keep class com.anchorfree.hdr.** { *; }
 
--keepclassmembers class com.anchorfree.hydrasdk.vpnservice.HydraVpnService {
-     public void protect(...);
+-keepclassmembers class com.anchorfree.vpnsdk.transporthydra.HydraTransport {
+     public *** protect(...);
 }
+-keep class com.northghost.ucr.** { *; }
+
+-keep class com.squareup.okhttp.** { *; }
+
+-keep interface com.squareup.okhttp.** { *; }
+
+-dontwarn com.squareup.okhttp.**
+
+-keepattributes InnerClasses
 
 # Set VPN process name
 
@@ -104,6 +113,8 @@ public class MyApplication extends Application {
               HydraSDKConfig.newBuilder()                                     
                       .addBypassDomain("*www.domaintobypass.com") // add domain to bypass vpn
                       .addBypassDomains(R.raw.bypass_domains) // add domains to bypass vpn, accepts raw resource, newline separated list
+                      .addBlacklistDomain("*facebook.com")//block domain access
+                      .addBlacklistDomains(R.raw.blocklist)//block domains access, accepts raw resource, newline separated list
                       .build());
    }
 }
