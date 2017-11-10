@@ -70,6 +70,9 @@ android {
 -keepclassmembers class com.anchorfree.vpnsdk.transporthydra.HydraTransport {
      public *** protect(...);
 }
+
+-dontwarn com.anchorfree.vpnsdk.transporthydra.proxyservice.*
+
 -keep class com.northghost.ucr.** { *; }
 
 -keep class com.squareup.okhttp.** { *; }
@@ -272,6 +275,11 @@ Send purchase raw json to server and check it</td>
     <td>static void</td>
     <td>purchase(java.lang.String rawJson, java.lang.String type,CompletableCallback callback)
 Send purchase raw json to server and check it</td>
+  </tr>
+  <tr>
+  <td>static void</td>
+  <td>deletePurchase(int purchaseId, ApiCompletableCallback callback) {
+  To delete purchases closed manually. This lets server know about this and disable unlimited traffic
   </tr>
   <tr>
     <td>static void</td>
