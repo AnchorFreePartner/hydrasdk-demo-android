@@ -373,6 +373,7 @@ This class represents reason for starting and stopping vpn. Reason is used for a
                 <td>Others, but this should not happen, or very small %</td>
                 </tr>
  </table>
+ 
 ### public class **ClientInfo**
 
 This is container for client data
