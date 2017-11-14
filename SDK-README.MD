@@ -303,37 +303,37 @@ Enable or disable sdk internal logging</td>
   </tr>
   <tr>
     <td>static void</td>
-    <td>startVPN(Callback<ServerCredentials> callback)
+    <td>startVPN(HydraSDK.ReasonInfo startReason, Callback<ServerCredentials> callback)
 Start VPN service with optimal server</td>
   </tr>
   <tr>
     <td>static void</td>
-    <td>startVPN(java.lang.String countryCode, Callback<ServerCredentials> callback)
+    <td>startVPN(java.lang.String countryCode, HydraSDK.ReasonInfo startReason, Callback<ServerCredentials> callback)
 Start VPN service</td>
   </tr>
   <tr>
     <td>static void</td>
-    <td>startVPNExceptApps(java.util.List<java.lang.String> disallowedApps,Callback<ServerCredentials> callback)
+    <td>startVPNExceptApps(java.util.List<java.lang.String> disallowedApps,HydraSDK.ReasonInfo startReason, Callback<ServerCredentials> callback)
 Start VPN service except the list of apps with optimal server</td>
   </tr>
   <tr>
     <td>static void</td>
-    <td>startVPNExceptApps(java.lang.String countryCode, java.util.List<java.lang.String> disallowedApps,Callback<ServerCredentials> callback)
+    <td>startVPNExceptApps(java.lang.String countryCode, java.util.List<java.lang.String> disallowedApps,HydraSDK.ReasonInfo startReason,Callback<ServerCredentials> callback)
 Start VPN service except the list of apps</td>
   </tr>
   <tr>
     <td>static void</td>
-    <td>startVPNForApps(java.util.List<java.lang.String> allowedApps,Callback<ServerCredentials> callback)
+    <td>startVPNForApps(java.util.List<java.lang.String> allowedApps,HydraSDK.ReasonInfo startReason,Callback<ServerCredentials> callback)
 Start VPN service for specific apps with optimal server</td>
   </tr>
   <tr>
     <td>static void</td>
-    <td>startVPNForApps(java.lang.String countryCode, java.util.List<java.lang.String> allowedApps, Callback<ServerCredentials> callback)
+    <td>startVPNForApps(java.lang.String countryCode, java.util.List<java.lang.String> allowedApps, HydraSDK.ReasonInfo startReason, Callback<ServerCredentials> callback)
 Start VPN service for specific apps</td>
   </tr>
   <tr>
     <td>static void</td>
-    <td>stopVPN(CompletableCallback callback)
+    <td>stopVPN(HydraSDK.ReasonInfo startReason, CompletableCallback callback)
 Stop VPN service
 
 </td>
@@ -347,7 +347,32 @@ Force Stop VPN service and set state to IDLE
   </tr>
 </table>
 
+### public class **HydraSDK.ReasonInfo**
 
+This class represents reason for starting and stopping vpn. Reason is used for analytics purpose. You can use one of static methods to get different reasons.
+
+<table>
+  <tr>
+    <td>Method</td>
+    <td>Description</td>
+  </tr>
+  <tr>
+  <td>manual(String details)</td>
+  <td>Connection start & end triggered by user action, such as tapping button or notification, connection as a result of launching the other app</td>
+  </tr>
+  <tr>
+    <td>auto(String details)</td>
+    <td>Triggered automatically without user interaction with UI, other than errors above. Network switch or loss, coming back from sleep, changing virtual location will be here</td>
+    </tr>
+    <tr>
+        <td>error(String details)</td>
+        <td>Reconnection & connection loss due to an error</td>
+        </tr>
+        <tr>
+                <td>other(String details)</td>
+                <td>Others, but this should not happen, or very small %</td>
+                </tr>
+ </table>
 ### public class **ClientInfo**
 
 This is container for client data
