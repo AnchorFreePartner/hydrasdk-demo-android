@@ -97,30 +97,47 @@ Add this string resource to your source file
 ```
 # Set Up
 
-To set up sdk you should call init() method with your specific details. 
+To set up sdk you should call init() method with your specific details for all process(each process has unique Application instance)
 
 ```java
 public class MyApplication extends Application {
    @Override
    public void onCreate() {
        super.onCreate();
-        HydraSdk.init(this, ClientInfo.newBuilder()
-              .baseUrl("http://yourvpnbackend.com")
-              .carrierId("carrier id")
-       	      .appKey("<app key to connect to hydra servers>")	
-              .build(),
-        NotificationConfig.newBuilder()
-              .title("Your custom vpn notification title")
-              .enableConnectionLost()//enabled show notification when no network connection
-              .build(),
-              HydraSDKConfig.newBuilder()                                     
-                      .addBypassDomain("*www.domaintobypass.com") // add domain to bypass vpn
-                      .addBypassDomains(R.raw.bypass_domains) // add domains to bypass vpn, accepts raw resource, newline separated list
-                      .addBlacklistDomain("*facebook.com")//block domain access
-                      .addBlacklistDomains(R.raw.blocklist)//block domains access, accepts raw resource, newline separated list
-                      .build());
+       initHydraSDK();
+   }
+   private void initHydraSDK(){
+       HydraSdk.init(this, ClientInfo.newBuilder()
+                     .baseUrl("http://yourvpnbackend.com")
+                     .carrierId("carrier id")
+                      .appKey("<app key to connect to hydra servers>")
+                     .build(),
+               NotificationConfig.newBuilder()
+                     .title("Your custom vpn notification title")
+                     .enableConnectionLost()//enabled show notification when no network connection
+                     .build(),
+                     HydraSDKConfig.newBuilder()
+                             .addBypassDomain("*www.domaintobypass.com") // add domain to bypass vpn
+                             .addBypassDomains(R.raw.bypass_domains) // add domains to bypass vpn, accepts raw resource, newline separated list
+                             .addBlacklistDomain("*facebook.com")//block domain access
+                             .addBlacklistDomains(R.raw.blocklist)//block domains access, accepts raw resource, newline separated list
+                             .build());
    }
 }
+```
+
+Each Android process has unique Application instance. If you have some specific initialization in Application onCreate, and don`t want it to init on vpn process you can use:
+
+```java
+//...
+
+initHydraSDK();
+
+if (!ProcessUtils.isVpnProcess(this)){
+    //do your initialization stuff
+}
+
+//...
 ```
 
 # Authentication
@@ -373,7 +390,8 @@ This class represents reason for starting and stopping vpn. Reason is used for a
                 <td>Others, but this should not happen, or very small %</td>
                 </tr>
  </table>
- 
+
+
 ### public class **ClientInfo**
 
 This is container for client data
@@ -969,3 +987,4 @@ private void handleStartVpnError(HydraException e) {
         }
 }
 ```
+
