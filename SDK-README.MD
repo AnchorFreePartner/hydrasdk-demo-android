@@ -45,18 +45,11 @@ dependencies {
 
 }
 ```
-To exclude x86 version of the library, add to your ‘app’ module an abi filter:
-```groovy
-android {
-…
-  defaultConfig {
-  ...   
-     ndk {
-            abiFilters "armeabi"
-        }
-  }
-}
-```
+
+SDK support only arm architecture. To check if ABI is supported you can use **HydraSDK.isABISupported**.
+
+In case of **startVpn** called on unsupported ABI you'll get **AbiNotSupportedException**
+
 # Proguard Rules
 
 -dontwarn okio.**
@@ -987,4 +980,3 @@ private void handleStartVpnError(HydraException e) {
         }
 }
 ```
-
