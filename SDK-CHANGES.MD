@@ -66,3 +66,7 @@
 
 - Fixed crashes in UCR
 - Removed x86 support with AbiNotSupportedException
+
+## 0.23.2 - 9 Jan 2018
+
+- Removed requirement to call HydraSDK.init on each process if sdk is in multiprocess mode
