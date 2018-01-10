@@ -1,10 +1,10 @@
 [![](https://jitpack.io/v/AnchorFreePartner/hydra-sdk-android.svg)](https://jitpack.io/#AnchorFreePartner/hydra-sdk-android)
 
-# Anchorfree Hydra VPN SDK for Android
+# HydraVPN SDK for Android
 
 Android SDK is a part of Anchorfree Partner SDK which contains of client-side libraries and server-side applications needed to implement custom VPN infrastructure.
 
-Changelog:
+## Changelog
 
 - [HydraSDK for Android changelog](https://raw.githubusercontent.com/AnchorFreePartner/hydrasdk-demo-android/master/SDK-CHANGES.MD)
 
@@ -176,7 +176,7 @@ HydraSdk.login(authMethod, new ApiCallback<User>() {
 
 # SDK Api
 
-### public class **HydraSdk**
+## public class **HydraSdk**
 
 This class is core interface to work with user account and to control vpn connection
 
@@ -361,7 +361,7 @@ Force Stop VPN service and set state to IDLE
   </tr>
 </table>
 
-### public class **HydraSDK.ReasonInfo**
+## public class **HydraSDK.ReasonInfo**
 
 This class represents reason for starting and stopping vpn. Reason is used for analytics purpose. You can use one of static methods to get different reasons.
 
@@ -389,7 +389,7 @@ This class represents reason for starting and stopping vpn. Reason is used for a
  </table>
 
 
-### public class **ClientInfo**
+## public class **ClientInfo**
 
 This is container for client data
 
@@ -423,7 +423,7 @@ Factory method for ClientInfo.Builder</td>
 </table>
 
 
-#### public class **ClientInfo.Builder**
+## public class **ClientInfo.Builder**
 
 Method Summary
 
@@ -454,7 +454,7 @@ Email is optional parameter</td>
 </table>
 
 
-### public class **AuthMethod**
+## public class **AuthMethod**
 
 Data class for OAuth token and provider name. There is no public constructor, use factory methods. For anonymous login use anonymous() For popular OAuth providers like Facebook, Twitter and other use named factories facebook(String), twitter(String) and etc. For other providers use customOauth(String) or custom(token, customMethodName).
 
@@ -507,7 +507,7 @@ Factory for custom auth type. If you are using custom authentication scheme, use
 </table>
 
 
-### public interface **TrafficListener**
+## public interface **TrafficListener**
 
 Listener for input and output traffic changes
 
@@ -525,7 +525,7 @@ Method Summary
 </table>
 
 
-### public interface **VpnStateListener**
+## public interface **VpnStateListener**
 
 Listener for VPN connection state changes
 
@@ -549,7 +549,7 @@ Called if state changed</td>
 </table>
 
 
-### public interface **ApiCallback<T>**
+## public interface **ApiCallback<T>**
 
 Callback for web api methods
 
@@ -588,7 +588,7 @@ Called if request is successful</td>
 </table>
 
 
-### public interface **CompletableCallback**
+## public interface **CompletableCallback**
 
 Callback for cases if no data to return
 
@@ -627,7 +627,7 @@ Call if request if failed</td>
 </table>
 
 
-### public class **User**
+## public class **User**
 
 Data class for user data
 
@@ -649,7 +649,7 @@ Subscribers information</td>
 </table>
 
 
-#### public class **Subscriber**
+## public class **Subscriber**
 
 Subscribers information
 
@@ -706,7 +706,7 @@ Timestamp for registration time</td>
 </table>
 
 
-#### public class **Bundle**
+## public class **Bundle**
 
 Data class for licence information
 
@@ -738,7 +738,7 @@ Sessions limit</td>
 </table>
 
 
-### public class **RemainingTraffic**
+## public class **RemainingTraffic**
 
 Data class of user traffic limitations
 
@@ -775,7 +775,7 @@ Is no traffic limits</td>
 </table>
 
 
-## Handling Errors
+# Handling Errors
 
 All methods have two callback functions: success, error. Error callback comes with HydraException object which is a good start to check what went wrong. There are several types of exceptions which may be generated during API methods request.
 
@@ -813,11 +813,11 @@ HydraException is base class for other sdk exceptions:
 </table>
 
 
-### public class **HydraException**
+## public class **HydraException**
 
 Base exception class of sdk
 
-### public class **ApiException** extends HydraException
+## public class **ApiException** extends HydraException
 
 Request specific or user account error
 
@@ -886,7 +886,7 @@ Response code</td>
 </table>
 
 
-### public class **HttpException** extends HydraException
+## public class **HttpException** extends HydraException
 
 Exception of http request level
 
@@ -930,19 +930,19 @@ Request details</td>
 </table>
 
 
-### public class **NetworkException** extends HydraException
+## public class **NetworkException** extends HydraException
 
 There was a network error during request: timeout, no connection, etc.
 
-### public class **VPNException** extends HydraException
+## public class **VPNException** extends HydraException
 
 Error of VPN Service
 
-### public class **InternalException** extends HydraException
+## public class **InternalException** extends HydraException
 
 Something went wrong on the server side.
 
-### Example of error handling
+## Example of error handling
 
 ```java
 private void handleStartVpnError(HydraException e) {
