@@ -4,6 +4,10 @@
 
 Android SDK is a part of Anchorfree Partner SDK which contains of client-side libraries and server-side applications needed to implement custom VPN infrastructure.
 
+Changelog:
+
+- [HydraSDK for Android changelog](https://raw.githubusercontent.com/AnchorFreePartner/hydrasdk-demo-android/master/SDK-CHANGES.MD)
+
 **Attention!** Public api can be changed in future releases.
 
 The Android SDK provides API containing
