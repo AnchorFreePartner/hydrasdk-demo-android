@@ -56,29 +56,29 @@ In case of **startVpn** called on unsupported ABI you'll get **AbiNotSupportedEx
 
 # Proguard Rules
 
--dontwarn okio.**
+    -dontwarn okio.**
 
--keep class com.anchorfree.hydrasdk.api.data.** { *; }
+    -keep class com.anchorfree.hydrasdk.api.data.** { *; }
 
--keep class com.anchorfree.hydrasdk.api.response.** { *; }
+    -keep class com.anchorfree.hydrasdk.api.response.** { *; }
 
--keep class com.anchorfree.hdr.** { *; }
+    -keep class com.anchorfree.hdr.** { *; }
 
--keepclassmembers class com.anchorfree.vpnsdk.transporthydra.HydraTransport {
-     public *** protect(...);
-}
+    -keepclassmembers class com.anchorfree.vpnsdk.transporthydra.HydraTransport {
+         public *** protect(...);
+    }
 
--dontwarn com.anchorfree.vpnsdk.transporthydra.proxyservice.*
+    -dontwarn com.anchorfree.vpnsdk.transporthydra.proxyservice.*
 
--keep class com.northghost.ucr.** { *; }
+    -keep class com.northghost.ucr.** { *; }
 
--keep class com.squareup.okhttp.** { *; }
+    -keep class com.squareup.okhttp.** { *; }
 
--keep interface com.squareup.okhttp.** { *; }
+    -keep interface com.squareup.okhttp.** { *; }
 
--dontwarn com.squareup.okhttp.**
+    -dontwarn com.squareup.okhttp.**
 
--keepattributes InnerClasses
+    -keepattributes InnerClasses
 
 # Set VPN process name
 
