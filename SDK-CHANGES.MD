@@ -70,3 +70,26 @@
 ## 0.23.2 - 9 Jan 2018
 
 - Removed requirement to call HydraSDK.init on each process if sdk is in multiprocess mode
+
+## 0.23.5 - 16 Jan 2018
+
+- fixed restore after kill main process while vpn is connected
+
+## 0.23.6 - 17 Jan 2018
+
+- updated ucr lib
+- ability to change global analytics prop
+
+## 0.23.7 - 5 Feb 2018
+
+- fix abi check
+- updated vpn module version
+
+## 0.23.8 - 8 Feb 2018
+
+- updated vpn module to 0.7.6
+- updated ucr module to 0.6.5-beta
+
+## 0.23.9 - 8 Feb 2018
+
+- send VpnException TrafficExceed on vpn Start
