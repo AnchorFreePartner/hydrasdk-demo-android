@@ -198,3 +198,21 @@ In order to set new country you must reconnect to Hydra Sdk.
 
 Note: In case your device is running Android 5.0 or 5.0.1 you must restart it after receiving SystemPermissionsErrorException.  
 Reference: https://issuetracker.google.com/issues/37011385
+
+## Collecting Debug information before submitting sdk issue
+
+After reproducing the issue, call **HydraSdk.collectDebugInfo** and attach result to your issue
+
+```java
+HydraSdk.collectDebugInfo(context, new Callback<String>() {
+    @Override
+    public void success(String debugInfo) {
+        //attach value of debugInfo to your issue description
+    }
+
+    @Override
+    public void failure(HydraException e) {
+
+    }
+});
+```
