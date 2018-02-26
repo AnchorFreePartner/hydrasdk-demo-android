@@ -33,7 +33,7 @@ import java.net.HttpURLConnection;
 public class MainActivity extends UIActivity implements TrafficListener, VpnStateListener,
         LoginDialog.LoginConfirmationInterface, RegionChooserDialog.RegionChooserInterface {
 
-    private String selectedCountry = null;
+    private String selectedCountry = "";
 
     @Override
     protected void onStart() {
@@ -97,7 +97,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
         showLoginProgress();
 
         HydraSdk.logout();
-        selectedCountry = null;
+        selectedCountry = "";
 
         hideLoginProgress();
         updateUI();
@@ -112,7 +112,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     protected void connectToVpn() {
         if (HydraSdk.isLoggedIn()) {
             showConnectProgress();
-            HydraSdk.startVPN(selectedCountry, new Callback<ServerCredentials>() {
+            HydraSdk.startVPN(selectedCountry, HydraSdk.ReasonInfo.manual(), new Callback<ServerCredentials>() {
                 @Override
                 public void success(ServerCredentials serverCredentials) {
                     hideConnectProgress();
@@ -135,7 +135,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     @Override
     protected void disconnectFromVnp() {
         showConnectProgress();
-        HydraSdk.stopVPN(new CompletableCallback() {
+        HydraSdk.stopVPN(HydraSdk.ReasonInfo.manual(), new CompletableCallback() {
             @Override
             public void complete() {
                 hideConnectProgress();
@@ -205,7 +205,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
 
         if (HydraSdk.isVpnStarted()) {
             showMessage("Reconnecting to VPN with " + selectedCountry);
-            HydraSdk.stopVPN(new CompletableCallback() {
+            HydraSdk.stopVPN(HydraSdk.ReasonInfo.manual(), new CompletableCallback() {
                 @Override
                 public void complete() {
                     connectToVpn();
@@ -214,7 +214,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                 @Override
                 public void error(HydraException e) {
                     // In this case we try to reconnect
-                    selectedCountry = null;
+                    selectedCountry = "";
                     connectToVpn();
                 }
             });
