@@ -93,3 +93,16 @@
 ## 0.23.9 - 8 Feb 2018
 
 - send VpnException TrafficExceed on vpn Start
+
+## 0.24.0 - 16 Feb 2018
+
+- updated hydra with armv7 support
+- method to get device id
+
+## 0.24.1 - 21 Feb 2018
+
+- added debug info method to sdk to collect information abot sdk issue
+
+## 0.24.2 - 28 Feb 2018
+
+- Changes in device id hashing
