@@ -106,3 +106,31 @@
 ## 0.24.2 - 28 Feb 2018
 
 - Changes in device id hashing
+
+## 0.24.3 - 5 Mar 2018
+
+- fixed crash on vpn error on initialization
+
+## 0.24.4 - 7 Mar 2018
+
+- removed Runtime.exec call
+- fix socket timeout after vpn connected
+
+## 0.24.5 - 15 Mar 2018
+
+- added api to show vpn permission dialog without vpn connection
+- fix restore vpn connection after network change
+- use username and password in hydra config
+
+## 0.24.6 - 21 Mar 2018
+
+- fixes in handling network change
+- updated hydra lib
+- removed unused native libs
+- updated readme
+
+## 0.24.7 - 21 Mar 2018
+
+- removed fabric references
+- removed android backup config
+- fix crashes
