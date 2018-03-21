@@ -207,7 +207,7 @@ Using server country</td>
   </tr>
   <tr>
     <td>static void</td>
-    <td>current(ApiCallback<User> callback)
+    <td>currentUser(ApiCallback<User> callback)
 Get details of current user</td>
   </tr>
   <tr>
