@@ -134,3 +134,7 @@
 - removed fabric references
 - removed android backup config
 - fix crashes
+
+## 0.24.8 - 23 Mar 2018
+
+- added ability to turn off network observation
