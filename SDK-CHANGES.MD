@@ -138,3 +138,7 @@
 ## 0.24.8 - 23 Mar 2018
 
 - added ability to turn off network observation
+
+## 0.24.9 - 27 Mar 2018
+
+- fix crash in device id generation
