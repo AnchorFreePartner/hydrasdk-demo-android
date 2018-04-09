@@ -1,0 +1,43 @@
+version: 2
+machine:
+  environment:
+    GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx4096m -XX:+HeapDumpOnOutOfMemoryError"'
+    _JAVA_OPTIONS: "-Xms1024m -Xmx4096m"
+jobs:
+  build:
+    docker:
+      - image: circleci/android:api-27-alpha
+    working_directory: ~/repo
+    resource_class: large
+    environment:
+      _JAVA_OPTIONS: "-Xms1024m -Xmx4096m"
+      JVM_OPTS: -Xmx10248M
+      TERM: dumb
+    steps:
+      - checkout
+      - restore_cache:
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+      - run:
+          name: Assemble
+          command: ./gradlew clean assembleDebug -PversionCode=${CIRCLE_BUILD_NUM}
+      - run:
+          name: HockeyApp Release Debug
+          command: ./ci/hockeyapp-release.sh ~/repo/app/build/outputs/apk/debug/app-debug.apk 3
+      - store_artifacts:
+          path: ~/repo/app/build/outputs/apk
+          destination: apks
+workflows:
+  version: 2
+  build-n-deploy:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/

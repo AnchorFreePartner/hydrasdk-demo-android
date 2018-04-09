@@ -1,0 +1,46 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.ajoberstar:grgit:1.5.0'
+    }
+}
+
+import org.ajoberstar.grgit.Grgit
+
+def getVersionName = { ->
+    def stdout = new ByteArrayOutputStream()
+    def stderr = new ByteArrayOutputStream()
+    try {
+        exec {
+            commandLine 'git', 'for-each-ref', '--format="%(refname:short)"', '--sort=-authordate', '--count=1', 'refs/tags'
+            standardOutput = stdout
+            errorOutput = stderr
+        }
+        return stdout.toString().trim().replaceAll("\"", "")
+    } catch (ignored) {
+        return "1.1.1"
+    }
+}
+def getWholeVersionName = { ->
+    try {
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'rev-parse', 'HEAD'
+            standardOutput = stdout
+        }
+        return stdout.toString().trim()
+    }
+    catch (ignored) {
+        return null;
+    }
+}
+ext {
+    git = Grgit.open(currentDir: projectDir)
+    gitVersionName = getVersionName()
+    wholeGitVersionName = getWholeVersionName()
+    gitLogVersionCode = git.log().size()
+    gitVersionCode = project.hasProperty('versionCode') ? 1000 + versionCode.toInteger() : gitLogVersionCode
+    gitVersionCodeTime = git.head().time
+}

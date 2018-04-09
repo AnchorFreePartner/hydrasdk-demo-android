@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Log;
 import com.anchorfree.hydrasdk.HydraSDKConfig;
+import com.anchorfree.hydrasdk.HydraSDKConfigFactory;
 import com.anchorfree.hydrasdk.HydraSdk;
 import com.anchorfree.hydrasdk.api.ClientInfo;
 import com.anchorfree.hydrasdk.utils.LogDelegate;
@@ -71,12 +72,7 @@ public class MainApplication extends Application {
             }
         });
 
-        HydraSDKConfig config = HydraSDKConfig.newBuilder()
-                //traffic to these domains will not go through VPN
-                .addBypassDomain("*facebook.com")
-                .addBypassDomain("*wtfismyip.com")
-                .build();
-        HydraSdk.init(this, clientInfo, notificationConfig, config);
+        HydraSdk.init(this, clientInfo, notificationConfig, HydraSDKConfigFactory.create());
     }
 
     public void setNewHostAndCarrier(String hostUrl, String carrierId) {
