@@ -114,6 +114,7 @@ public class MyApplication extends Application {
                      .enableConnectionLost()//enabled show notification when no network connection
                      .build(),
                      HydraSDKConfig.newBuilder()
+                             .observeNetworkChanges(false) // turn on/off handling network changes by sdk
                              .addBypassDomain("*www.domaintobypass.com") // add domain to bypass vpn
                              .addBypassDomains(R.raw.bypass_domains) // add domains to bypass vpn, accepts raw resource, newline separated list
                              .addBlacklistDomain("*facebook.com")//block domain access
@@ -207,7 +208,7 @@ Using server country</td>
   </tr>
   <tr>
     <td>static void</td>
-    <td>current(ApiCallback<User> callback)
+    <td>currentUser(ApiCallback<User> callback)
 Get details of current user</td>
   </tr>
   <tr>
