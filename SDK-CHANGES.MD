@@ -142,3 +142,31 @@
 ## 0.24.9 - 27 Mar 2018
 
 - fix crash in device id generation
+
+## 0.25.0 - 30 Mar 2018
+
+- internal analytics improvements
+- proguard fix
+- crash fixes
+
+## 0.25.1 - 9 Apr 2018
+
+- dont notify multiple times on the same state
+- removed http url for captive portal check
+- make hydra with PKI by default
+
+## 0.25.2 - 16 Apr 2018
+
+- removed Quantcast
+
+## 0.25.3 - 18 Apr 2018
+
+- removed allowBackup from lib
+- fix in analytics
+
+## 0.25.4 - 19 Apr 2018
+
+- updated api client
+- stop vpn on network loss(fix sd issue)
+- torrents traffic forwarding enabled
+- sd enabled
