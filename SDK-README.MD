@@ -79,7 +79,10 @@ In case of **startVpn** called on unsupported ABI you'll get **AbiNotSupportedEx
     -dontwarn com.squareup.okhttp.**
 
     -keepattributes InnerClasses
-
+    -dontwarn okhttp3.**
+    -dontwarn okio.**
+    -dontwarn javax.annotation.**
+    -dontwarn org.conscrypt.**
 # Set VPN process name
 
 Add this string resource to your source file
