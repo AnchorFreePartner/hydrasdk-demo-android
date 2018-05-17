@@ -170,3 +170,26 @@
 - stop vpn on network loss(fix sd issue)
 - torrents traffic forwarding enabled
 - sd enabled
+
+
+## 0.25.6 - 10 May 2018
+
+- updated hydra
+
+## 0.25.7 - 16 May 2018
+
+- fix notify on idle state after sdk initialization
+
+## 0.25.8 - 16 May 2018
+
+- fix app_start analytics
+
+## 0.25.9 - 16 May 2018
+
+- changed vpn module to release tag
+
+## 0.27.0 - 16 May 2018
+
+- bugfix
+- traffic speed optimization
+- updated hydra
