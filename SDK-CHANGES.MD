@@ -193,3 +193,34 @@
 - bugfix
 - traffic speed optimization
 - updated hydra
+
+
+## 0.27.1 - 20 May 2018
+
+- bugfix
+- speed degradation fix
+- updated hydra
+
+## 0.27.2 - 21 May 2018
+
+- fix for reporting connected country in ServerCredentials
+
+## 0.27.3 - 21 May 2018
+
+- fix for hydra cache
+
+## 0.27.4 - 22 May 2018
+
+- fix for bq reporting
+
+## 0.27.5 - 23 May 2018
+
+- fix for proguard rules
+
+## 0.27.6 - 23 May 2018
+
+- fix for credentials cache
+
+## 0.27.7 - 30 May 2018
+
+- bugfix
