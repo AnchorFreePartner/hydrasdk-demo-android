@@ -224,3 +224,13 @@
 ## 0.27.7 - 30 May 2018
 
 - bugfix
+
+## 0.27.8 - 13 June 2018
+
+- fix use a lot of alarm manager
+- another fix for app_start event
+- updated hydra lib
+- updated proguard
+- fix ucr crash
+- Provide app_version and sdk_version into sessions
+- fix crash in unregister online observer
