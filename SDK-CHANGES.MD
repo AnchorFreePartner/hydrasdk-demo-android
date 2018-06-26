@@ -171,7 +171,6 @@
 - torrents traffic forwarding enabled
 - sd enabled
 
-
 ## 0.25.6 - 10 May 2018
 
 - updated hydra
@@ -193,7 +192,6 @@
 - bugfix
 - traffic speed optimization
 - updated hydra
-
 
 ## 0.27.1 - 20 May 2018
 
@@ -234,3 +232,7 @@
 - fix ucr crash
 - Provide app_version and sdk_version into sessions
 - fix crash in unregister online observer
+
+## 0.28.0 - 19 June 2018
+
+- encrypt stored data
