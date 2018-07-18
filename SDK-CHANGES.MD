@@ -236,3 +236,10 @@
 ## 0.28.0 - 19 June 2018
 
 - encrypt stored data
+
+## 0.28.2 - 16 July 2018
+
+- hydra module updated to 4.0.38
+- x86 fixes
+- analytics improvements
+- bug fixes
