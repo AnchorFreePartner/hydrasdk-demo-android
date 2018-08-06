@@ -243,3 +243,9 @@
 - x86 fixes
 - analytics improvements
 - bug fixes
+
+## 0.28.3
+
+- crashes in data encryption
+- crashes in analytics
+- fix infinite loop on api calls without internet connection

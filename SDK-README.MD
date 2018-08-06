@@ -50,11 +50,11 @@ dependencies {
 }
 ```
 
-SDK support only arm architecture. To check if ABI is supported you can use **HydraSDK.isABISupported**.
-
 In case of **startVpn** called on unsupported ABI you'll get **AbiNotSupportedException**
 
 # Proguard Rules
+
+Proguard rules are included in sdk, but you can use these if required:
 
 ```
     #HYDRASDK
@@ -81,15 +81,28 @@ In case of **startVpn** called on unsupported ABI you'll get **AbiNotSupportedEx
 # Set VPN process name
 
 Add this string resource to your source file
-```groovy
-<string name="vpn_process_name" translatable="false">my.custom.vpn.process.name</string>
+```xml
+<string name="vpn_process_name" translatable="false">:vpn</string>
 ```
 # Set Up VPN content provider authorities
 
 Add this string resource to your source file
-```groovy
-<string name="vpn_provider_authorities" translatable="false">%e.g your package name%</string>
+```xml
+<string name="vpn_provider_authorities" translatable="false"><e.g your package name></string>
 ```
+
+# Java 8
+
+Add Java 8 support to project **build.gradle**
+
+```groovy
+compileOptions {
+    sourceCompatibility 1.8
+    targetCompatibility 1.8
+}
+```
+
+If you cannot enable java 8 support in your project please contact us for further details
 # Set Up
 
 To set up sdk you should call init() method with your specific details for all process(each process has unique Application instance)
@@ -103,13 +116,12 @@ public class MyApplication extends Application {
    }
    private void initHydraSDK(){
        HydraSdk.init(this, ClientInfo.newBuilder()
-                     .baseUrl("http://yourvpnbackend.com")
-                     .carrierId("carrier id")
-                      .appKey("<app key to connect to hydra servers>")
+                     .baseUrl("http://yourvpnbackend.com") // set base url for api calls
+                     .carrierId("carrier id") // set your carrier id
                      .build(),
                NotificationConfig.newBuilder()
-                     .title("Your custom vpn notification title")
-                     .enableConnectionLost()//enabled show notification when no network connection
+                     .title("Your custom vpn notification title") // notification title to display in status bar
+                     .enableConnectionLost() //enabled show notification when no network connection
                      .build(),
                      HydraSDKConfig.newBuilder()
                              .observeNetworkChanges(false) // turn on/off handling network changes by sdk
@@ -117,6 +129,8 @@ public class MyApplication extends Application {
                              .addBypassDomains(R.raw.bypass_domains) // add domains to bypass vpn, accepts raw resource, newline separated list
                              .addBlacklistDomain("*facebook.com")//block domain access
                              .addBlacklistDomains(R.raw.blocklist)//block domains access, accepts raw resource, newline separated list
+                             .unsafeClient(false)// set true if want to use unsafe client instead
+                             .captivePortal(true)//control if sdk should check if device is behind captive portal
                              .build());
    }
 }
@@ -138,7 +152,7 @@ if (!ProcessUtils.isVpnProcess(this)){
 
 # Authentication
 
-Anchorfree Partner VPN Backend supports OAuth authentication with a partner's OAuth server, this is a primary authentication method. 
+Anchorfree Partner VPN Backend supports OAuth authentication with a partner's OAuth server, this is a primary authentication method.
 
 Steps to implement OAuth:
 
@@ -173,6 +187,269 @@ HydraSdk.login(authMethod, new ApiCallback<User>() {
 });
 ```
 
+# List available countries
+
+```java
+HydraSdk.countries(new ApiCallback<List<Country>>() {
+                @Override
+                public void success(ApiRequest request, List<Country> response) {
+                    for (Country country:response){
+                        //country.getCountry()
+                    }
+                }
+
+                @Override
+                public void failure(ApiException error) {
+                    //request failed
+                }
+            });
+```
+
+# Start VPN with optimal server
+
+```java
+HydraSdk.startVPN(HydraSdk.COUNTRY_OPTIMAL, TrackingConstants.GprReasons.M_UI, new Callback<ServerCredentials>() {
+                @Override
+                public void success(@NonNull ServerCredentials serverCredentials) {
+                    //VPN connected
+                }
+
+                @Override
+                public void failure(@NonNull HydraException e) {
+                    //Failed to connect vpn
+                }
+            });
+```
+
+Instead of **HydraSdk.COUNTRY_OPTIMAL** its possible to use country value from **HydraSdk.countries**
+
+For **reason** param refer to **TrackingConstants.GprReasons**
+
+Possible values:
+
+- M_UI - manually from ui
+- M_SYSTEM - manually from system
+- M_OTHER - manually from other place
+- A_APP_RUN - auto on app run
+- A_RECONNECT - auto on reconnect
+- A_ERROR - auto after error
+- A_SLEEP - auto after sleep
+- A_NETWORK - auto on network event
+- A_OTHER - auto on other reason
+
+# Stop vpn
+
+```java
+HydraSdk.stopVPN(TrackingConstants.GprReasons.M_UI, new CompletableCallback() {
+    @Override
+    public void complete() {
+        //VPN was stopped
+    }
+
+    @Override
+    public void error(HydraException e) {
+        //Failed to stop vpn
+    }
+});
+```
+
+# Listen for vpn status and traffic updates
+
+```java
+ HydraSdk.addVpnListener(new VpnStateListener() {
+    @Override
+    public void vpnStateChanged(VPNState vpnState) {
+        //handle state change
+    }
+
+    @Override
+    public void vpnError(VPNException e) {
+        //handle vpn error
+    }
+});
+HydraSdk.addTrafficListener(new TrafficListener() {
+    @Override
+    public void onTrafficUpdate(long tx, long rx) {
+        //handle used traffic update
+        //tx - bytes transfered
+        //rx - bytes received
+    }
+});
+
+//stop listening for update
+HydraSdk.removeTrafficListener(...);
+HydraSdk.removeVpnListener(...);
+```
+
+# Purchases functionality
+
+```java
+HydraSdk.purchase("json from google", new ApiCompletableCallback() {
+   @Override
+   public void complete() {
+       //purchase request success
+   }
+
+   @Override
+   public void error(ApiException e) {
+        //failed to process purchase
+   }
+});
+HydraSdk.deletePurchase(purchaseID, new ApiCompletableCallback() {
+   @Override
+   public void complete() {
+       //request success
+   }
+
+   @Override
+   public void error(ApiException e) {
+        //failed to process request
+   }
+});
+```
+
+# Get data about user
+```java
+//get information about remaining traffic for user
+HydraSdk.remainingTraffic(new ApiCallback<RemainingTraffic>() {
+   @Override
+   public void success(ApiRequest request, RemainingTraffic response) {
+       //handle response
+   }
+
+   @Override
+   public void failure(ApiException error) {
+        //failed to send request
+   }
+});
+//get information about current logged in user
+HydraSdk.currentUser(new ApiCallback<User>() {
+   @Override
+   public void success(ApiRequest request, User response) {
+       //handle response
+   }
+
+   @Override
+   public void failure(ApiException error) {
+        //failed to send request
+   }
+});
+```
+
+# Get Current vpn state
+```java
+HydraSdk.getVpnState(new Callback<VPNState>() {
+   @Override
+   public void success(@NonNull VPNState state) {
+        //handle current state
+   }
+
+   @Override
+   public void failure(@NonNull HydraException e) {
+        //failed to get current vpn state
+   }
+});
+```
+
+# Call VPN permission dialog without connecting to vpn
+
+```java
+if (HydraSdk.requestVpnPermission(new CompletableCallback() {
+    @Override
+    public void complete() {
+        //dialog was shown and permission was granted
+    }
+
+    @Override
+    public void error(HydraException e) {
+        //dialog was shown and permission was NOT granted
+    }
+})){
+    //will show vpn permissions dialog
+}else{
+    //already have vpn permissions, no need to request
+}
+```
+
+# Collecting Debug information before submitting sdk issue
+
+After reproducing the issue, call **HydraSdk.collectDebugInfo** and attach result to your issue
+
+```java
+HydraSdk.collectDebugInfo(context, new Callback<String>() {
+    @Override
+    public void success(String debugInfo) {
+        //attach value of debugInfo to your issue description
+    }
+
+    @Override
+    public void failure(HydraException e) {
+
+    }
+});
+```
+
+## Handle of ApiException
+```java
+private void handleAPIexception(ApiException e) {
+    if (e instanceof HttpException) {
+
+    } else if (e instanceof RequestException) {
+
+    } else if (e instanceof NetworkException) {
+
+    } else {
+        //Unexpected exception source. Handle cause
+    }
+}
+```
+
+## Handle of HydraException
+
+```java
+private void handleStartVpnError(HydraException e) {
+           if (e instanceof NetworkException) {
+            showMessage("Check internet connection");
+        } else if (e instanceof VPNException) {
+            switch (((VPNException) e).getCode()) {
+                case VPNException.CRASH_FORCE:
+                    showMessage("Hydra called forceStop");
+                    break;
+                case VPNException.CRASH_TIMEOUT:
+                    showMessage("Hydra connect timeout");
+                    break;
+                default:
+                    showMessage("Error in VPN Service");
+                    break;
+            }
+        } else if (e instanceof HttpException) {
+            showMessage("Wrong web api request while start vpn");
+        } else if (e instanceof InternalException) {
+            if (e.getCause() instanceof SystemPermissionsErrorException) {
+                showMessage("VPN Permission error. Reboot device");
+            } else if (e.getCause() instanceof CaptivePortalErrorException) {
+                showMessage("Captive portal detected");
+            } else if (e.getCause() instanceof NetworkException) {
+                showMessage("Network exception");
+            } else {
+                showMessage("Unexpected error");
+            }
+        } else if (e instanceof ApiHydraException) {
+            switch (((ApiHydraException) e).getCode()) {
+                case HttpURLConnection.HTTP_UNAUTHORIZED:
+                    showMessage("User unauthorized");
+                    break;
+                case HttpURLConnection.HTTP_INTERNAL_ERROR:
+                    showMessage("Server unavailable");
+                    break;
+            }
+        }
+}
+```
+
+Note: In case your device is running Android 5.0 or 5.0.1 you must restart it after receiving SystemPermissionsErrorException.
+Reference: https://issuetracker.google.com/issues/37011385
+
 # SDK Api
 
 ## public class *HydraSdk*
@@ -200,11 +477,6 @@ Listen VPN connection state changes</td>
 Get list of countries where vpn servers are exist</td>
   </tr>
   <tr>
-    <td>static java.lang.String</td>
-    <td>country()
-Using server country</td>
-  </tr>
-  <tr>
     <td>static void</td>
     <td>currentUser(ApiCallback<User> callback)
 Get details of current user</td>
@@ -230,8 +502,8 @@ Get timestamp of VPN start event</td>
 Get traffic statistics of current VPN session</td>
   </tr>
   <tr>
-    <td>static VPNState</td>
-    <td>getVpnState()
+    <td>static void</td>
+    <td>getVpnState(final Callback<VPNState> callback)
 Get state of VPN Service</td>
   </tr>
   <tr>
@@ -316,77 +588,55 @@ Enable or disable sdk internal logging</td>
   </tr>
   <tr>
     <td>static void</td>
-    <td>startVPN(HydraSDK.ReasonInfo startReason, Callback<ServerCredentials> callback)
+    <td>startVPN(String reason, Callback<ServerCredentials> callback)
 Start VPN service with optimal server</td>
   </tr>
   <tr>
     <td>static void</td>
-    <td>startVPN(java.lang.String countryCode, HydraSDK.ReasonInfo startReason, Callback<ServerCredentials> callback)
+    <td>startVPN(java.lang.String countryCode, String reason, Callback<ServerCredentials> callback)
 Start VPN service</td>
   </tr>
   <tr>
     <td>static void</td>
-    <td>startVPNExceptApps(java.util.List<java.lang.String> disallowedApps,HydraSDK.ReasonInfo startReason, Callback<ServerCredentials> callback)
+    <td>startVPNExceptApps(java.util.List<java.lang.String> disallowedApps,String reason, Callback<ServerCredentials> callback)
 Start VPN service except the list of apps with optimal server</td>
   </tr>
   <tr>
     <td>static void</td>
-    <td>startVPNExceptApps(java.lang.String countryCode, java.util.List<java.lang.String> disallowedApps,HydraSDK.ReasonInfo startReason,Callback<ServerCredentials> callback)
+    <td>startVPNExceptApps(java.lang.String countryCode, java.util.List<java.lang.String> disallowedApps,String reason,Callback<ServerCredentials> callback)
 Start VPN service except the list of apps</td>
   </tr>
   <tr>
     <td>static void</td>
-    <td>startVPNForApps(java.util.List<java.lang.String> allowedApps,HydraSDK.ReasonInfo startReason,Callback<ServerCredentials> callback)
+    <td>startVPNForApps(java.util.List<java.lang.String> allowedApps,String reason,Callback<ServerCredentials> callback)
 Start VPN service for specific apps with optimal server</td>
   </tr>
   <tr>
     <td>static void</td>
-    <td>startVPNForApps(java.lang.String countryCode, java.util.List<java.lang.String> allowedApps, HydraSDK.ReasonInfo startReason, Callback<ServerCredentials> callback)
+    <td>startVPNForApps(java.lang.String countryCode, java.util.List<java.lang.String> allowedApps, String reason, Callback<ServerCredentials> callback)
 Start VPN service for specific apps</td>
   </tr>
   <tr>
     <td>static void</td>
-    <td>stopVPN(HydraSDK.ReasonInfo startReason, CompletableCallback callback)
+    <td>stopVPN(String reason, CompletableCallback callback)
 Stop VPN service
-
 </td>
   </tr>
-  <tr>
-    <td>static void</td>
-    <td>forceStopVPN()
-Force Stop VPN service and set state to IDLE
 
-</td>
-  </tr>
-</table>
-
-## public class *HydraSDK.ReasonInfo*
-
-This class represents reason for starting and stopping vpn. Reason is used for analytics purpose. You can use one of static methods to get different reasons.
-
-<table>
   <tr>
-    <td>Method</td>
-    <td>Description</td>
-  </tr>
-  <tr>
-  <td>manual(String details)</td>
-  <td>Connection start & end triggered by user action, such as tapping button or notification, connection as a result of launching the other app</td>
-  </tr>
-  <tr>
-    <td>auto(String details)</td>
-    <td>Triggered automatically without user interaction with UI, other than errors above. Network switch or loss, coming back from sleep, changing virtual location will be here</td>
+      <td>static boolean</td>
+      <td>requestVpnPermission(final CompletableCallback completableCallback)
+  Show system VPN permission dialog without connecting to VPN
+  </td>
     </tr>
-    <tr>
-        <td>error(String details)</td>
-        <td>Reconnection & connection loss due to an error</td>
+     <tr>
+          <td>static boolean</td>
+          <td>hasVpnPermissions
+      Check if app was granted the VPN permission
+      </td>
         </tr>
-        <tr>
-                <td>other(String details)</td>
-                <td>Others, but this should not happen, or very small %</td>
-                </tr>
- </table>
 
+</table>
 
 ## public class *ClientInfo*
 
@@ -466,17 +716,17 @@ Method Summary
   </tr>
   <tr>
     <td>static AuthMethod</td>
-    <td>anonymous() 
+    <td>anonymous()
 Factory for anonymous auth type</td>
   </tr>
   <tr>
     <td>static AuthMethod</td>
-    <td>customOauth(java.lang.String accessToken) 
+    <td>customOauth(java.lang.String accessToken)
 Factory for custom OAuth auth type</td>
   </tr>
     <tr>
     <td>static AuthMethod</td>
-    <td>custom(java.lang.String accessToken, java.lang.String customMethodName) 
+    <td>custom(java.lang.String accessToken, java.lang.String customMethodName)
 Factory for custom auth type. If you are using custom authentication scheme, use this method.</td>
   </tr>
   <tr>
@@ -941,45 +1191,4 @@ Error of VPN Service
 
 Something went wrong on the server side.
 
-## Example of error handling
 
-```java
-private void handleStartVpnError(HydraException e) {
-           if (e instanceof NetworkException) {
-            showMessage("Check internet connection");
-        } else if (e instanceof VPNException) {
-            switch (((VPNException) e).getCode()) {
-                case VPNException.CRASH_FORCE:
-                    showMessage("Hydra called forceStop");
-                    break;
-                case VPNException.CRASH_TIMEOUT:
-                    showMessage("Hydra connect timeout");
-                    break;
-                default:
-                    showMessage("Error in VPN Service");
-                    break;
-            }
-        } else if (e instanceof HttpException) {
-            showMessage("Wrong web api request while start vpn");
-        } else if (e instanceof InternalException) {
-            if (e.getCause() instanceof SystemPermissionsErrorException) {
-                showMessage("VPN Permission error. Reboot device");
-            } else if (e.getCause() instanceof CaptivePortalErrorException) {
-                showMessage("Captive portal detected");
-            } else if (e.getCause() instanceof NetworkException) {
-                showMessage("Network exception");
-            } else {
-                showMessage("Unexpected error");
-            }
-        } else if (e instanceof ApiHydraException) {
-            switch (((ApiHydraException) e).getCode()) {
-                case HttpURLConnection.HTTP_UNAUTHORIZED:
-                    showMessage("User unauthorized");
-                    break;
-                case HttpURLConnection.HTTP_INTERNAL_ERROR:
-                    showMessage("Server unavailable");
-                    break;
-            }
-        }
-}
-```

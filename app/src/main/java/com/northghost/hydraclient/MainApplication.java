@@ -8,8 +8,6 @@ import android.util.Log;
 import com.anchorfree.hydrasdk.HydraSDKConfig;
 import com.anchorfree.hydrasdk.HydraSdk;
 import com.anchorfree.hydrasdk.api.ClientInfo;
-import com.anchorfree.hydrasdk.utils.LogDelegate;
-import com.anchorfree.hydrasdk.utils.Logger;
 import com.anchorfree.hydrasdk.vpnservice.connectivity.NotificationConfig;
 
 public class MainApplication extends Application {
@@ -25,7 +23,6 @@ public class MainApplication extends Application {
         ClientInfo clientInfo = ClientInfo.newBuilder()
                 .baseUrl(prefs.getString(BuildConfig.STORED_HOST_URL_KEY, BuildConfig.BASE_HOST))
                 .carrierId(prefs.getString(BuildConfig.STORED_CARRIER_ID_KEY, BuildConfig.BASE_CARRIER_ID))
-                .checkCaptive(false)
                 .build();
 
         NotificationConfig notificationConfig = NotificationConfig.newBuilder()
@@ -33,48 +30,14 @@ public class MainApplication extends Application {
                 .enableConnectionLost()
                 .build();
 
-        HydraSdk.setLoggingEnabled(true);
-        Logger.setLogDelegate(new LogDelegate() {
-            @Override
-            public void d(String s, String s1) {
-                Log.d(s, s1);
-            }
-
-            @Override
-            public void v(String s, String s1) {
-                Log.v(s, s1);
-            }
-
-            @Override
-            public void i(String s, String s1) {
-                Log.i(s, s1);
-            }
-
-            @Override
-            public void e(String s, String s1) {
-                Log.e(s, s1);
-            }
-
-            @Override
-            public void w(String s, String s1) {
-                Log.w(s, s1);
-            }
-
-            @Override
-            public void w(String s, String s1, Throwable throwable) {
-                Log.w(s, s1, throwable);
-            }
-
-            @Override
-            public void e(String s, String s1, Throwable throwable) {
-                Log.e(s, s1, throwable);
-            }
-        });
+        HydraSdk.setLoggingLevel(Log.VERBOSE);
 
         HydraSDKConfig config = HydraSDKConfig.newBuilder()
                 //traffic to these domains will not go through VPN
                 .addBypassDomain("*facebook.com")
                 .addBypassDomain("*wtfismyip.com")
+                .observeNetworkChanges(true) //sdk will handle network changes and start/stop vpn
+                .captivePortal(true) //sdk will handle if user is behind captive portal wifi
                 .build();
         HydraSdk.init(this, clientInfo, notificationConfig, config);
     }

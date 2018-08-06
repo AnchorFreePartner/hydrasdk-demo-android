@@ -32,12 +32,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.github.AnchorFreePartner:hydra-sdk-android:0.24.3'
+    compile 'com.github.AnchorFreePartner:hydra-sdk-android:ae02ff3'
 
     compile "com.android.support:appcompat-v7:${androidSupportLibraryVersion}"
     compile "com.android.support:cardview-v7:${androidSupportLibraryVersion}"

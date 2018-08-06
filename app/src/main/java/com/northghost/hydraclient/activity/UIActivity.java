@@ -3,6 +3,7 @@ package com.northghost.hydraclient.activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -14,6 +15,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.anchorfree.hydrasdk.HydraSdk;
 import com.anchorfree.hydrasdk.api.response.RemainingTraffic;
+import com.anchorfree.hydrasdk.callbacks.Callback;
+import com.anchorfree.hydrasdk.exceptions.HydraException;
 import com.northghost.hydraclient.R;
 import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.utils.Converter;
@@ -124,7 +127,7 @@ public abstract class UIActivity extends AppCompatActivity {
 
     protected abstract void chooseServer();
 
-    protected abstract String getCurrentServer();
+    protected abstract void getCurrentServer(Callback<String> callback);
 
     protected void startUIUpdateTask() {
         stopUIUpdateTask();
@@ -148,9 +151,25 @@ public abstract class UIActivity extends AppCompatActivity {
         trafficStats.setVisibility(HydraSdk.isVpnStarted() ? View.VISIBLE : View.INVISIBLE);
         trafficLimitTextView.setVisibility(HydraSdk.isVpnStarted() ? View.VISIBLE : View.INVISIBLE);
 
-        String currentServer = getCurrentServer();
-        currentServerBtn.setText(currentServer != null ? R.string.current_server : R.string.optimal_server);
-        selectedServerTextView.setText(currentServer != null ? currentServer : "UNKNOWN");
+        getCurrentServer(new Callback<String>() {
+            @Override
+            public void success(@NonNull final String currentServer) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        currentServerBtn.setText(currentServer != null ? R.string.current_server : R.string.optimal_server);
+                        selectedServerTextView.setText(currentServer != null ? currentServer : "UNKNOWN");
+                    }
+                });
+            }
+
+            @Override
+            public void failure(@NonNull HydraException e) {
+                currentServerBtn.setText(R.string.optimal_server);
+                selectedServerTextView.setText("UNKNOWN");
+            }
+        });
+
     }
 
     protected void updateTrafficStats(long outBytes, long inBytes) {

@@ -1,8 +1,7 @@
 package com.northghost.hydraclient.activity;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
-import com.anchorfree.hydrasdk.callbacks.Callback;
-import com.anchorfree.hydrasdk.callbacks.CompletableCallback;
 import com.anchorfree.hydrasdk.HydraSdk;
 import com.anchorfree.hydrasdk.api.ApiCallback;
 import com.anchorfree.hydrasdk.api.ApiRequest;
@@ -11,6 +10,8 @@ import com.anchorfree.hydrasdk.api.data.Country;
 import com.anchorfree.hydrasdk.api.data.ServerCredentials;
 import com.anchorfree.hydrasdk.api.response.RemainingTraffic;
 import com.anchorfree.hydrasdk.api.response.User;
+import com.anchorfree.hydrasdk.callbacks.Callback;
+import com.anchorfree.hydrasdk.callbacks.CompletableCallback;
 import com.anchorfree.hydrasdk.callbacks.TrafficListener;
 import com.anchorfree.hydrasdk.callbacks.VpnStateListener;
 import com.anchorfree.hydrasdk.exceptions.ApiException;
@@ -23,8 +24,8 @@ import com.anchorfree.hydrasdk.exceptions.NetworkException;
 import com.anchorfree.hydrasdk.exceptions.RequestException;
 import com.anchorfree.hydrasdk.exceptions.SystemPermissionsErrorException;
 import com.anchorfree.hydrasdk.exceptions.VPNException;
+import com.anchorfree.hydrasdk.tracking.TrackingConstants;
 import com.anchorfree.hydrasdk.vpnservice.VPNState;
-
 import com.northghost.hydraclient.MainApplication;
 import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.dialog.RegionChooserDialog;
@@ -112,7 +113,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     protected void connectToVpn() {
         if (HydraSdk.isLoggedIn()) {
             showConnectProgress();
-            HydraSdk.startVPN(selectedCountry, HydraSdk.ReasonInfo.manual(), new Callback<ServerCredentials>() {
+            HydraSdk.startVPN(selectedCountry, TrackingConstants.GprReasons.M_UI, new Callback<ServerCredentials>() {
                 @Override
                 public void success(ServerCredentials serverCredentials) {
                     hideConnectProgress();
@@ -135,7 +136,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     @Override
     protected void disconnectFromVnp() {
         showConnectProgress();
-        HydraSdk.stopVPN(HydraSdk.ReasonInfo.manual(), new CompletableCallback() {
+        HydraSdk.stopVPN(TrackingConstants.GprReasons.M_UI, new CompletableCallback() {
             @Override
             public void complete() {
                 hideConnectProgress();
@@ -162,12 +163,22 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     }
 
     @Override
-    protected String getCurrentServer() {
-        if (HydraSdk.isVpnStarted()) {
-            return HydraSdk.getServerCredentials().getCountry();
-        } else {
-            return selectedCountry;
-        }
+    protected void getCurrentServer(final Callback<String> callback) {
+        HydraSdk.getVpnState(new Callback<VPNState>() {
+            @Override
+            public void success(@NonNull VPNState state) {
+                if (state == VPNState.CONNECTED) {
+                    callback.success(HydraSdk.getServerCredentials().getCountry());
+                } else {
+                    callback.success(selectedCountry);
+                }
+            }
+
+            @Override
+            public void failure(@NonNull HydraException e) {
+                callback.failure(e);
+            }
+        });
     }
 
     @Override
@@ -203,22 +214,32 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
         selectedCountry = item.getCountry();
         updateUI();
 
-        if (HydraSdk.isVpnStarted()) {
-            showMessage("Reconnecting to VPN with " + selectedCountry);
-            HydraSdk.stopVPN(HydraSdk.ReasonInfo.manual(), new CompletableCallback() {
-                @Override
-                public void complete() {
-                    connectToVpn();
-                }
+        HydraSdk.getVpnState(new Callback<VPNState>() {
+            @Override
+            public void success(@NonNull VPNState state) {
+                if (state == VPNState.CONNECTED) {
+                    showMessage("Reconnecting to VPN with " + selectedCountry);
+                    HydraSdk.stopVPN(TrackingConstants.GprReasons.M_UI, new CompletableCallback() {
+                        @Override
+                        public void complete() {
+                            connectToVpn();
+                        }
 
-                @Override
-                public void error(HydraException e) {
-                    // In this case we try to reconnect
-                    selectedCountry = "";
-                    connectToVpn();
+                        @Override
+                        public void error(HydraException e) {
+                            // In this case we try to reconnect
+                            selectedCountry = "";
+                            connectToVpn();
+                        }
+                    });
                 }
-            });
-        }
+            }
+
+            @Override
+            public void failure(@NonNull HydraException e) {
+
+            }
+        });
     }
 
     // Example of error handling
