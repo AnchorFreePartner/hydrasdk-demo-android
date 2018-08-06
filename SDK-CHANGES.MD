@@ -142,3 +142,104 @@
 ## 0.24.9 - 27 Mar 2018
 
 - fix crash in device id generation
+
+## 0.25.0 - 30 Mar 2018
+
+- internal analytics improvements
+- proguard fix
+- crash fixes
+
+## 0.25.1 - 9 Apr 2018
+
+- dont notify multiple times on the same state
+- removed http url for captive portal check
+- make hydra with PKI by default
+
+## 0.25.2 - 16 Apr 2018
+
+- removed Quantcast
+
+## 0.25.3 - 18 Apr 2018
+
+- removed allowBackup from lib
+- fix in analytics
+
+## 0.25.4 - 19 Apr 2018
+
+- updated api client
+- stop vpn on network loss(fix sd issue)
+- torrents traffic forwarding enabled
+- sd enabled
+
+## 0.25.6 - 10 May 2018
+
+- updated hydra
+
+## 0.25.7 - 16 May 2018
+
+- fix notify on idle state after sdk initialization
+
+## 0.25.8 - 16 May 2018
+
+- fix app_start analytics
+
+## 0.25.9 - 16 May 2018
+
+- changed vpn module to release tag
+
+## 0.27.0 - 16 May 2018
+
+- bugfix
+- traffic speed optimization
+- updated hydra
+
+## 0.27.1 - 20 May 2018
+
+- bugfix
+- speed degradation fix
+- updated hydra
+
+## 0.27.2 - 21 May 2018
+
+- fix for reporting connected country in ServerCredentials
+
+## 0.27.3 - 21 May 2018
+
+- fix for hydra cache
+
+## 0.27.4 - 22 May 2018
+
+- fix for bq reporting
+
+## 0.27.5 - 23 May 2018
+
+- fix for proguard rules
+
+## 0.27.6 - 23 May 2018
+
+- fix for credentials cache
+
+## 0.27.7 - 30 May 2018
+
+- bugfix
+
+## 0.27.8 - 13 June 2018
+
+- fix use a lot of alarm manager
+- another fix for app_start event
+- updated hydra lib
+- updated proguard
+- fix ucr crash
+- Provide app_version and sdk_version into sessions
+- fix crash in unregister online observer
+
+## 0.28.0 - 19 June 2018
+
+- encrypt stored data
+
+## 0.28.2 - 16 July 2018
+
+- hydra module updated to 4.0.38
+- x86 fixes
+- analytics improvements
+- bug fixes

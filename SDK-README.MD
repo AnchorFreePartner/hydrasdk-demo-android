@@ -45,7 +45,7 @@ And then add dependencies in build.gradle of your app module. Version name is av
 ```groovy
 dependencies {
 
-    compile 'com.github.AnchorFreePartner:hydra-sdk-android:{VERSION_NAME}'
+    compile 'com.github.AnchorFreePartner.hydra-sdk-android:sdk:{VERSION_NAME}'
 
 }
 ```
@@ -56,29 +56,27 @@ In case of **startVpn** called on unsupported ABI you'll get **AbiNotSupportedEx
 
 # Proguard Rules
 
+```
+    #HYDRASDK
     -dontwarn okio.**
-
     -keep class com.anchorfree.hydrasdk.api.data.** { *; }
-
     -keep class com.anchorfree.hydrasdk.api.response.** { *; }
-
     -keep class com.anchorfree.hdr.** { *; }
-
     -keepclassmembers class com.anchorfree.vpnsdk.transporthydra.HydraTransport {
          public *** protect(...);
     }
-
     -dontwarn com.anchorfree.vpnsdk.transporthydra.proxyservice.*
-
-    -keep class com.northghost.ucr.** { *; }
-
-    -keep class com.squareup.okhttp.** { *; }
-
-    -keep interface com.squareup.okhttp.** { *; }
-
-    -dontwarn com.squareup.okhttp.**
-
     -keepattributes InnerClasses
+    -dontwarn sun.misc.**
+    -dontwarn okhttp3.**
+    -dontwarn okio.**
+    -dontwarn javax.annotation.**
+    -dontwarn org.conscrypt.**
+    -keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
+    #DNSJava
+    -dontnote org.xbill.DNS.spi.DNSJavaNameServiceDescriptor
+    -dontwarn org.xbill.DNS.spi.DNSJavaNameServiceDescriptor
+```
 
 # Set VPN process name
 
