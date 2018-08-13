@@ -244,8 +244,12 @@
 - analytics improvements
 - bug fixes
 
-## 0.28.3
+## 0.28.3 - 13 Aug 2018
 
 - crashes in data encryption
 - crashes in analytics
 - fix infinite loop on api calls without internet connection
+- speed up reconnection process
+- E:182 on some servers on connect
+- Issue on vpn restart
+- fix connection restore after connecting to network without internet
