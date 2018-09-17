@@ -175,13 +175,13 @@ For more AuthMethod types, see API reference.
 Login implementation example:
 ```java
 AuthMethod authMethod = AuthMethod.firebase(token);
-HydraSdk.login(authMethod, new ApiCallback<User>() {
+HydraSdk.login(authMethod, new Callback<User>() {
    @Override
-   public void success(ApiRequest request, User response) {
+   public void success(User response) {
        showMessage("Logged in successfully");
    }
    @Override
-   public void failure(ApiException error) {
+   public void failure(HydraException error) {
        showMessage("Fail to login");
    }
 });
@@ -190,16 +190,16 @@ HydraSdk.login(authMethod, new ApiCallback<User>() {
 # List available countries
 
 ```java
-HydraSdk.countries(new ApiCallback<List<Country>>() {
+HydraSdk.countries(new Callback<List<Country>>() {
                 @Override
-                public void success(ApiRequest request, List<Country> response) {
+                public void success(List<Country> response) {
                     for (Country country:response){
                         //country.getCountry()
                     }
                 }
 
                 @Override
-                public void failure(ApiException error) {
+                public void failure(HydraException error) {
                     //request failed
                 }
             });
@@ -284,25 +284,25 @@ HydraSdk.removeVpnListener(...);
 # Purchases functionality
 
 ```java
-HydraSdk.purchase("json from google", new ApiCompletableCallback() {
+HydraSdk.purchase("json from google", new CompletableCallback() {
    @Override
    public void complete() {
        //purchase request success
    }
 
    @Override
-   public void error(ApiException e) {
+   public void error(HydraException e) {
         //failed to process purchase
    }
 });
-HydraSdk.deletePurchase(purchaseID, new ApiCompletableCallback() {
+HydraSdk.deletePurchase(purchaseID, new CompletableCallback() {
    @Override
    public void complete() {
        //request success
    }
 
    @Override
-   public void error(ApiException e) {
+   public void error(HydraException e) {
         //failed to process request
    }
 });
@@ -311,26 +311,26 @@ HydraSdk.deletePurchase(purchaseID, new ApiCompletableCallback() {
 # Get data about user
 ```java
 //get information about remaining traffic for user
-HydraSdk.remainingTraffic(new ApiCallback<RemainingTraffic>() {
+HydraSdk.remainingTraffic(new Callback<RemainingTraffic>() {
    @Override
    public void success(ApiRequest request, RemainingTraffic response) {
        //handle response
    }
 
    @Override
-   public void failure(ApiException error) {
+   public void failure(HydraException error) {
         //failed to send request
    }
 });
 //get information about current logged in user
-HydraSdk.currentUser(new ApiCallback<User>() {
+HydraSdk.currentUser(new Callback<User>() {
    @Override
    public void success(ApiRequest request, User response) {
        //handle response
    }
 
    @Override
-   public void failure(ApiException error) {
+   public void failure(HydraException error) {
         //failed to send request
    }
 });
@@ -389,63 +389,60 @@ HydraSdk.collectDebugInfo(context, new Callback<String>() {
 });
 ```
 
-## Handle of ApiException
-```java
-private void handleAPIexception(ApiException e) {
-    if (e instanceof HttpException) {
+## Exceptions
 
-    } else if (e instanceof RequestException) {
+All exceptions sdk can throw extends **com.anchorfree.hydrasdk.exceptions.HydraException**
 
-    } else if (e instanceof NetworkException) {
+There are couple of main derivatives of this exception
 
-    } else {
-        //Unexpected exception source. Handle cause
-    }
-}
-```
+- **ApiHydraException**
 
-## Handle of HydraException
+  Thrown in case of server api errors.
 
-```java
-private void handleStartVpnError(HydraException e) {
-           if (e instanceof NetworkException) {
-            showMessage("Check internet connection");
-        } else if (e instanceof VPNException) {
-            switch (((VPNException) e).getCode()) {
-                case VPNException.CRASH_FORCE:
-                    showMessage("Hydra called forceStop");
-                    break;
-                case VPNException.CRASH_TIMEOUT:
-                    showMessage("Hydra connect timeout");
-                    break;
-                default:
-                    showMessage("Error in VPN Service");
-                    break;
-            }
-        } else if (e instanceof HttpException) {
-            showMessage("Wrong web api request while start vpn");
-        } else if (e instanceof InternalException) {
-            if (e.getCause() instanceof SystemPermissionsErrorException) {
-                showMessage("VPN Permission error. Reboot device");
-            } else if (e.getCause() instanceof CaptivePortalErrorException) {
-                showMessage("Captive portal detected");
-            } else if (e.getCause() instanceof NetworkException) {
-                showMessage("Network exception");
-            } else {
-                showMessage("Unexpected error");
-            }
-        } else if (e instanceof ApiHydraException) {
-            switch (((ApiHydraException) e).getCode()) {
-                case HttpURLConnection.HTTP_UNAUTHORIZED:
-                    showMessage("User unauthorized");
-                    break;
-                case HttpURLConnection.HTTP_INTERNAL_ERROR:
-                    showMessage("Server unavailable");
-                    break;
-            }
-        }
-}
-```
+  **getCode** - HTTP error code
 
-Note: In case your device is running Android 5.0 or 5.0.1 you must restart it after receiving SystemPermissionsErrorException.
+  **getContent** - response content
+
+  Possible values for getContent:
+  - ApiException.CODE_NOT_AUTHORIZED("NOT_AUTHORIZED") - user is not authorized. Need to call HydraSdk.login
+  - ApiException.CODE_SESSIONS_EXCEED("SESSIONS_EXCEED") - Session limit is achieved in accordance with the ToS
+  - ApiException.CODE_DEVICES_EXCEED("DEVICES_EXCEED") - Devices limit is achieved in accordance with the ToS
+  - ApiException.CODE_OAUTH_ERROR("OAUTH_ERROR") - Returns in all cases when an authentication error occurred through OAuth-server
+  - ApiException.CODE_TRAFFIC_EXCEED("TRAFFIC_EXCEED") - Ended limitation traffic activated in accordance with the terms of the license
+  - ApiException.CODE_SERVER_UNAVAILABLE("SERVER_UNAVAILABLE") - Server temporary unavailable or server not found
+  - ApiException.CODE_INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR") - Internal server error
+  - ApiException.USER_SUSPENDED("USER_SUSPENDED") - User Suspended
+  - ApiException.CODE_PARSE_EXCEPTION("PARSE_EXCEPTION") - Failed to parse server response
+
+- **NetworkRelatedException**
+
+  Thrown in case of network problem communicating to server
+
+- **VPNException**
+
+  Thrown when error happen in vpn
+
+  **getCode** - code of error
+
+  Possible values for getCode
+  - VPNException.VPN_FD_NULL_NO_PERMISSIONS(-4) - Android fatal error. VpnService.Builder.establish returns null. Not possible to continue
+  - VPNException.REVOKED(-5) - Use revoked vpn permission
+  - VPNException.VPN_PERMISSION_DENIED_BY_USER(-7) - Use not granted vpn permission in dialog
+  - VPNException.CANCELLED(-10) - Start was cancelled
+  - VPNException.HYDRA_ERROR_START_TIMEOUT(-11) - Timeout of start
+  - VPNException.HYDRA_ERROR_BROKEN(181) - VPN connection broken
+  - VPNException.HYDRA_ERROR_CONNECT(182) - Hydra fails to connect to server
+  - VPNException.HYDRA_DCN_BLOCKED_BW(191) - Hydra server reported traffic exceed. Connection interrupted
+  - VPNException.HYDRA_DCN_BLOCKED_AUTH(196) - Hydra server reported auth failed
+
+- **WrongStateException**
+
+  Thrown when calling startVpn or stopVpn in wrong sdk state
+
+- **InternalException**
+
+    Thrown for any other unexpected cases. In **getCause** you can get original source exception
+
+
+Note: In case your device is running Android 5.0 or 5.0.1 you must restart it after receiving VPN_FD_NULL_NO_PERMISSIONS.
 Reference: https://issuetracker.google.com/issues/37011385
