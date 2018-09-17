@@ -15,10 +15,9 @@ import android.widget.ProgressBar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.anchorfree.hydrasdk.HydraSdk;
-import com.anchorfree.hydrasdk.api.ApiCallback;
-import com.anchorfree.hydrasdk.api.ApiRequest;
 import com.anchorfree.hydrasdk.api.data.Country;
-import com.anchorfree.hydrasdk.exceptions.ApiException;
+import com.anchorfree.hydrasdk.callbacks.Callback;
+import com.anchorfree.hydrasdk.exceptions.HydraException;
 import com.northghost.hydraclient.R;
 import com.northghost.hydraclient.adapter.RegionListAdapter;
 import java.util.List;
@@ -73,15 +72,15 @@ public class RegionChooserDialog extends DialogFragment implements RegionListAda
 
     private void loadServers() {
         showProgress();
-        HydraSdk.countries(new ApiCallback<List<Country>>() {
+        HydraSdk.countries(new Callback<List<Country>>() {
             @Override
-            public void success(ApiRequest apiRequest, List<Country> countries) {
+            public void success(List<Country> countries) {
                 hideProress();
                 regionAdapter.setRegions(countries);
             }
 
             @Override
-            public void failure(ApiException e) {
+            public void failure(HydraException e) {
                 hideProress();
                 dismiss();
             }

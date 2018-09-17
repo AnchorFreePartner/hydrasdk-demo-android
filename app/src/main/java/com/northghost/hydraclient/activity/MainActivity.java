@@ -3,8 +3,6 @@ package com.northghost.hydraclient.activity;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import com.anchorfree.hydrasdk.HydraSdk;
-import com.anchorfree.hydrasdk.api.ApiCallback;
-import com.anchorfree.hydrasdk.api.ApiRequest;
 import com.anchorfree.hydrasdk.api.AuthMethod;
 import com.anchorfree.hydrasdk.api.data.Country;
 import com.anchorfree.hydrasdk.api.data.ServerCredentials;
@@ -14,22 +12,17 @@ import com.anchorfree.hydrasdk.callbacks.Callback;
 import com.anchorfree.hydrasdk.callbacks.CompletableCallback;
 import com.anchorfree.hydrasdk.callbacks.TrafficListener;
 import com.anchorfree.hydrasdk.callbacks.VpnStateListener;
-import com.anchorfree.hydrasdk.exceptions.ApiException;
 import com.anchorfree.hydrasdk.exceptions.ApiHydraException;
 import com.anchorfree.hydrasdk.exceptions.CaptivePortalErrorException;
-import com.anchorfree.hydrasdk.exceptions.HttpException;
 import com.anchorfree.hydrasdk.exceptions.HydraException;
-import com.anchorfree.hydrasdk.exceptions.InternalException;
-import com.anchorfree.hydrasdk.exceptions.NetworkException;
+import com.anchorfree.hydrasdk.exceptions.NetworkRelatedException;
 import com.anchorfree.hydrasdk.exceptions.RequestException;
-import com.anchorfree.hydrasdk.exceptions.SystemPermissionsErrorException;
 import com.anchorfree.hydrasdk.exceptions.VPNException;
-import com.anchorfree.hydrasdk.tracking.TrackingConstants;
 import com.anchorfree.hydrasdk.vpnservice.VPNState;
+import com.anchorfree.reporting.TrackingConstants;
 import com.northghost.hydraclient.MainApplication;
 import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.dialog.RegionChooserDialog;
-import java.net.HttpURLConnection;
 
 public class MainActivity extends UIActivity implements TrafficListener, VpnStateListener,
         LoginDialog.LoginConfirmationInterface, RegionChooserDialog.RegionChooserInterface {
@@ -76,15 +69,15 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     protected void loginToVpn() {
         showLoginProgress();
         AuthMethod authMethod = AuthMethod.anonymous();
-        HydraSdk.login(authMethod, new ApiCallback<User>() {
+        HydraSdk.login(authMethod, new Callback<User>() {
             @Override
-            public void success(ApiRequest apiRequest, User user) {
+            public void success(User user) {
                 hideLoginProgress();
                 updateUI();
             }
 
             @Override
-            public void failure(ApiException e) {
+            public void failure(HydraException e) {
                 hideLoginProgress();
                 updateUI();
 
@@ -183,14 +176,14 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
 
     @Override
     protected void checkRemainingTraffic() {
-        HydraSdk.remainingTraffic(new ApiCallback<RemainingTraffic>() {
+        HydraSdk.remainingTraffic(new Callback<RemainingTraffic>() {
             @Override
-            public void success(ApiRequest apiRequest, RemainingTraffic remainingTraffic) {
+            public void success(RemainingTraffic remainingTraffic) {
                 updateRemainingTraffic(remainingTraffic);
             }
 
             @Override
-            public void failure(ApiException e) {
+            public void failure(HydraException e) {
                 updateUI();
 
                 handleError(e);
@@ -245,51 +238,42 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     // Example of error handling
     public void handleError(Throwable e) {
         Log.w(TAG, e);
-        if (e instanceof NetworkException) {
+        if (e instanceof NetworkRelatedException) {
             showMessage("Check internet connection");
         } else if (e instanceof VPNException) {
             switch (((VPNException) e).getCode()) {
-                case VPNException.CRASH_FORCE:
-                    showMessage("Hydra called forceStop");
+                case VPNException.REVOKED:
+                    showMessage("User revoked vpn permissions");
                     break;
-                case VPNException.CRASH_TIMEOUT:
-                    showMessage("Hydra connect timeout");
+                case VPNException.VPN_PERMISSION_DENIED_BY_USER:
+                    showMessage("User canceled to grant vpn permissions");
                     break;
-                case VPNException.TRAFFIC_EXCEED:
+                case VPNException.HYDRA_ERROR_BROKEN:
+                    showMessage("Connection with vpn service was lost");
+                    break;
+                case VPNException.HYDRA_DCN_BLOCKED_BW:
                     showMessage("Client traffic exceeded");
                     break;
                 default:
                     showMessage("Error in VPN Service");
                     break;
             }
-        } else if (e instanceof HttpException) {
-            showMessage("Network error: " + e.toString());
-        } else if (e instanceof InternalException) {
-            if (e.getCause() instanceof SystemPermissionsErrorException) {
-                // Attention! In case of receiving this Exception all Android 5.0 and 5.0.1 must be
-                // rebooted due to open bug in VpnService: https://issuetracker.google.com/issues/37011385
-                showMessage("VPN Permission error. Reboot device");
-            } else if (e.getCause() instanceof CaptivePortalErrorException) {
+        } else if (e instanceof ApiHydraException) {
+            if (e.getCause() instanceof CaptivePortalErrorException) {
                 showMessage("Captive portal detected");
-            } else if (e.getCause() instanceof NetworkException) {
-                showMessage("Network exception");
-            } else if (e.getCause() instanceof RequestException) {
-                RequestException requestException = (RequestException) e.getCause();
-                if (RequestException.CODE_TRAFFIC_EXCEED.equals(requestException.getResult())) {
-                    showMessage("Traffic exceed");
-                } else {
-                    showMessage("Request error " + requestException.getResult());
-                }
             } else {
                 showMessage("Unexpected error");
             }
         } else if (e instanceof ApiHydraException) {
-            switch (((ApiHydraException) e).getCode()) {
-                case HttpURLConnection.HTTP_UNAUTHORIZED:
+            switch (((ApiHydraException) e).getContent()) {
+                case RequestException.CODE_NOT_AUTHORIZED:
                     showMessage("User unauthorized");
                     break;
-                case HttpURLConnection.HTTP_INTERNAL_ERROR:
+                case RequestException.CODE_TRAFFIC_EXCEED:
                     showMessage("Server unavailable");
+                    break;
+                default:
+                    showMessage("Other error. Check RequestException constants");
                     break;
             }
         }
