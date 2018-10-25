@@ -4,6 +4,10 @@
 
 Android SDK is a part of Anchorfree Partner SDK which contains of client-side libraries and server-side applications needed to implement custom VPN infrastructure.
 
+## Versioning convention
+Android SDK versioning is in format MAJOR.MINOR.PATCH and should be associated with version in Jira.
+[See convensioning rules](https://semver.org/)
+
 ## Changelog
 
 - [HydraSDK for Android changelog](https://raw.githubusercontent.com/AnchorFreePartner/hydrasdk-demo-android/master/SDK-CHANGES.MD)
@@ -61,13 +65,16 @@ Proguard rules are included in sdk, but you can use these if required:
     -dontwarn okio.**
     -keep class com.anchorfree.hydrasdk.api.data.** { *; }
     -keep class com.anchorfree.hydrasdk.api.response.** { *; }
-    -keep class com.anchorfree.hdr.** { *; }
+    -keep class com.anchorfree.hdr.HydraHeaderListener { *; }
+    -keep class com.anchorfree.hdr.HydraConnInfo { *; }
+    -keep class com.anchorfree.hdr.AFHydra { *; }
     -keepclassmembers class com.anchorfree.vpnsdk.transporthydra.HydraTransport {
          public *** protect(...);
     }
     -dontwarn com.anchorfree.vpnsdk.transporthydra.proxyservice.*
     -keepattributes InnerClasses
     -dontwarn sun.misc.**
+    -dontwarn java.lang.invoke.**
     -dontwarn okhttp3.**
     -dontwarn okio.**
     -dontwarn javax.annotation.**
@@ -76,6 +83,16 @@ Proguard rules are included in sdk, but you can use these if required:
     #DNSJava
     -dontnote org.xbill.DNS.spi.DNSJavaNameServiceDescriptor
     -dontwarn org.xbill.DNS.spi.DNSJavaNameServiceDescriptor
+    -keep class com.northghost.ucr.UCRTracker$User { *; }
+    -keep class * implements com.google.gson.TypeAdapterFactory
+    -keep class * implements com.google.gson.JsonSerializer
+    -keep class * implements com.google.gson.JsonDeserializer
+    -keep class com.anchorfree.hydrasdk.SessionConfig { *; }
+    -keep class com.anchorfree.hydrasdk.fireshield.** { *; }
+    -keep class com.anchorfree.hydrasdk.dns.** { *; }
+    -keep class com.anchorfree.hydrasdk.HydraSDKConfig { *; }
+    -keep class com.anchorfree.hydrasdk.api.ClientInfo { *; }
+    -keep class com.anchorfree.hydrasdk.vpnservice.connectivity.NotificationConfig { *; }
 ```
 
 # Set VPN process name
@@ -103,8 +120,59 @@ compileOptions {
 ```
 
 If you cannot enable java 8 support in your project please contact us for further details
-# Set Up
 
+## Configure notifications
+
+To configure sdk notification use **NotificationConfig.Builder** class
+
+- completely disable sdk notifications
+
+```java
+NotificationConfig.Builder builder = NotificationConfig.newBuilder();
+builder = builder.disabled()
+```
+
+- Configure notifications for different states
+```java
+builder.inConnected("Title","Message");//Notification to be displayed when vpn is connected
+builder.inIdle("Title","Message");//Notification to be displayed when vpn is not connected
+builder.inConnecting("Title","Message");//Notification to be displayed when vpn is connecting
+builder.inPause("Title","Message");//Notification to be displayed when vpn is paused(waiting for network connection)
+```
+
+- Notification message with fallback
+
+
+By default sdk displays notification for state connected and inPause.
+- fallback for title
+
+If **inConnected** was not called it tries to use value set with **title** message
+
+If **title** was not called on Builder, it will use App name as in launcher
+
+- fallback for message
+
+If **inConnected** was not called it will try to use string resource **state_connected**
+
+If **inPause** was not called it will try to use string resource **state_nonetwork**
+
+### Update notification preferences
+
+Notification config can be updated calling sdk method
+
+```java
+HydraSdk.update(createNotificationConfig());
+```
+
+### Notification click intent
+
+To configure action when user click's on notification use **clickAction** method. You must have Activity responds to specified action.
+Action will be used to create Intent.
+If **clickAction** not specified, sdk will open application launch activity on notification click.
+
+In intent extras sdk will set boolean value **HydraSdk.EXTRA_FROM_NOTIFICATION** as **true**
+
+# Set Up
 To set up sdk you should call init() method with your specific details for all process(each process has unique Application instance)
 
 ```java
@@ -125,10 +193,6 @@ public class MyApplication extends Application {
                      .build(),
                      HydraSDKConfig.newBuilder()
                              .observeNetworkChanges(false) // turn on/off handling network changes by sdk
-                             .addBypassDomain("*www.domaintobypass.com") // add domain to bypass vpn
-                             .addBypassDomains(R.raw.bypass_domains) // add domains to bypass vpn, accepts raw resource, newline separated list
-                             .addBlacklistDomain("*facebook.com")//block domain access
-                             .addBlacklistDomains(R.raw.blocklist)//block domains access, accepts raw resource, newline separated list
                              .unsafeClient(false)// set true if want to use unsafe client instead
                              .captivePortal(true)//control if sdk should check if device is behind captive portal
                              .build());
@@ -152,7 +216,7 @@ if (!ProcessUtils.isVpnProcess(this)){
 
 # Authentication
 
-Anchorfree Partner VPN Backend supports OAuth authentication with a partner's OAuth server, this is a primary authentication method. 
+Anchorfree Partner VPN Backend supports OAuth authentication with a partner's OAuth server, this is a primary authentication method.
 
 Steps to implement OAuth:
 
@@ -208,7 +272,10 @@ HydraSdk.countries(new Callback<List<Country>>() {
 # Start VPN with optimal server
 
 ```java
-HydraSdk.startVPN(HydraSdk.COUNTRY_OPTIMAL, TrackingConstants.GprReasons.M_UI, new Callback<ServerCredentials>() {
+HydraSdk.startVPN(new SessionConfig.Builder()
+                .withVirtualLocation(HydraSdk.COUNTRY_OPTIMAL)
+                .withReason(TrackingConstants.GprReasons.M_UI)
+                .build(), new Callback<ServerCredentials>() {
                 @Override
                 public void success(@NonNull ServerCredentials serverCredentials) {
                     //VPN connected
@@ -221,9 +288,9 @@ HydraSdk.startVPN(HydraSdk.COUNTRY_OPTIMAL, TrackingConstants.GprReasons.M_UI, n
             });
 ```
 
-Instead of **HydraSdk.COUNTRY_OPTIMAL** its possible to use country value from **HydraSdk.countries**
+For **withVirtualLocation** its possible to use **HydraSdk.COUNTRY_OPTIMAL** to detect optimal location automatically or use country value from **HydraSdk.countries**
 
-For **reason** param refer to **TrackingConstants.GprReasons**
+For **withReason** param refer to **TrackingConstants.GprReasons**
 
 Possible values:
 
@@ -236,6 +303,50 @@ Possible values:
 - A_SLEEP - auto after sleep
 - A_NETWORK - auto on network event
 - A_OTHER - auto on other reason
+
+# Start VPN for specified apps
+
+```java
+final List<String> allowedApps = new LinkedList<String();
+allowedApps.add("com.google.chrome");
+HydraSdk.startVPN(new SessionConfig.Builder()
+                .withVirtualLocation(HydraSdk.COUNTRY_OPTIMAL)
+                .withReason(TrackingConstants.GprReasons.M_UI)
+                .forApps(allowedApps)
+                .build(), new Callback<ServerCredentials>() {
+                @Override
+                public void success(@NonNull ServerCredentials serverCredentials) {
+                    //VPN connected
+                }
+
+                @Override
+                public void failure(@NonNull HydraException e) {
+                    //Failed to connect vpn
+                }
+            });
+```
+
+# Start VPN and deny specified apps access to it
+
+```java
+final List<String> exteptApps = new LinkedList<String();
+exteptApps.add("com.google.chrome");
+HydraSdk.startVPN(new SessionConfig.Builder()
+                .withVirtualLocation(HydraSdk.COUNTRY_OPTIMAL)
+                .withReason(TrackingConstants.GprReasons.M_UI)
+                .exceptApps(exteptApps)
+                .build(), new Callback<ServerCredentials>() {
+                @Override
+                public void success(@NonNull ServerCredentials serverCredentials) {
+                    //VPN connected
+                }
+
+                @Override
+                public void failure(@NonNull HydraException e) {
+                    //Failed to connect vpn
+                }
+            });
+```
 
 # Stop vpn
 
@@ -389,6 +500,70 @@ HydraSdk.collectDebugInfo(context, new Callback<String>() {
 });
 ```
 
+## Categorization service (aka Fireshield)
+
+Hydra SDK provides ability to categorize domains goes through VPN and perform specified action on them.
+To configure you need to create instance of **FireshieldConfig** and pass it to **SessionConfig.Builder** when starting vpn session
+
+```java
+HydraSdk.startVPN(new SessionConfig.Builder()
+                .withVirtualLocation(HydraSdk.COUNTRY_OPTIMAL)
+                .withReason(TrackingConstants.GprReasons.M_UI)
+                .withFireshieldConfig(createFireshieldConfig())
+                .build(), new Callback<ServerCredentials>() {
+                @Override
+                public void success(@NonNull ServerCredentials serverCredentials) {
+                    //VPN connected
+                }
+
+                @Override
+                public void failure(@NonNull HydraException e) {
+                    //Failed to connect vpn
+                }
+            });
+```
+
+# Create fireshield config
+
+Categorization configuration based on specification of categories and rules for categories
+
+To create categories you can use one of factory methods
+
+- **FireshieldCategory.Builder.vpn** - will create category, with action VPN ( traffic (encrypted) goes through the tunnel as IP packets )
+- **FireshieldCategory.Builder.proxy** - will create category, with action proxy(traffic (encrypted) goes through the tunnel just as payload (for TCP only))
+- **FireshieldCategory.Builder.bypass** - will create category, with action bypass(traffic goes directly to its destination, without vpn tunnel)
+- **FireshieldCategory.Builder.block** - will create category, with action block(traffic gets blocked)
+- **FireshieldCategory.Builder.blockAlertPage** - will create category, with action block(traffic gets blocked) and redirection to Alert Page specified(works for http only)
+
+To create category rules(which domains gets to specified category) you can use one of factory methods
+
+- **FireshieldCategoryRule.Builder.fromAssets** - create category rules from file stored in **assets** folder
+- **FireshieldCategoryRule.Builder.fromDomains** - create category rules from list of domains
+- **FireshieldCategoryRule.Builder.fromFile** - create category rules from file on sdcard/internal storage
+
+To addition to category file configuration its possible to use online categorization services
+
+Possible values defined as constants in **FireshieldConfig.Services**
+
+Alert page configuration
+
+**AlertPage** static method create accepts two parameters: domain and path, on categorization action user will be redirected to [https://domain/page?url=<blocked_url>]
+
+```java
+
+FireshieldConfig createFireshieldConfig(){
+        FireshieldConfig.Builder builder = new FireshieldConfig.Builder();
+        builder.enabled(true);
+        builder.alertPage(AlertPage.create("connect.bitdefender.net", "safe_zone.html"))
+        builder.addService(FireshieldConfig.Services.IP);
+        builder.addService(FireshieldConfig.Services.SOPHOS);
+        builder.addCategory(FireshieldCategory.Builder.vpn(FireshieldConfig.Categories.SAFE));//need to add safe category to allow safe traffic
+        builder.addCategory(FireshieldCategory.Builder.block(FireshieldConfig.Categories.MALWARE));
+        builder.addCategoryRule(FireshieldCategoryRule.Builder.fromAssets(FireshieldConfig.Categories.MALWARE,"malware-domains.txt"));
+        return builder.build();
+}
+
+```
 ## Exceptions
 
 All exceptions sdk can throw extends **com.anchorfree.hydrasdk.exceptions.HydraException**
@@ -446,3 +621,63 @@ There are couple of main derivatives of this exception
 
 Note: In case your device is running Android 5.0 or 5.0.1 you must restart it after receiving VPN_FD_NULL_NO_PERMISSIONS.
 Reference: https://issuetracker.google.com/issues/37011385
+
+
+## API changes history
+
+### 0.28.3
+
+- Deprecated
+    - TrafficStats getTrafficStats()
+    - VPNState getVpnState()
+    - void current(@NonNull final Callback<User> callback)
+    - void startVPNForApps(@NonNull final List<String> allowedApps, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
+    - void startVPNExceptApps(@NonNull final List<String> disallowedApps, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
+    - boolean isLoggingEnabled()
+    - void setLoggingEnabled()
+    - boolean isVpnStarted()
+    - VPNState getVpnState()
+
+### 0.28.4
+
+- Changed
+    - HydraSDKConfig.Builder to HydraSDKConfigBuilder
+    - ApiCallback to Callback in all public HydraSdk calls
+    - ApiCompletableCallback to CompletableCallback in all public HydraSdk calls
+    - VPNException with VPNException.WRONG_STATE code to WrongStateException
+    - NotAuthorizedException to ApiHydraException with HttpsURLConnection.HTTP_UNAUTHORIZED code
+    - NetworkException to NetworkRelatedException
+    - SystemPermissionsErrorException to VPNException with VPNException.VPN_FD_NULL_NO_PERMISSIONS
+
+- Removed
+    - HttpException
+    - SystemPermissionsErrorException
+
+### 0.28.5
+
+- Added
+
+    - method **channelId** to **NotificationConfig** for notifications support on Android O+
+
+### 0.28.7-alpha2
+
+- Changed
+
+    - ServerCredentials now have multiple servers we are trying to connect
+
+### 1.0.0
+
+- Added
+    - class SessionConfig to configure starting vpn session
+    - To update vpn config without restarting vpn(limited options update) void updateConfig(@NonNull final SessionConfig sessionConfig, @NonNull final CompletableCallback callback)
+    - void startVPN(@NonNull final SessionConfig sessionConfig, @NonNull final Callback<ServerCredentials> callback)
+
+- Deprecated
+    - void startVPN(@TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
+    - void startVPN(@NonNull final String countryCode, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
+    - void startVPNForApps(@NonNull final String countryCode, @NonNull final List<String> allowedApps, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
+    - void startVPNExceptApps(@NonNull final String countryCode, @NonNull final List<String> disallowedApps, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
+    - addBlacklistDomain
+    - addBlacklistDomains
+    - addBypassDomains
+

@@ -34,8 +34,6 @@ public class MainApplication extends Application {
 
         HydraSDKConfig config = HydraSDKConfig.newBuilder()
                 //traffic to these domains will not go through VPN
-                .addBypassDomain("*facebook.com")
-                .addBypassDomain("*wtfismyip.com")
                 .observeNetworkChanges(true) //sdk will handle network changes and start/stop vpn
                 .captivePortal(true) //sdk will handle if user is behind captive portal wifi
                 .build();

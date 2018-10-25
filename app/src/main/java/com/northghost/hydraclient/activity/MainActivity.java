@@ -3,6 +3,7 @@ package com.northghost.hydraclient.activity;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import com.anchorfree.hydrasdk.HydraSdk;
+import com.anchorfree.hydrasdk.SessionConfig;
 import com.anchorfree.hydrasdk.api.AuthMethod;
 import com.anchorfree.hydrasdk.api.data.Country;
 import com.anchorfree.hydrasdk.api.data.ServerCredentials;
@@ -12,6 +13,7 @@ import com.anchorfree.hydrasdk.callbacks.Callback;
 import com.anchorfree.hydrasdk.callbacks.CompletableCallback;
 import com.anchorfree.hydrasdk.callbacks.TrafficListener;
 import com.anchorfree.hydrasdk.callbacks.VpnStateListener;
+import com.anchorfree.hydrasdk.dns.DnsRule;
 import com.anchorfree.hydrasdk.exceptions.ApiHydraException;
 import com.anchorfree.hydrasdk.exceptions.CaptivePortalErrorException;
 import com.anchorfree.hydrasdk.exceptions.HydraException;
@@ -23,6 +25,8 @@ import com.anchorfree.reporting.TrackingConstants;
 import com.northghost.hydraclient.MainApplication;
 import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.dialog.RegionChooserDialog;
+import java.util.LinkedList;
+import java.util.List;
 
 public class MainActivity extends UIActivity implements TrafficListener, VpnStateListener,
         LoginDialog.LoginConfirmationInterface, RegionChooserDialog.RegionChooserInterface {
@@ -106,7 +110,14 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     protected void connectToVpn() {
         if (HydraSdk.isLoggedIn()) {
             showConnectProgress();
-            HydraSdk.startVPN(selectedCountry, TrackingConstants.GprReasons.M_UI, new Callback<ServerCredentials>() {
+            List<String> bypassDomains = new LinkedList<>();
+            bypassDomains.add("*facebook.com");
+            bypassDomains.add("*wtfismyip.com");
+            HydraSdk.startVPN(new SessionConfig.Builder()
+                    .withReason(TrackingConstants.GprReasons.M_UI)
+                    .withVirtualLocation(selectedCountry)
+                    .addDnsRule(DnsRule.Builder.bypass().fromDomains(bypassDomains))
+                    .build(), new Callback<ServerCredentials>() {
                 @Override
                 public void success(ServerCredentials serverCredentials) {
                     hideConnectProgress();

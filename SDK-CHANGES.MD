@@ -244,12 +244,79 @@
 - analytics improvements
 - bug fixes
 
-## 0.28.3 - 13 Aug 2018
+## 0.28.3 - 13 August 2018
 
 - crashes in data encryption
 - crashes in analytics
 - fix infinite loop on api calls without internet connection
-- speed up reconnection process
-- E:182 on some servers on connect
-- Issue on vpn restart
-- fix connection restore after connecting to network without internet
+
+## 0.28.4
+
+- move TrackingConstants to com.anchorfree.reporting package
+- changed exceptions on api calls
+- refactored exceptions reporting
+- fix reconnection issue
+- country/language in login request
+
+## 1.0.0
+
+- Refactored API interface
+- Added categorization service. aka Fireshield
+
+## API changes history
+
+### 0.28.3
+
+- Deprecated
+    - TrafficStats getTrafficStats()
+    - VPNState getVpnState()
+    - void current(@NonNull final Callback<User> callback)
+    - void startVPNForApps(@NonNull final List<String> allowedApps, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
+    - void startVPNExceptApps(@NonNull final List<String> disallowedApps, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
+    - boolean isLoggingEnabled()
+    - void setLoggingEnabled()
+    - boolean isVpnStarted()
+    - VPNState getVpnState()
+
+### 0.28.4
+
+- Changed
+    - HydraSDKConfig.Builder to HydraSDKConfigBuilder
+    - ApiCallback to Callback in all public HydraSdk calls
+    - ApiCompletableCallback to CompletableCallback in all public HydraSdk calls
+    - VPNException with VPNException.WRONG_STATE code to WrongStateException
+    - NotAuthorizedException to ApiHydraException with HttpsURLConnection.HTTP_UNAUTHORIZED code
+    - NetworkException to NetworkRelatedException
+    - SystemPermissionsErrorException to VPNException with VPNException.VPN_FD_NULL_NO_PERMISSIONS
+
+- Removed
+    - HttpException
+    - SystemPermissionsErrorException
+
+### 0.28.5
+
+- Added
+
+    - method **channelId** to **NotificationConfig** for notifications support on Android O+
+
+### 0.28.7-alpha2
+
+- Changed
+
+    - ServerCredentials now have multiple servers we are trying to connect
+
+### 1.0.0
+
+- Added
+    - class SessionConfig to configure starting vpn session
+    - To update vpn config without restarting vpn(limited options update) void updateConfig(@NonNull final SessionConfig sessionConfig, @NonNull final CompletableCallback callback)
+    - void startVPN(@NonNull final SessionConfig sessionConfig, @NonNull final Callback<ServerCredentials> callback)
+
+- Deprecated
+    - void startVPN(@TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
+    - void startVPN(@NonNull final String countryCode, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
+    - void startVPNForApps(@NonNull final String countryCode, @NonNull final List<String> allowedApps, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
+    - void startVPNExceptApps(@NonNull final String countryCode, @NonNull final List<String> disallowedApps, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
+    - addBlacklistDomain
+    - addBlacklistDomains
+    - addBypassDomains

@@ -2,7 +2,7 @@
     <string name="app_name">Hydra SDK Demo</string>
 
     <string name="vpn_process_name" translatable="false">:my.custom.vpn.process.name</string>
-    <string name="vpn_provider_authorities">com.anchorfree.hydrasdk.app</string>
+    <string name="vpn_provider_authorities" translatable="false">com.anchorfree.hydrasdk.app.demo</string>
 
     <string name="log_in">LOGIN</string>
     <string name="log_out">LOGOUT</string>
