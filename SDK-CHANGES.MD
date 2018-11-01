@@ -320,3 +320,7 @@
     - addBlacklistDomain
     - addBlacklistDomains
     - addBypassDomains
+
+### 1.0.1
+
+- No changes
