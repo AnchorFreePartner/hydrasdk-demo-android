@@ -688,3 +688,7 @@ Reference: https://issuetracker.google.com/issues/37011385
 ### 1.0.2
 
 - No changes
+
+### 1.1.0
+
+- Supports VPN Always on feature
