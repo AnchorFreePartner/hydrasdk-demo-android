@@ -692,3 +692,11 @@ Reference: https://issuetracker.google.com/issues/37011385
 ### 1.1.0
 
 - Supports VPN Always on feature
+
+### 1.2.0
+
+- remote domain bypass lists integrated
+
+### 1.2.1
+
+- updated vpn transport lib
