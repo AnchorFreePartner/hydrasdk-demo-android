@@ -45,5 +45,7 @@
     <string name="traffic_unlimited">UNLIMITED</string>
 
     <string name="current_server">CURRENT_SERVER</string>
+    <string name="connecting">Connecting</string>
+    <string name="paused">Paused</string>
 
 </resources>

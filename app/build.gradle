@@ -1,18 +1,16 @@
 apply plugin: 'com.android.application'
 
 ext {
-    androidBuildToolsVersion = "27.0.1"
-    androidSupportLibraryVersion = "27.0.2"
+    androidSupportLibraryVersion = "28.0.0"
 }
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion androidBuildToolsVersion
+    compileSdkVersion 28
 
     defaultConfig {
         applicationId "com.northghost.hydraclient"
         minSdkVersion 15
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -25,10 +23,18 @@ android {
         buildConfigField "String", "STORED_HOST_URL_KEY", "\"com.northghost.afvclient.STORED_HOST_KEY\""
         buildConfigField "String", "STORED_CARRIER_ID_KEY", "\"com.northghost.afvclient.CARRIER_ID_KEY\""
     }
-
+    signingConfigs {
+        release {
+            keyAlias 'demo'
+            keyPassword 'demodemo'
+            storeFile file("${rootProject.projectDir}/demo.keystore")
+            storePassword 'demodemo'
+        }
+    }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -41,7 +47,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.github.AnchorFreePartner.hydra-sdk-android:sdk:1.0.1'
+    compile 'com.github.AnchorFreePartner.hydra-sdk-android:sdk:2.0.0'
 
     compile "com.android.support:appcompat-v7:${androidSupportLibraryVersion}"
     compile "com.android.support:cardview-v7:${androidSupportLibraryVersion}"

@@ -17,6 +17,7 @@ import com.anchorfree.hydrasdk.HydraSdk;
 import com.anchorfree.hydrasdk.api.response.RemainingTraffic;
 import com.anchorfree.hydrasdk.callbacks.Callback;
 import com.anchorfree.hydrasdk.exceptions.HydraException;
+import com.anchorfree.hydrasdk.vpnservice.VPNState;
 import com.northghost.hydraclient.R;
 import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.utils.Converter;
@@ -79,9 +80,19 @@ public abstract class UIActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (isConnected()) {
-            startUIUpdateTask();
-        }
+        isConnected(new Callback<Boolean>() {
+            @Override
+            public void success(@NonNull Boolean aBoolean) {
+                if (aBoolean) {
+                    startUIUpdateTask();
+                }
+            }
+
+            @Override
+            public void failure(@NonNull HydraException e) {
+
+            }
+        });
     }
 
     @Override
@@ -107,14 +118,24 @@ public abstract class UIActivity extends AppCompatActivity {
 
     @OnClick(R.id.connect_btn)
     public void onConnectBtnClick(View v) {
-        if (isConnected()) {
-            disconnectFromVnp();
-        } else {
-            connectToVpn();
-        }
+        isConnected(new Callback<Boolean>() {
+            @Override
+            public void success(@NonNull Boolean aBoolean) {
+                if (aBoolean) {
+                    disconnectFromVnp();
+                } else {
+                    connectToVpn();
+                }
+            }
+
+            @Override
+            public void failure(@NonNull HydraException e) {
+
+            }
+        });
     }
 
-    protected abstract boolean isConnected();
+    protected abstract void isConnected(Callback<Boolean> callback);
 
     protected abstract void connectToVpn();
 
@@ -142,14 +163,55 @@ public abstract class UIActivity extends AppCompatActivity {
     protected abstract void checkRemainingTraffic();
 
     protected void updateUI() {
+        HydraSdk.getVpnState(new Callback<VPNState>() {
+            @Override
+            public void success(@NonNull VPNState vpnState) {
+
+                trafficStats.setVisibility(vpnState == VPNState.CONNECTED ? View.VISIBLE : View.INVISIBLE);
+                trafficLimitTextView.setVisibility(vpnState == VPNState.CONNECTED ? View.VISIBLE : View.INVISIBLE);
+
+                switch (vpnState) {
+                    case IDLE: {
+                        connectBtnTextView.setEnabled(true);
+                        connectBtnTextView.setText(R.string.connect);
+                        connectionStateTextView.setText(R.string.disconnected);
+                        hideConnectProgress();
+                        break;
+                    }
+                    case CONNECTED: {
+                        connectBtnTextView.setEnabled(true);
+                        connectBtnTextView.setText(R.string.disconnect);
+                        connectionStateTextView.setText(R.string.connected);
+                        hideConnectProgress();
+                        break;
+                    }
+                    case CONNECTING_VPN:
+                    case CONNECTING_CREDENTIALS:
+                    case CONNECTING_PERMISSIONS: {
+                        connectBtnTextView.setText(R.string.connecting);
+                        connectionStateTextView.setText(R.string.connecting);
+                        connectBtnTextView.setEnabled(false);
+                        showConnectProgress();
+                        break;
+                    }
+                    case PAUSED: {
+                        connectBtnTextView.setEnabled(false);
+                        connectBtnTextView.setText(R.string.paused);
+                        connectionStateTextView.setText(R.string.paused);
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void failure(@NonNull HydraException e) {
+
+            }
+        });
         loginBtnTextView.setText(HydraSdk.isLoggedIn() ? R.string.log_out : R.string.log_in);
         loginStateTextView.setText(HydraSdk.isLoggedIn() ? R.string.logged_in : R.string.logged_out);
 
-        connectBtnTextView.setText(HydraSdk.isVpnStarted() ? R.string.disconnect : R.string.connect);
-        connectionStateTextView.setText(HydraSdk.isVpnStarted() ? R.string.connected : R.string.disconnected);
 
-        trafficStats.setVisibility(HydraSdk.isVpnStarted() ? View.VISIBLE : View.INVISIBLE);
-        trafficLimitTextView.setVisibility(HydraSdk.isVpnStarted() ? View.VISIBLE : View.INVISIBLE);
 
         getCurrentServer(new Callback<String>() {
             @Override

@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import com.anchorfree.hydrasdk.HydraSdk;
 import com.anchorfree.hydrasdk.SessionConfig;
+import com.anchorfree.hydrasdk.SessionInfo;
 import com.anchorfree.hydrasdk.api.AuthMethod;
 import com.anchorfree.hydrasdk.api.data.Country;
 import com.anchorfree.hydrasdk.api.data.ServerCredentials;
@@ -13,9 +14,9 @@ import com.anchorfree.hydrasdk.callbacks.Callback;
 import com.anchorfree.hydrasdk.callbacks.CompletableCallback;
 import com.anchorfree.hydrasdk.callbacks.TrafficListener;
 import com.anchorfree.hydrasdk.callbacks.VpnStateListener;
+import com.anchorfree.hydrasdk.compat.CredentialsCompat;
 import com.anchorfree.hydrasdk.dns.DnsRule;
 import com.anchorfree.hydrasdk.exceptions.ApiHydraException;
-import com.anchorfree.hydrasdk.exceptions.CaptivePortalErrorException;
 import com.anchorfree.hydrasdk.exceptions.HydraException;
 import com.anchorfree.hydrasdk.exceptions.NetworkRelatedException;
 import com.anchorfree.hydrasdk.exceptions.RequestException;
@@ -59,7 +60,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     }
 
     @Override
-    public void vpnError(VPNException e) {
+    public void vpnError(HydraException e) {
         updateUI();
         handleError(e);
     }
@@ -94,7 +95,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     protected void logOutFromVnp() {
         showLoginProgress();
 
-        HydraSdk.logout();
+        HydraSdk.logout(CompletableCallback.EMPTY);
         selectedCountry = "";
 
         hideLoginProgress();
@@ -102,8 +103,18 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     }
 
     @Override
-    protected boolean isConnected() {
-        return HydraSdk.isVpnStarted();
+    protected void isConnected(Callback<Boolean> callback) {
+        HydraSdk.getVpnState(new Callback<VPNState>() {
+            @Override
+            public void success(@NonNull VPNState vpnState) {
+                callback.success(vpnState == VPNState.CONNECTED);
+            }
+
+            @Override
+            public void failure(@NonNull HydraException e) {
+                callback.success(false);
+            }
+        });
     }
 
     @Override
@@ -172,7 +183,18 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
             @Override
             public void success(@NonNull VPNState state) {
                 if (state == VPNState.CONNECTED) {
-                    callback.success(HydraSdk.getServerCredentials().getCountry());
+                    HydraSdk.getSessionInfo(new Callback<SessionInfo>() {
+                        @Override
+                        public void success(@NonNull SessionInfo sessionInfo) {
+                            callback.success(CredentialsCompat.getServerCountry(sessionInfo.getCredentials()));
+                        }
+
+                        @Override
+                        public void failure(@NonNull HydraException e) {
+                            callback.success(selectedCountry);
+                        }
+                    });
+
                 } else {
                     callback.success(selectedCountry);
                 }
@@ -268,12 +290,6 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                 default:
                     showMessage("Error in VPN Service");
                     break;
-            }
-        } else if (e instanceof ApiHydraException) {
-            if (e.getCause() instanceof CaptivePortalErrorException) {
-                showMessage("Captive portal detected");
-            } else {
-                showMessage("Unexpected error");
             }
         } else if (e instanceof ApiHydraException) {
             switch (((ApiHydraException) e).getContent()) {

@@ -684,3 +684,25 @@ Reference: https://issuetracker.google.com/issues/37011385
 ### 1.0.1
 
 - No changes
+
+### 1.1.0
+
+- Supports VPN Always on feature
+
+### 1.2.0
+
+- remote domain bypass lists integrated
+
+### 1.2.1
+
+- updated vpn transport lib
+
+### 2.0.0
+
+Internal refactoring
+
+#### Behaviour Changes:
+
+1) Removed all deprecated methods
+2) StartVPN/stopVPN errors are forwarded also to vpnError callback of HydraSdk.addVpnListener(). Callbacks on startVpn/stopVpn will be called when operation is finished
+3) All vpnError callback now gets base HydraException

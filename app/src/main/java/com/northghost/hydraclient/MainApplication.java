@@ -27,15 +27,14 @@ public class MainApplication extends Application {
 
         NotificationConfig notificationConfig = NotificationConfig.newBuilder()
                 .title(getResources().getString(R.string.app_name))
-                .enableConnectionLost()
                 .build();
 
         HydraSdk.setLoggingLevel(Log.VERBOSE);
 
         HydraSDKConfig config = HydraSDKConfig.newBuilder()
-                //traffic to these domains will not go through VPN
                 .observeNetworkChanges(true) //sdk will handle network changes and start/stop vpn
                 .captivePortal(true) //sdk will handle if user is behind captive portal wifi
+                .moveToIdleOnPause(false)//sdk will report PAUSED state
                 .build();
         HydraSdk.init(this, clientInfo, notificationConfig, config);
     }
