@@ -12,8 +12,6 @@ Android SDK versioning is in format MAJOR.MINOR.PATCH and should be associated w
 
 - [HydraSDK for Android changelog](https://raw.githubusercontent.com/AnchorFreePartner/hydrasdk-demo-android/master/SDK-CHANGES.MD)
 
-**Attention!** Public api can be changed in future releases.
-
 The Android SDK provides API containing
 * Classes and methods to authorize client users
 * Ability to connect to backend VPN service
@@ -100,12 +98,6 @@ Proguard rules are included in sdk, but you can use these if required:
 Add this string resource to your source file
 ```xml
 <string name="vpn_process_name" translatable="false">:vpn</string>
-```
-# Set Up VPN content provider authorities
-
-Add this string resource to your source file
-```xml
-<string name="vpn_provider_authorities" translatable="false"><e.g your package name></string>
 ```
 
 # Java 8
@@ -621,6 +613,10 @@ There are couple of main derivatives of this exception
 
 Note: In case your device is running Android 5.0 or 5.0.1 you must restart it after receiving VPN_FD_NULL_NO_PERMISSIONS.
 Reference: https://issuetracker.google.com/issues/37011385
+
+## Contact US
+
+Have problems integrating the sdk or found any issue, feel free to submit bug to [GitHub][https://github.com/AnchorFreePartner/hydrasdk-demo-android/issues/new]
 
 
 ## API changes history
