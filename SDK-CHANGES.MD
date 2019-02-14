@@ -325,6 +325,10 @@
 
 - No changes
 
+### 1.0.2
+
+- No changes
+
 ### 1.1.0
 
 - Supports VPN Always on feature
@@ -336,6 +340,7 @@
 ### 1.2.1
 
 - updated vpn transport lib
+<<<<<<< HEAD
 
 ### 2.0.0
 
