@@ -614,101 +614,10 @@ There are couple of main derivatives of this exception
 Note: In case your device is running Android 5.0 or 5.0.1 you must restart it after receiving VPN_FD_NULL_NO_PERMISSIONS.
 Reference: https://issuetracker.google.com/issues/37011385
 
+## Sample App
+
+You can find source code of sample app with integrated sdk on [GitHub](https://github.com/AnchorFreePartner/hydrasdk-demo-android)
+
 ## Contact US
 
-Have problems integrating the sdk or found any issue, feel free to submit bug to [GitHub][https://github.com/AnchorFreePartner/hydrasdk-demo-android/issues/new]
-
-
-## API changes history
-
-### 0.28.3
-
-- Deprecated
-    - TrafficStats getTrafficStats()
-    - VPNState getVpnState()
-    - void current(@NonNull final Callback<User> callback)
-    - void startVPNForApps(@NonNull final List<String> allowedApps, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
-    - void startVPNExceptApps(@NonNull final List<String> disallowedApps, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
-    - boolean isLoggingEnabled()
-    - void setLoggingEnabled()
-    - boolean isVpnStarted()
-    - VPNState getVpnState()
-
-### 0.28.4
-
-- Changed
-    - HydraSDKConfig.Builder to HydraSDKConfigBuilder
-    - ApiCallback to Callback in all public HydraSdk calls
-    - ApiCompletableCallback to CompletableCallback in all public HydraSdk calls
-    - VPNException with VPNException.WRONG_STATE code to WrongStateException
-    - NotAuthorizedException to ApiHydraException with HttpsURLConnection.HTTP_UNAUTHORIZED code
-    - NetworkException to NetworkRelatedException
-    - SystemPermissionsErrorException to VPNException with VPNException.VPN_FD_NULL_NO_PERMISSIONS
-
-- Removed
-    - HttpException
-    - SystemPermissionsErrorException
-
-### 0.28.5
-
-- Added
-
-    - method **channelId** to **NotificationConfig** for notifications support on Android O+
-
-### 0.28.7-alpha2
-
-- Changed
-
-    - ServerCredentials now have multiple servers we are trying to connect
-
-### 1.0.0
-
-- Added
-    - class SessionConfig to configure starting vpn session
-    - To update vpn config without restarting vpn(limited options update) void updateConfig(@NonNull final SessionConfig sessionConfig, @NonNull final CompletableCallback callback)
-    - void startVPN(@NonNull final SessionConfig sessionConfig, @NonNull final Callback<ServerCredentials> callback)
-
-- Deprecated
-    - void startVPN(@TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
-    - void startVPN(@NonNull final String countryCode, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
-    - void startVPNForApps(@NonNull final String countryCode, @NonNull final List<String> allowedApps, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
-    - void startVPNExceptApps(@NonNull final String countryCode, @NonNull final List<String> disallowedApps, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
-    - addBlacklistDomain
-    - addBlacklistDomains
-    - addBypassDomains
-
-### 1.0.1
-
-- No changes
-
-### 1.1.0
-
-- Supports VPN Always on feature
-
-### 1.2.0
-
-- remote domain bypass lists integrated
-
-### 1.2.1
-
-- updated vpn transport lib
-
-### 2.0.0
-
-Internal refactoring
-
-#### Behaviour Changes:
-
-1) Removed all deprecated methods
-2) StartVPN/stopVPN errors are forwarded also to vpnError callback of HydraSdk.addVpnListener(). Callbacks on startVpn/stopVpn will be called when operation is finished
-3) All vpnError callback now gets base HydraException
-
-### 2.2.0
-
-Internal improvements
-
-### 2.2.1
-
-Removed sticky vpn service on network loss and reconnection
-
-
+Have problems integrating the sdk or found any issue, feel free to submit bug to [GitHub](https://github.com/AnchorFreePartner/hydrasdk-demo-android/issues/new)

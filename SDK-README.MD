@@ -616,7 +616,7 @@ Reference: https://issuetracker.google.com/issues/37011385
 
 ## Contact US
 
-Have problems integrating the sdk or found any issue, feel free to submit bug to [GitHub][https://github.com/AnchorFreePartner/hydrasdk-demo-android/issues/new]
+Have problems integrating the sdk or found any issue, feel free to submit bug to [GitHub](https://github.com/AnchorFreePartner/hydrasdk-demo-android/issues/new)
 
 ## API changes history
 
@@ -703,7 +703,9 @@ Internal refactoring
 #### Behaviour Changes:
 
 1) Removed all deprecated methods
+
 2) StartVPN/stopVPN errors are forwarded also to vpnError callback of HydraSdk.addVpnListener(). Callbacks on startVpn/stopVpn will be called when operation is finished
+
 3) All vpnError callback now gets base HydraException
 
 ### 2.2.0
