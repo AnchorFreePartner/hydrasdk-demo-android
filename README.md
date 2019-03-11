@@ -703,3 +703,12 @@ Internal refactoring
 2) StartVPN/stopVPN errors are forwarded also to vpnError callback of HydraSdk.addVpnListener(). Callbacks on startVpn/stopVpn will be called when operation is finished
 3) All vpnError callback now gets base HydraException
 
+### 2.2.0
+
+Internal improvements
+
+### 2.2.1
+
+Removed sticky vpn service on network loss and reconnection
+
+
