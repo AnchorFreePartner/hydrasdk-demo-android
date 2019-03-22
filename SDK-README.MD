@@ -556,7 +556,7 @@ FireshieldConfig createFireshieldConfig(){
 }
 
 ```
-## Exceptions
+# Exceptions
 
 All exceptions sdk can throw extends **com.anchorfree.hydrasdk.exceptions.HydraException**
 
@@ -614,11 +614,11 @@ There are couple of main derivatives of this exception
 Note: In case your device is running Android 5.0 or 5.0.1 you must restart it after receiving VPN_FD_NULL_NO_PERMISSIONS.
 Reference: https://issuetracker.google.com/issues/37011385
 
-## Contact US
+# Contact US
 
 Have problems integrating the sdk or found any issue, feel free to submit bug to [GitHub](https://github.com/AnchorFreePartner/hydrasdk-demo-android/issues/new)
 
-## API changes history
+# API changes history
 
 ### 0.28.3
 
