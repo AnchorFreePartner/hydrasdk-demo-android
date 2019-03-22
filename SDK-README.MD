@@ -54,7 +54,9 @@ dependencies {
 
 In case of **startVpn** called on unsupported ABI you'll get **AbiNotSupportedException**
 
-# Proguard Rules
+# Configuration
+
+## Proguard Rules
 
 Proguard rules are included in sdk, but you can use these if required:
 
@@ -93,14 +95,14 @@ Proguard rules are included in sdk, but you can use these if required:
     -keep class com.anchorfree.hydrasdk.vpnservice.connectivity.NotificationConfig { *; }
 ```
 
-# Set VPN process name
+## Set VPN process name
 
 Add this string resource to your source file
 ```xml
 <string name="vpn_process_name" translatable="false">:vpn</string>
 ```
 
-# Java 8
+## Java 8
 
 Add Java 8 support to project **build.gradle**
 
@@ -113,7 +115,7 @@ compileOptions {
 
 If you cannot enable java 8 support in your project please contact us for further details
 
-## Configure notifications
+## Notifications
 
 To configure sdk notification use **NotificationConfig.Builder** class
 
@@ -164,7 +166,7 @@ If **clickAction** not specified, sdk will open application launch activity on n
 
 In intent extras sdk will set boolean value **HydraSdk.EXTRA_FROM_NOTIFICATION** as **true**
 
-# Set Up
+## Set Up
 To set up sdk you should call init() method with your specific details for all process(each process has unique Application instance)
 
 ```java
@@ -206,7 +208,9 @@ if (!ProcessUtils.isVpnProcess(this)){
 //...
 ```
 
-# Authentication
+# Usage
+
+## Authentication
 
 Anchorfree Partner VPN Backend supports OAuth authentication with a partner's OAuth server, this is a primary authentication method.
 
@@ -243,7 +247,7 @@ HydraSdk.login(authMethod, new Callback<User>() {
 });
 ```
 
-# List available countries
+## List available countries
 
 ```java
 HydraSdk.countries(new Callback<List<Country>>() {
@@ -261,7 +265,7 @@ HydraSdk.countries(new Callback<List<Country>>() {
             });
 ```
 
-# Start VPN with optimal server
+## Start VPN with optimal server
 
 ```java
 HydraSdk.startVPN(new SessionConfig.Builder()
@@ -296,7 +300,7 @@ Possible values:
 - A_NETWORK - auto on network event
 - A_OTHER - auto on other reason
 
-# Start VPN for specified apps
+## Start VPN for specified apps
 
 ```java
 final List<String> allowedApps = new LinkedList<String();
@@ -318,7 +322,7 @@ HydraSdk.startVPN(new SessionConfig.Builder()
             });
 ```
 
-# Start VPN and deny specified apps access to it
+## Start VPN and deny specified apps access to it
 
 ```java
 final List<String> exteptApps = new LinkedList<String();
@@ -340,7 +344,7 @@ HydraSdk.startVPN(new SessionConfig.Builder()
             });
 ```
 
-# Stop vpn
+## Stop vpn
 
 ```java
 HydraSdk.stopVPN(TrackingConstants.GprReasons.M_UI, new CompletableCallback() {
@@ -356,7 +360,7 @@ HydraSdk.stopVPN(TrackingConstants.GprReasons.M_UI, new CompletableCallback() {
 });
 ```
 
-# Listen for vpn status and traffic updates
+## Listen for vpn status and traffic updates
 
 ```java
  HydraSdk.addVpnListener(new VpnStateListener() {
@@ -384,7 +388,7 @@ HydraSdk.removeTrafficListener(...);
 HydraSdk.removeVpnListener(...);
 ```
 
-# Purchases functionality
+## Purchases functionality
 
 ```java
 HydraSdk.purchase("json from google", new CompletableCallback() {
@@ -411,7 +415,7 @@ HydraSdk.deletePurchase(purchaseID, new CompletableCallback() {
 });
 ```
 
-# Get data about user
+## Get data about user
 ```java
 //get information about remaining traffic for user
 HydraSdk.remainingTraffic(new Callback<RemainingTraffic>() {
@@ -439,7 +443,7 @@ HydraSdk.currentUser(new Callback<User>() {
 });
 ```
 
-# Get Current vpn state
+## Get Current vpn state
 ```java
 HydraSdk.getVpnState(new Callback<VPNState>() {
    @Override
@@ -454,7 +458,7 @@ HydraSdk.getVpnState(new Callback<VPNState>() {
 });
 ```
 
-# Call VPN permission dialog without connecting to vpn
+## Call VPN permission dialog without connecting to vpn
 
 ```java
 if (HydraSdk.requestVpnPermission(new CompletableCallback() {
@@ -474,25 +478,7 @@ if (HydraSdk.requestVpnPermission(new CompletableCallback() {
 }
 ```
 
-# Collecting Debug information before submitting sdk issue
-
-After reproducing the issue, call **HydraSdk.collectDebugInfo** and attach result to your issue
-
-```java
-HydraSdk.collectDebugInfo(context, new Callback<String>() {
-    @Override
-    public void success(String debugInfo) {
-        //attach value of debugInfo to your issue description
-    }
-
-    @Override
-    public void failure(HydraException e) {
-
-    }
-});
-```
-
-## Categorization service (aka Fireshield)
+# Categorization service (aka Fireshield)
 
 Hydra SDK provides ability to categorize domains goes through VPN and perform specified action on them.
 To configure you need to create instance of **FireshieldConfig** and pass it to **SessionConfig.Builder** when starting vpn session
@@ -515,7 +501,7 @@ HydraSdk.startVPN(new SessionConfig.Builder()
             });
 ```
 
-# Create fireshield config
+## Create fireshield config
 
 Categorization configuration based on specification of categories and rules for categories
 
@@ -617,6 +603,24 @@ Reference: https://issuetracker.google.com/issues/37011385
 # Contact US
 
 Have problems integrating the sdk or found any issue, feel free to submit bug to [GitHub](https://github.com/AnchorFreePartner/hydrasdk-demo-android/issues/new)
+
+## Collecting Debug information before submitting sdk issue
+
+After reproducing the issue, call **HydraSdk.collectDebugInfo** and attach result to your issue
+
+```java
+HydraSdk.collectDebugInfo(context, new Callback<String>() {
+    @Override
+    public void success(String debugInfo) {
+        //attach value of debugInfo to your issue description
+    }
+
+    @Override
+    public void failure(HydraException e) {
+
+    }
+});
+```
 
 # API changes history
 
