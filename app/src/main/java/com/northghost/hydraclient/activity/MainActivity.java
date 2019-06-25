@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import com.anchorfree.hydrasdk.HydraCredentialsSource;
 import com.anchorfree.hydrasdk.HydraSDKConfig;
 import com.anchorfree.hydrasdk.HydraSdk;
 import com.anchorfree.hydrasdk.SessionConfig;
@@ -30,10 +31,11 @@ import com.anchorfree.hydrasdk.fireshield.FireshieldCategory;
 import com.anchorfree.hydrasdk.fireshield.FireshieldConfig;
 import com.anchorfree.hydrasdk.vpnservice.ConnectionStatus;
 import com.anchorfree.hydrasdk.vpnservice.VPNState;
-import com.anchorfree.hydrasdk.vpnservice.config.VpnConfig;
 import com.anchorfree.hydrasdk.vpnservice.connectivity.NotificationConfig;
 import com.anchorfree.hydrasdk.vpnservice.credentials.AppPolicy;
 import com.anchorfree.reporting.TrackingConstants;
+import com.anchorfree.vpnsdk.transporthydra.HydraTransport;
+import com.anchorfree.vpnsdk.transporthydra.HydraTransportFactory;
 import com.northghost.hydraclient.MainApplication;
 import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.dialog.RegionChooserDialog;
@@ -72,7 +74,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     }
 
     @Override
-    public void vpnError(VPNException e) {
+    public void vpnError(HydraException e) {
         updateUI();
         handleError(e);
     }
@@ -107,7 +109,17 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     protected void logOutFromVnp() {
         showLoginProgress();
 
-        HydraSdk.logout();
+        HydraSdk.logout(new CompletableCallback() {
+            @Override
+            public void complete() {
+
+            }
+
+            @Override
+            public void error(HydraException e) {
+
+            }
+        });
         selectedCountry = "";
 
         hideLoginProgress();
@@ -364,7 +376,28 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
 
             }
         });
-        HydraSdk.restartVpn("", TrackingConstants.GprReasons.A_APP_RUN, AppPolicy.newBuilder().build(), new Bundle(), new Callback<Bundle>() {
+        HydraSdk.restartVpn(new SessionConfig.Builder()
+                .withReason(TrackingConstants.GprReasons.M_UI)
+                .addDnsRule(DnsRule.Builder.block().fromAssets(""))
+                .addDnsRule(DnsRule.Builder.bypass().fromAssets(""))
+                .addDnsRule(DnsRule.Builder.proxy().fromAssets(""))
+                .addDnsRule(DnsRule.Builder.vpn().fromAssets(""))
+                .addDnsRule(DnsRule.Builder.vpn().fromDomains(new ArrayList<>()))
+                .addDnsRule(DnsRule.Builder.vpn().fromFile(""))
+                .addDnsRule(DnsRule.Builder.vpn().fromResource(0))
+                .exceptApps(new ArrayList<>())
+                .forApps(new ArrayList<>())
+                .withVirtualLocation("")
+                .withPolicy(AppPolicy.newBuilder().build())
+                .withFireshieldConfig(new FireshieldConfig.Builder()
+                        .addCategory(FireshieldCategory.Builder.block(""))
+                        .addCategory(FireshieldCategory.Builder.blockAlertPage(""))
+                        .addCategory(FireshieldCategory.Builder.bypass(""))
+                        .addCategory(FireshieldCategory.Builder.custom("", ""))
+                        .addCategory(FireshieldCategory.Builder.proxy(""))
+                        .addCategory(FireshieldCategory.Builder.vpn(""))
+                        .build())
+                .build(), new Callback<Bundle>() {
             @Override
             public void success(@NonNull Bundle bundle) {
 
@@ -376,7 +409,17 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
             }
         });
         HydraSdk.setLoggingLevel(Log.VERBOSE);
-        HydraSdk.isPausedForReconnection();
+        HydraSdk.isPausedForReconnection(new Callback<Boolean>() {
+            @Override
+            public void success(@NonNull Boolean aBoolean) {
+
+            }
+
+            @Override
+            public void failure(@NonNull HydraException e) {
+
+            }
+        });
         HydraSdk.collectDebugInfo(new Callback<HydraSdk.DebugInfo>() {
             @Override
             public void success(@NonNull HydraSdk.DebugInfo debugInfo) {
@@ -432,17 +475,6 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
 
             }
         });
-        HydraSdk.current(new Callback<User>() {
-            @Override
-            public void success(@NonNull User user) {
-
-            }
-
-            @Override
-            public void failure(@NonNull HydraException e) {
-
-            }
-        });
         HydraSdk.getDeviceId();
         HydraSdk.currentUser(new Callback<User>() {
             @Override
@@ -467,7 +499,6 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
             }
         });
         HydraSdk.getAccessToken();
-        HydraSdk.getTrafficStats();
         HydraSdk.requestVpnPermission(new CompletableCallback() {
             @Override
             public void complete() {
@@ -480,14 +511,9 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
             }
         });
         HydraSdk.getConnectionAttemptId();
-        HydraSdk.getStartVpnTimestamp();
-        HydraSdk.getVpnState();
-        HydraSdk.getTrafficStats();
+
         HydraSdk.getLoggingLevel();
         HydraSdk.isABISupported();
-        HydraSdk.isLoggingEnabled();
-        HydraSdk.isVpnStarted();
-        HydraSdk.isLoggingEnabled();
         HydraSdk.collectDebugInfo(new Callback<HydraSdk.DebugInfo>() {
             @Override
             public void success(@NonNull HydraSdk.DebugInfo debugInfo) {
@@ -499,94 +525,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
 
             }
         });
-        HydraSdk.collectDebugInfo(this, new Callback<String>() {
-            @Override
-            public void success(@NonNull String s) {
 
-            }
-
-            @Override
-            public void failure(@NonNull HydraException e) {
-
-            }
-        });
-        HydraSdk.current(new Callback<User>() {
-            @Override
-            public void success(@NonNull User user) {
-
-            }
-
-            @Override
-            public void failure(@NonNull HydraException e) {
-
-            }
-        });
-        HydraSdk.startVPN("", new Callback<ServerCredentials>() {
-            @Override
-            public void success(@NonNull ServerCredentials serverCredentials) {
-
-            }
-
-            @Override
-            public void failure(@NonNull HydraException e) {
-
-            }
-        });
-        HydraSdk.startVPN("", "", new Callback<ServerCredentials>() {
-            @Override
-            public void success(@NonNull ServerCredentials serverCredentials) {
-
-            }
-
-            @Override
-            public void failure(@NonNull HydraException e) {
-
-            }
-        });
-        HydraSdk.startVPNExceptApps(new ArrayList<>(), "", new Callback<ServerCredentials>() {
-            @Override
-            public void success(@NonNull ServerCredentials serverCredentials) {
-
-            }
-
-            @Override
-            public void failure(@NonNull HydraException e) {
-
-            }
-        });
-        HydraSdk.startVPNExceptApps("", new ArrayList<>(), "", new Callback<ServerCredentials>() {
-            @Override
-            public void success(@NonNull ServerCredentials serverCredentials) {
-
-            }
-
-            @Override
-            public void failure(@NonNull HydraException e) {
-
-            }
-        });
-        HydraSdk.startVPNForApps(new ArrayList<>(), "", new Callback<ServerCredentials>() {
-            @Override
-            public void success(@NonNull ServerCredentials serverCredentials) {
-
-            }
-
-            @Override
-            public void failure(@NonNull HydraException e) {
-
-            }
-        });
-        HydraSdk.startVPNForApps("", new ArrayList<>(), "", new Callback<ServerCredentials>() {
-            @Override
-            public void success(@NonNull ServerCredentials serverCredentials) {
-
-            }
-
-            @Override
-            public void failure(@NonNull HydraException e) {
-
-            }
-        });
         HydraSdk.addTrafficListener(new TrafficListener() {
             @Override
             public void onTrafficUpdate(long l, long l1) {
@@ -606,7 +545,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
             }
 
             @Override
-            public void vpnError(VPNException e) {
+            public void vpnError(HydraException e) {
 
             }
         });
@@ -624,7 +563,6 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                         .channelId("")
                         .clickAction("")
                         .disabled()
-                        .enableConnectionLost()
                         .icon(null)
                         .inConnecting("", "")
                         .inIdle("", "")
@@ -636,20 +574,15 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                         .moveToIdleOnPause(false)
                         .observeNetworkChanges(true)
                         .unsafeClient(false)
-                        .addBlacklistDomain("")
-                        .addBlacklistDomains(0)
-                        .addBypassDomain("")
-                        .addBypassDomains(0)
-                        .addBypassDomain(VpnConfig.MODE.BYPASS, "")
-                        .addBypassDomain(VpnConfig.MODE.PROXY_PEER, "")
-                        .addBypassDomain(VpnConfig.MODE.VPN, "")
+                        .idfaEnabled(false)
+                        .registerTransport(HydraTransport.TRANSPORT_ID, HydraTransportFactory.class, HydraCredentialsSource.class)
+                        .resetTransports()
                         .build());
         HydraSdk.update(NotificationConfig.newBuilder()
                 .inConnected("", "")
                 .channelId("")
                 .clickAction("")
                 .disabled()
-                .enableConnectionLost()
                 .icon(null)
                 .inConnecting("", "")
                 .inIdle("", "")
@@ -657,6 +590,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                 .smallIconId(0)
                 .build());
         HydraSdk.updateConfig(new SessionConfig.Builder()
+                .withReason(TrackingConstants.GprReasons.M_UI)
                 .addDnsRule(DnsRule.Builder.block().fromAssets(""))
                 .addDnsRule(DnsRule.Builder.bypass().fromAssets(""))
                 .addDnsRule(DnsRule.Builder.proxy().fromAssets(""))
@@ -665,6 +599,8 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                 .addDnsRule(DnsRule.Builder.vpn().fromFile(""))
                 .addDnsRule(DnsRule.Builder.vpn().fromResource(0))
                 .exceptApps(new ArrayList<>())
+                .withTransport("")
+                .withSessionId("")
                 .forApps(new ArrayList<>())
                 .withVirtualLocation("")
                 .withPolicy(AppPolicy.newBuilder().build())
