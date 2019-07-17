@@ -766,6 +766,9 @@ Removed sticky vpn service on network loss and reconnection
 
 Added support for OpenVPN transport
 
+## 2.3.1
+
+Internal migration fix
 
 # SDK version migration
 
