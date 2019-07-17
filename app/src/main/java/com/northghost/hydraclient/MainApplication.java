@@ -1,8 +1,11 @@
 package com.northghost.hydraclient;
 
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 import com.anchorfree.hydrasdk.HydraSDKConfig;
@@ -12,6 +15,8 @@ import com.anchorfree.hydrasdk.vpnservice.connectivity.NotificationConfig;
 
 public class MainApplication extends Application {
 
+    private static final String CHANNEL_ID = "vpn";
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -19,6 +24,7 @@ public class MainApplication extends Application {
     }
 
     public void initHydraSdk() {
+        createNotificationChannel();
         SharedPreferences prefs = getPrefs();
         ClientInfo clientInfo = ClientInfo.newBuilder()
                 .baseUrl(prefs.getString(BuildConfig.STORED_HOST_URL_KEY, BuildConfig.BASE_HOST))
@@ -27,6 +33,7 @@ public class MainApplication extends Application {
 
         NotificationConfig notificationConfig = NotificationConfig.newBuilder()
                 .title(getResources().getString(R.string.app_name))
+                .channelId(CHANNEL_ID)
                 .build();
 
         HydraSdk.setLoggingLevel(Log.VERBOSE);
@@ -57,5 +64,21 @@ public class MainApplication extends Application {
 
     public SharedPreferences getPrefs() {
         return getSharedPreferences(BuildConfig.SHARED_PREFS, Context.MODE_PRIVATE);
+    }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Sample VPN";
+            String description = "VPN notification";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 }

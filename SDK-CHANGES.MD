@@ -359,3 +359,5 @@ Internal improvements
 ### 2.2.1
 
 Removed sticky vpn service on network loss and reconnection
+
+###

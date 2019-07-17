@@ -795,3 +795,9 @@ Added support for OpenVPN transport
 - HydraSdk.logout() removed, use HydraSdk.logout(CompletableCallback) instead
 
 ## 2.2.4 - 2.3.0
+
+- no changes required 
+
+## 2.3.0 - 2.3.1
+
+- no changes required 
