@@ -762,13 +762,18 @@ Internal improvements
 
 Removed sticky vpn service on network loss and reconnection
 
+## 2.2.4
+
+Internal analytics improvements
+
 ## 2.3.0
 
 Added support for OpenVPN transport
 
 ## 2.3.1
 
-Internal migration fix
+Fix for internal account migration from older versions
+
 
 # SDK version migration
 
