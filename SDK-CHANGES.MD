@@ -342,22 +342,32 @@
 - updated vpn transport lib
 <<<<<<< HEAD
 
-### 2.0.0
+## 2.0.0
 
 Internal refactoring
 
-#### Behaviour Changes:
+1) Removed all deprecated versions
+2) startVPN/stopVPN errors are forwarded also to vpnError callback of HydraSdk.addVpnListener(). Callbacks on startVpn/stopVpn will be called when operation is finished
+3) Cannot turn off notification for PAUSED state
+4) new VpnState - PAUSED - sdk moves to this state when connection was lost due to network loss, and will be restored on network connected
+5) vpnError callback now gets base HydraException
 
-1) Removed all deprecated methods
-2) StartVPN/stopVPN errors are forwarded also to vpnError callback of HydraSdk.addVpnListener(). Callbacks on startVpn/stopVpn will be called when operation is finished
-3) All vpnError callback now gets base HydraException
-
-### 2.2.0
+## 2.2.0
 
 Internal improvements
 
-### 2.2.1
+## 2.2.1
 
 Removed sticky vpn service on network loss and reconnection
 
-###
+## 2.2.4
+
+Internal analytics improvements
+
+## 2.3.0
+
+Added support for OpenVPN transport
+
+## 2.3.1
+
+Fix for internal account migration from older versions
