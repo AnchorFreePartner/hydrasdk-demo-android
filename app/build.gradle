@@ -47,7 +47,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.github.AnchorFreePartner.hydra-sdk-android:sdk:8fb22e9'
+    compile 'com.github.AnchorFreePartner.hydra-sdk-android:sdk:2.4.0'
 
     compile "com.android.support:appcompat-v7:${androidSupportLibraryVersion}"
     compile "com.android.support:cardview-v7:${androidSupportLibraryVersion}"

@@ -371,3 +371,8 @@ Added support for OpenVPN transport
 ## 2.3.1
 
 Fix for internal account migration from older versions
+
+## 2.4.0
+
+Add Client network list 
+Add private servers
