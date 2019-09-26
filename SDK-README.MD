@@ -530,7 +530,7 @@ Alert page configuration
 FireshieldConfig createFireshieldConfig(){
         FireshieldConfig.Builder builder = new FireshieldConfig.Builder();
         builder.enabled(true);
-        builder.alertPage(AlertPage.create("connect.bitdefender.net", "safe_zone.html"))
+        builder.alertPage(AlertPage.create("connect.bitdefender.net", "safe_zone"))
         builder.addService(FireshieldConfig.Services.IP);
         builder.addService(FireshieldConfig.Services.SOPHOS);
         builder.addCategory(FireshieldCategory.Builder.vpn(FireshieldConfig.Categories.SAFE));//need to add safe category to allow safe traffic
@@ -774,7 +774,6 @@ Added support for OpenVPN transport
 
 Fix for internal account migration from older versions
 
-
 # SDK version migration
 
 ## 1.0.1 - 2.2.4
@@ -803,13 +802,3 @@ Fix for internal account migration from older versions
 - HydraSdk.logout() removed, use HydraSdk.logout(CompletableCallback) instead
 
 ## 2.2.4 - 2.3.0
-
-- no changes required 
-
-## 2.3.0 - 2.3.1
-
-- no changes required 
-
-## 2.3.1 - 2.4.0
-
-- no changes required
