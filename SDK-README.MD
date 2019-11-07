@@ -774,6 +774,18 @@ Added support for OpenVPN transport
 
 Fix for internal account migration from older versions
 
+## 2.4.0
+
+1) Client network list
+2) Private servers
+3) Internal fixes
+
+## 2.4.1
+
+1) Openvpn android q support
+2) Internal fixes
+3) Fireshield runtime whitelist
+
 # SDK version migration
 
 ## 1.0.1 - 2.2.4
