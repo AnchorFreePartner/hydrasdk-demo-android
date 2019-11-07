@@ -376,3 +376,9 @@ Fix for internal account migration from older versions
 
 Add Client network list 
 Add private servers
+
+## 2.4.1
+
+1) Openvpn android q support
+2) Internal fixes
+3) Fireshield runtime whitelist
