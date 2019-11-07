@@ -530,7 +530,7 @@ Alert page configuration
 FireshieldConfig createFireshieldConfig(){
         FireshieldConfig.Builder builder = new FireshieldConfig.Builder();
         builder.enabled(true);
-        builder.alertPage(AlertPage.create("connect.bitdefender.net", "safe_zone.html"))
+        builder.alertPage(AlertPage.create("connect.bitdefender.net", "safe_zone"))
         builder.addService(FireshieldConfig.Services.IP);
         builder.addService(FireshieldConfig.Services.SOPHOS);
         builder.addCategory(FireshieldCategory.Builder.vpn(FireshieldConfig.Categories.SAFE));//need to add safe category to allow safe traffic
@@ -773,7 +773,6 @@ Added support for OpenVPN transport
 ## 2.3.1
 
 Fix for internal account migration from older versions
-
 
 # SDK version migration
 
