@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import com.anchorfree.hydrasdk.api.data.Country;
+import com.anchorfree.partner.api.data.Country;
 import com.northghost.hydraclient.R;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +62,7 @@ public class RegionListAdapter extends RecyclerView.Adapter<RegionListAdapter.Vi
 
     public void setRegions(List<Country> list) {
         regions = new ArrayList<>();
-        regions.add(new Country());
+        regions.add(new Country(""));
         regions.addAll(list);
         notifyDataSetChanged();
     }

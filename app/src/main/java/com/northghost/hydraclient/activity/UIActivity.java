@@ -13,11 +13,11 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import com.anchorfree.hydrasdk.HydraSdk;
-import com.anchorfree.hydrasdk.api.response.RemainingTraffic;
-import com.anchorfree.hydrasdk.callbacks.Callback;
-import com.anchorfree.hydrasdk.exceptions.HydraException;
-import com.anchorfree.hydrasdk.vpnservice.VPNState;
+import com.anchorfree.partner.api.response.RemainingTraffic;
+import com.anchorfree.sdk.UnifiedSDK;
+import com.anchorfree.vpnsdk.callbacks.Callback;
+import com.anchorfree.vpnsdk.exceptions.VpnException;
+import com.anchorfree.vpnsdk.vpnservice.VPNState;
 import com.northghost.hydraclient.R;
 import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.utils.Converter;
@@ -89,7 +89,7 @@ public abstract class UIActivity extends AppCompatActivity {
             }
 
             @Override
-            public void failure(@NonNull HydraException e) {
+            public void failure(@NonNull VpnException e) {
 
             }
         });
@@ -103,14 +103,24 @@ public abstract class UIActivity extends AppCompatActivity {
 
     @OnClick(R.id.login_btn)
     public void onLoginBtnClick(View v) {
-        if (isLoggedIn()) {
-            logOutFromVnp();
-        } else {
-            LoginDialog.newInstance().show(getSupportFragmentManager(), LoginDialog.TAG);
-        }
+        isLoggedIn(new Callback<Boolean>() {
+            @Override
+            public void success(@NonNull Boolean aBoolean) {
+                if (aBoolean) {
+                    logOutFromVnp();
+                } else {
+                    LoginDialog.newInstance().show(getSupportFragmentManager(), LoginDialog.TAG);
+                }
+            }
+
+            @Override
+            public void failure(@NonNull VpnException e) {
+
+            }
+        });
     }
 
-    protected abstract boolean isLoggedIn();
+    protected abstract void isLoggedIn(Callback<Boolean> callback);
 
     protected abstract void loginToVpn();
 
@@ -129,7 +139,7 @@ public abstract class UIActivity extends AppCompatActivity {
             }
 
             @Override
-            public void failure(@NonNull HydraException e) {
+            public void failure(@NonNull VpnException e) {
 
             }
         });
@@ -163,7 +173,7 @@ public abstract class UIActivity extends AppCompatActivity {
     protected abstract void checkRemainingTraffic();
 
     protected void updateUI() {
-        HydraSdk.getVpnState(new Callback<VPNState>() {
+        UnifiedSDK.getVpnState(new Callback<VPNState>() {
             @Override
             public void success(@NonNull VPNState vpnState) {
 
@@ -204,12 +214,24 @@ public abstract class UIActivity extends AppCompatActivity {
             }
 
             @Override
-            public void failure(@NonNull HydraException e) {
+            public void failure(@NonNull VpnException e) {
 
             }
         });
-        loginBtnTextView.setText(HydraSdk.isLoggedIn() ? R.string.log_out : R.string.log_in);
-        loginStateTextView.setText(HydraSdk.isLoggedIn() ? R.string.logged_in : R.string.logged_out);
+        UnifiedSDK.getInstance().getBackend().isLoggedIn(new Callback<Boolean>() {
+            @Override
+            public void success(@NonNull Boolean isLoggedIn) {
+                loginBtnTextView.setText(isLoggedIn ? R.string.log_out : R.string.log_in);
+                loginStateTextView.setText(isLoggedIn ? R.string.logged_in : R.string.logged_out);
+            }
+
+            @Override
+            public void failure(@NonNull VpnException e) {
+
+            }
+        });
+
+
 
 
 
@@ -226,7 +248,7 @@ public abstract class UIActivity extends AppCompatActivity {
             }
 
             @Override
-            public void failure(@NonNull HydraException e) {
+            public void failure(@NonNull VpnException e) {
                 currentServerBtn.setText(R.string.optimal_server);
                 selectedServerTextView.setText("UNKNOWN");
             }

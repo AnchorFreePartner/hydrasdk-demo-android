@@ -8,10 +8,14 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
-import com.anchorfree.hydrasdk.HydraSDKConfig;
-import com.anchorfree.hydrasdk.HydraSdk;
-import com.anchorfree.hydrasdk.api.ClientInfo;
-import com.anchorfree.hydrasdk.vpnservice.connectivity.NotificationConfig;
+import com.anchorfree.partner.api.ClientInfo;
+import com.anchorfree.sdk.NotificationConfig;
+import com.anchorfree.sdk.UnifiedSDK;
+import com.anchorfree.sdk.UnifiedSDKConfig;
+//import com.anchorfree.hydrasdk.HydraSDKConfig;
+//import com.anchorfree.hydrasdk.HydraSdk;
+//import com.anchorfree.hydrasdk.api.ClientInfo;
+//import com.anchorfree.hydrasdk.vpnservice.connectivity.NotificationConfig;
 
 public class MainApplication extends Application {
 
@@ -23,6 +27,7 @@ public class MainApplication extends Application {
         initHydraSdk();
     }
 
+    UnifiedSDK unifiedSDK;
     public void initHydraSdk() {
         createNotificationChannel();
         SharedPreferences prefs = getPrefs();
@@ -31,19 +36,16 @@ public class MainApplication extends Application {
                 .carrierId(prefs.getString(BuildConfig.STORED_CARRIER_ID_KEY, BuildConfig.BASE_CARRIER_ID))
                 .build();
 
+        UnifiedSDKConfig config = UnifiedSDKConfig.newBuilder().idfaEnabled(false).build();
+        unifiedSDK = UnifiedSDK.getInstance(clientInfo, config);
+
         NotificationConfig notificationConfig = NotificationConfig.newBuilder()
                 .title(getResources().getString(R.string.app_name))
                 .channelId(CHANNEL_ID)
                 .build();
+        UnifiedSDK.update(notificationConfig);
 
-        HydraSdk.setLoggingLevel(Log.VERBOSE);
-
-        HydraSDKConfig config = HydraSDKConfig.newBuilder()
-                .observeNetworkChanges(true) //sdk will handle network changes and start/stop vpn
-                .captivePortal(true) //sdk will handle if user is behind captive portal wifi
-                .moveToIdleOnPause(false)//sdk will report PAUSED state
-                .build();
-        HydraSdk.init(this, clientInfo, notificationConfig, config);
+        UnifiedSDK.setLoggingLevel(Log.VERBOSE);
     }
 
     public void setNewHostAndCarrier(String hostUrl, String carrierId) {

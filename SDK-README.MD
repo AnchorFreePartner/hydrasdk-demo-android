@@ -44,12 +44,10 @@ And then add dependencies in build.gradle of your app module. Version name is av
 ```groovy
 dependencies {
 
-    compile 'com.github.AnchorFreePartner.hydra-sdk-android:sdk:{VERSION_NAME}'
+    implementation 'com.github.AnchorFreePartner.hydra-sdk-android:sdk:{VERSION_NAME}'
 
 }
 ```
-
-In case of **startVpn** called on unsupported ABI you'll get **AbiNotSupportedException**
 
 # Configuration
 
@@ -58,43 +56,57 @@ In case of **startVpn** called on unsupported ABI you'll get **AbiNotSupportedEx
 Proguard rules are included in sdk, but you can use these if required:
 
 ```
-    #HYDRASDK
     -dontwarn okio.**
-    -keep class com.anchorfree.hydrasdk.api.data.** { *; }
-    -keep class com.anchorfree.hydrasdk.api.response.** { *; }
-    -keep class com.anchorfree.hdr.HydraHeaderListener { *; }
-    -keep class com.anchorfree.hdr.HydraConnInfo { *; }
-    -keep class com.anchorfree.hdr.AFHydra { *; }
-    -keepclassmembers class com.anchorfree.vpnsdk.transporthydra.HydraTransport {
-         public *** protect(...);
-    }
-    -dontwarn com.anchorfree.vpnsdk.transporthydra.proxyservice.*
     -keepattributes InnerClasses
     -dontwarn sun.misc.**
     -dontwarn java.lang.invoke.**
     -dontwarn okhttp3.**
+    -dontwarn com.anchorfree.sdk.**
     -dontwarn okio.**
     -dontwarn javax.annotation.**
     -dontwarn org.conscrypt.**
     -keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
     #DNSJava
+    -keep class org.xbill.DNS.** {*;}
     -dontnote org.xbill.DNS.spi.DNSJavaNameServiceDescriptor
     -dontwarn org.xbill.DNS.spi.DNSJavaNameServiceDescriptor
-    -keep class com.northghost.ucr.UCRTracker$User { *; }
     -keep class * implements com.google.gson.TypeAdapterFactory
     -keep class * implements com.google.gson.JsonSerializer
     -keep class * implements com.google.gson.JsonDeserializer
-    -keep class com.anchorfree.hydrasdk.SessionConfig { *; }
-    -keep class com.anchorfree.hydrasdk.fireshield.** { *; }
-    -keep class com.anchorfree.hydrasdk.dns.** { *; }
-    -keep class com.anchorfree.hydrasdk.HydraSDKConfig { *; }
-    -keep class com.anchorfree.hydrasdk.api.ClientInfo { *; }
-    -keep class com.anchorfree.hydrasdk.vpnservice.connectivity.NotificationConfig { *; }
+    -keep class com.anchorfree.sdk.SessionConfig { *; }
+    -keep class com.anchorfree.sdk.fireshield.** { *; }
+    -keep class com.anchorfree.sdk.dns.** { *; }
+    -keep class com.anchorfree.sdk.HydraSDKConfig { *; }
+    -keep class com.anchorfree.partner.api.ClientInfo { *; }
+    -keep class com.anchorfree.sdk.NotificationConfig { *; }
+    -keep class com.anchorfree.sdk.NotificationConfig$Builder { *; }
+    -keep class com.anchorfree.sdk.NotificationConfig$StateNotification { *; }
+    -keepclassmembers public class com.anchorfree.ucr.transport.DefaultTrackerTransport {
+       public <init>(...);
+     }
+     -keepclassmembers class com.anchorfree.ucr.SharedPrefsStorageProvider{
+        public <init>(...);
+     }
+     -keepclassmembers class com.anchorfree.sdk.InternalReporting$InternalTrackingTransport{
+     public <init>(...);
+     }
+     -keep class com.anchorfree.sdk.exceptions.* {
+        *;
+     }
+      
+    -keepclassmembers class * implements javax.net.ssl.SSLSocketFactory {
+        final javax.net.ssl.SSLSocketFactory delegate;
+    }
+    
+    # https://stackoverflow.com/questions/56142150/fatal-exception-java-lang-nullpointerexception-in-release-build
+    -keepclassmembers,allowobfuscation class * {
+      @com.google.gson.annotations.SerializedName <fields>;
+    }
 ```
 
 ## Set VPN process name
 
-Add this string resource to your source file
+Add this string resource to your source file to set custom process name for vpn
 ```xml
 <string name="vpn_process_name" translatable="false">:vpn</string>
 ```
@@ -116,44 +128,39 @@ If you cannot enable java 8 support in your project please contact us for furthe
 
 To configure sdk notification use **NotificationConfig.Builder** class
 
-- completely disable sdk notifications
+#### Disable notifications
 
 ```java
-NotificationConfig.Builder builder = NotificationConfig.newBuilder();
-builder = builder.disabled()
+    NotificationConfig.Builder builder = NotificationConfig.newBuilder();
+    builder = builder.disabled()
 ```
 
-- Configure notifications for different states
+#### Notifications for different states
+
 ```java
-builder.inConnected("Title","Message");//Notification to be displayed when vpn is connected
-builder.inIdle("Title","Message");//Notification to be displayed when vpn is not connected
-builder.inConnecting("Title","Message");//Notification to be displayed when vpn is connecting
-builder.inPause("Title","Message");//Notification to be displayed when vpn is paused(waiting for network connection)
+//Notification to be displayed when vpn is connected
+builder.inConnected("Title","Message");
+//Notification to be displayed when vpn is not connected
+builder.inIdle("Title","Message");
+//Notification to be displayed when vpn is connecting
+builder.inConnecting("Title","Message");
+//Notification to be displayed when vpn is paused(waiting for network connection)
+builder.inPause("Title","Message");
+//Notification to be displayed if Client Network List feature is used
+builder.inCnl("Title","Message");
 ```
 
-- Notification message with fallback
+#### Notification message and title fallback
 
-
-By default sdk displays notification for state connected and inPause.
-- fallback for title
+By default sdk displays notification for state CONNECTED and PAUSED.
 
 If **inConnected** was not called it tries to use value set with **title** message
 
-If **title** was not called on Builder, it will use App name as in launcher
+If `NotificationConfig.Builder`.`title` was not set, it will use App name as in launcher
 
-- fallback for message
+If **inConnected** was not called it will try to use string resource **default_notification_connected_message**
 
-If **inConnected** was not called it will try to use string resource **state_connected**
-
-If **inPause** was not called it will try to use string resource **state_nonetwork**
-
-### Update notification preferences
-
-Notification config can be updated calling sdk method
-
-```java
-HydraSdk.update(createNotificationConfig());
-```
+If **inPause** was not called it will try to use string resource **default_notification_paused_message**
 
 ### Notification click intent
 
@@ -161,51 +168,44 @@ To configure action when user click's on notification use **clickAction** method
 Action will be used to create Intent.
 If **clickAction** not specified, sdk will open application launch activity on notification click.
 
-In intent extras sdk will set boolean value **HydraSdk.EXTRA_FROM_NOTIFICATION** as **true**
+In intent extras sdk will set boolean value **UnifiedSDKNotificationManager.EXTRA_NOTIFICATION** as **true**
+
+To handle click action, register `intent-filter` with your activity
+
+``` xml
+<intent-filter>
+    <action android:name="com.sdk.notification.action"/>
+    <category android:name="android.intent.category.DEFAULT"/>
+</intent-filter>
+```
+
+### Update notification preferences
+
+Notification config can be updated calling sdk method
+
+```java
+    UnifiedSDK.update(createNotificationConfig());
+```
+
+# Usage
 
 ## Set Up
-To set up sdk you should call init() method with your specific details for all process(each process has unique Application instance)
+
+To set up sdk you should call getInstance method with your specific details
 
 ```java
 public class MyApplication extends Application {
    @Override
    public void onCreate() {
        super.onCreate();
-       initHydraSDK();
-   }
-   private void initHydraSDK(){
-       HydraSdk.init(this, ClientInfo.newBuilder()
+       final ClientInfo info = ClientInfo.newBuilder()
                      .baseUrl("http://yourvpnbackend.com") // set base url for api calls
                      .carrierId("carrier id") // set your carrier id
-                     .build(),
-               NotificationConfig.newBuilder()
-                     .title("Your custom vpn notification title") // notification title to display in status bar
-                     .enableConnectionLost() //enabled show notification when no network connection
-                     .build(),
-                     HydraSDKConfig.newBuilder()
-                             .observeNetworkChanges(false) // turn on/off handling network changes by sdk
-                             .unsafeClient(false)// set true if want to use unsafe client instead
-                             .captivePortal(true)//control if sdk should check if device is behind captive portal
-                             .build());
+                     .build();
+       final UnifiedSDK sdk = UnifiedSDK.getInstance(info);
    }
 }
 ```
-
-Each Android process has unique Application instance. If you have some specific initialization in Application onCreate, and don`t want it to init on vpn process you can use:
-
-```java
-//...
-
-initHydraSDK();
-
-if (!ProcessUtils.isVpnProcess(this)){
-    //do your initialization stuff
-}
-
-//...
-```
-
-# Usage
 
 ## Authentication
 
@@ -225,21 +225,20 @@ There are some auth method types:
 ```
 AuthMethod.anonymous();
 AuthMethod.firebase(token); // should be configured when creating an app
-AuthMethod.customOath(token); // specific OAuth type, should be configured when creating an app
+AuthMethod.customOauth(token); // specific OAuth type, should be configured when creating an app
 ```
-For more AuthMethod types, see API reference.
 
 Login implementation example:
 ```java
 AuthMethod authMethod = AuthMethod.firebase(token);
-HydraSdk.login(authMethod, new Callback<User>() {
+sdk.getBackend().login(authMethod, new Callback<User>() {
    @Override
    public void success(User response) {
-       showMessage("Logged in successfully");
+       
    }
    @Override
-   public void failure(HydraException error) {
-       showMessage("Fail to login");
+   public void failure(VpnException error) {
+       
    }
 });
 ```
@@ -247,112 +246,160 @@ HydraSdk.login(authMethod, new Callback<User>() {
 ## List available countries
 
 ```java
-HydraSdk.countries(new Callback<List<Country>>() {
-                @Override
-                public void success(List<Country> response) {
-                    for (Country country:response){
-                        //country.getCountry()
-                    }
-                }
+sdk.getBackend().countries(new Callback<AvailableCountries>() {
+    @Override
+    public void success(AvailableCountries response) {
+        
+    }
 
-                @Override
-                public void failure(HydraException error) {
-                    //request failed
-                }
-            });
+    @Override
+    public void failure(HydraException error) {
+        
+    }
+});
 ```
 
-## Start VPN with optimal server
+## Configure VPN session
 
-```java
-HydraSdk.startVPN(new SessionConfig.Builder()
-                .withVirtualLocation(HydraSdk.COUNTRY_OPTIMAL)
+For vpn session configuration use class `SessionConfig`
+
+Available `Builder` methods
+
+- `withTransport` - set transport name to start session with. Can be used in case multiple transports available
+- `withPolicy` - define app policy to use. 
+  - `AppPolicy.forAll` - vpn will be available for all apps
+  - `AppPolicy.Builder.policy` with `AppPolicy.POLICY_FOR_LIST` - apps list allowed to use vpn
+  - `AppPolicy.Builder.policy` with `AppPolicy.POLICY_EXCEPT_LIST` - apps list not allowed to use vpn
+- `withReason` - define reason for starting session ` com.anchorfree.reporting.TrackingConstants.GprReasons`. Will be used in analytics 
+- `withVirtualLocation` - define virtual location for session (country)
+- `withPrivateGroup` - define private server for session
+- `withVpnParams` - define vpn tunnel params. Like dns servers, additional routes.
+- `addDnsRule` - add dns rule for session. *For Hydra transport only* 
+  - `TrafficRule.block` - to block dns calls
+  - `TrafficRule.vpn` - to pass dns calls through vpn
+  - `TrafficRule.proxy` - to pass dns calls through vpn proxy
+  - `TrafficRule.bypass` - to bypass dns calls over vpn tunnel (direct)
+  - `TrafficRule.Builder.fromAssets` - specify domains with newline separated file in assets
+  - `TrafficRule.Builder.fromFile` - specify domains with newline separated file on storage
+  - `TrafficRule.Builder.fromDomains` - specify domains with list
+  - `TrafficRule.Builder.fromResource` - specify domains with newline separated file in resources
+  - `TrafficRule.Builder.fromIp` - specify ip and mask
+- `addProxyRule` - add proxy rule for session. *For Hydra transport only*
+  - `TrafficRule.block` - to block requests
+  - `TrafficRule.vpn` - to pass requests through vpn
+  - `TrafficRule.proxy` - to pass requests through vpn proxy
+  - `TrafficRule.bypass` - to bypass requests over vpn tunnel (direct)
+  - `TrafficRule.Builder.fromAssets` - specify domains with newline separated file in assets
+  - `TrafficRule.Builder.fromFile` - specify domains with newline separated file on storage
+  - `TrafficRule.Builder.fromDomains` - specify domains with list
+  - `TrafficRule.Builder.fromResource` - specify domains with newline separated file in resources
+  - `TrafficRule.Builder.fromIp` - specify ip and mask  
+- `withFireshieldConfig` - define categorization service rules (more information on Fireshield section below). *For Hydra transport only*
+  
+Examples:
+
+### Start VPN with optimal server
+
+``` java
+final SessionConfig session = new SessionConfig.Builder()
+                .withVirtualLocation(UnifiedSDK.COUNTRY_OPTIMAL)
                 .withReason(TrackingConstants.GprReasons.M_UI)
-                .build(), new Callback<ServerCredentials>() {
-                @Override
-                public void success(@NonNull ServerCredentials serverCredentials) {
-                    //VPN connected
-                }
-
-                @Override
-                public void failure(@NonNull HydraException e) {
-                    //Failed to connect vpn
-                }
-            });
+                .build();
 ```
 
-For **withVirtualLocation** its possible to use **HydraSdk.COUNTRY_OPTIMAL** to detect optimal location automatically or use country value from **HydraSdk.countries**
-
-For **withReason** param refer to **TrackingConstants.GprReasons**
-
-Possible values:
-
-- M_UI - manually from ui
-- M_SYSTEM - manually from system
-- M_OTHER - manually from other place
-- A_APP_RUN - auto on app run
-- A_RECONNECT - auto on reconnect
-- A_ERROR - auto after error
-- A_SLEEP - auto after sleep
-- A_NETWORK - auto on network event
-- A_OTHER - auto on other reason
-
-## Start VPN for specified apps
+### Start VPN for chrome only
 
 ```java
-final List<String> allowedApps = new LinkedList<String();
-allowedApps.add("com.google.chrome");
-HydraSdk.startVPN(new SessionConfig.Builder()
-                .withVirtualLocation(HydraSdk.COUNTRY_OPTIMAL)
+final List<String> apps = new ArrayList<String();
+apps.add("com.google.chrome");
+final SessionConfig session = new SessionConfig.Builder()
+                .withVirtualLocation(UnifiedSDK.COUNTRY_OPTIMAL)
                 .withReason(TrackingConstants.GprReasons.M_UI)
-                .forApps(allowedApps)
-                .build(), new Callback<ServerCredentials>() {
-                @Override
-                public void success(@NonNull ServerCredentials serverCredentials) {
-                    //VPN connected
-                }
-
-                @Override
-                public void failure(@NonNull HydraException e) {
-                    //Failed to connect vpn
-                }
-            });
+                .appPolicy(AppPolicy.newBuilder().policy(AppPolity.POLICY_FOR_LIST).appList(apps).build())
+                .build(); 
 ```
 
-## Start VPN and deny specified apps access to it
+### Analytics reasons
+
+- `M_UI` - manually from ui
+- `M_SYSTEM` - manually from system
+- `M_OTHER` - manually from other place
+- `A_APP_RUN` - auto on app run
+- `A_RECONNECT` - auto on reconnect
+- `A_ERROR` - auto after error
+- `A_SLEEP` - auto after sleep
+- `A_NETWORK` - auto on network event
+- `A_OTHER` - auto on other reason
+
+
+## Start VPN session
 
 ```java
-final List<String> exteptApps = new LinkedList<String();
-exteptApps.add("com.google.chrome");
-HydraSdk.startVPN(new SessionConfig.Builder()
-                .withVirtualLocation(HydraSdk.COUNTRY_OPTIMAL)
-                .withReason(TrackingConstants.GprReasons.M_UI)
-                .exceptApps(exteptApps)
-                .build(), new Callback<ServerCredentials>() {
-                @Override
-                public void success(@NonNull ServerCredentials serverCredentials) {
-                    //VPN connected
-                }
+final SessionConfig session = //create session config
+sdk.getVPN().start(session, new CompletableCallback() {
+    @Override
+    public void complete() {
+        
+    }
 
-                @Override
-                public void failure(@NonNull HydraException e) {
-                    //Failed to connect vpn
-                }
-            });
+    @Override
+    public void error(@NonNull VpnException e) {
+
+    }
+});
 ```
 
 ## Stop vpn
 
 ```java
-HydraSdk.stopVPN(TrackingConstants.GprReasons.M_UI, new CompletableCallback() {
+sdk.getVPN().stop(TrackingConstants.GprReasons.M_UI, new CompletableCallback() {
     @Override
     public void complete() {
         //VPN was stopped
     }
 
     @Override
-    public void error(HydraException e) {
+    public void error(@NonNull VpnException e) {
         //Failed to stop vpn
+    }
+});
+```
+
+## Restart vpn
+
+Will restart vpn session with new config without IDLE state
+
+```java
+final SessionConfig session = //create session config
+sdk.getVPN().restart(session, new CompletableCallback() {
+    @Override
+    public void complete() {
+        
+    }
+
+    @Override
+    public void error(@NonNull VpnException e) {
+
+    }
+});
+```
+
+## Update session config
+
+Can update some vpn session configs without restarting vpn session.
+Can be used to update Fireshield rules
+
+``` java
+final SessionConfig session = //create session config
+sdk.getVPN().updateConfig(session, new CompletableCallback() {
+    @Override
+    public void complete() {
+        
+    }
+
+    @Override
+    public void error(@NonNull VpnException e) {
+
     }
 });
 ```
@@ -360,53 +407,52 @@ HydraSdk.stopVPN(TrackingConstants.GprReasons.M_UI, new CompletableCallback() {
 ## Listen for vpn status and traffic updates
 
 ```java
- HydraSdk.addVpnListener(new VpnStateListener() {
+UnifiedSDK.addVpnStateListener(new VpnStateListener() {
     @Override
-    public void vpnStateChanged(VPNState vpnState) {
-        //handle state change
+    public void vpnStateChanged(@NonNull VPNState vpnState) {
+        
     }
 
     @Override
-    public void vpnError(VPNException e) {
-        //handle vpn error
+    public void vpnError(@NonNull VpnException e) {
+
     }
 });
-HydraSdk.addTrafficListener(new TrafficListener() {
+
+UnifiedSDK.addTrafficListener(new TrafficListener() {
     @Override
-    public void onTrafficUpdate(long tx, long rx) {
-        //handle used traffic update
-        //tx - bytes transfered
-        //rx - bytes received
+    public void onTrafficUpdate(long rx, long tx) {
+        
     }
 });
 
 //stop listening for update
-HydraSdk.removeTrafficListener(...);
-HydraSdk.removeVpnListener(...);
+UnifiedSDK.removeTrafficListener(...);
+UnifiedSDK.removeVpnStateListener(...);
 ```
 
 ## Purchases functionality
 
 ```java
-HydraSdk.purchase("json from google", new CompletableCallback() {
+sdk.getBackend().purchase("json from google", new CompletableCallback() {
    @Override
    public void complete() {
        //purchase request success
    }
 
    @Override
-   public void error(HydraException e) {
+   public void error(VpnException e) {
         //failed to process purchase
    }
 });
-HydraSdk.deletePurchase(purchaseID, new CompletableCallback() {
+sdk.getBackend().deletePurchase(purchaseID, new CompletableCallback() {
    @Override
    public void complete() {
        //request success
    }
 
    @Override
-   public void error(HydraException e) {
+   public void error(VpnException e) {
         //failed to process request
    }
 });
@@ -415,88 +461,121 @@ HydraSdk.deletePurchase(purchaseID, new CompletableCallback() {
 ## Get data about user
 ```java
 //get information about remaining traffic for user
-HydraSdk.remainingTraffic(new Callback<RemainingTraffic>() {
-   @Override
-   public void success(ApiRequest request, RemainingTraffic response) {
-       //handle response
-   }
+sdk.getBackend().remainingTraffic(new Callback<RemainingTraffic>() {
+    @Override
+    public void success(@NonNull RemainingTraffic remainingTraffic) {
+        
+    }
 
-   @Override
-   public void failure(HydraException error) {
-        //failed to send request
-   }
+    @Override
+    public void failure(@NonNull VpnException e) {
+
+    }
 });
 //get information about current logged in user
-HydraSdk.currentUser(new Callback<User>() {
-   @Override
-   public void success(ApiRequest request, User response) {
-       //handle response
-   }
+sdk.getBackend().currentUser(new Callback<User>() {
+    @Override
+    public void success(@NonNull User user) {
+        
+    }
 
-   @Override
-   public void failure(HydraException error) {
-        //failed to send request
-   }
+    @Override
+    public void failure(@NonNull VpnException e) {
+
+    }
 });
 ```
 
 ## Get Current vpn state
 ```java
-HydraSdk.getVpnState(new Callback<VPNState>() {
-   @Override
-   public void success(@NonNull VPNState state) {
-        //handle current state
-   }
+UnifiedSDK.getVpnState(new Callback<VPNState>() {
+    @Override
+    public void success(@NonNull VPNState vpnState) {
+        
+    }
 
-   @Override
-   public void failure(@NonNull HydraException e) {
-        //failed to get current vpn state
-   }
+    @Override
+    public void failure(@NonNull VpnException e) {
+
+    }
 });
 ```
 
 ## Call VPN permission dialog without connecting to vpn
 
 ```java
-if (HydraSdk.requestVpnPermission(new CompletableCallback() {
+VpnPermissions.request(new CompletableCallback() {
     @Override
     public void complete() {
-        //dialog was shown and permission was granted
+        //permission was granted
     }
 
     @Override
-    public void error(HydraException e) {
-        //dialog was shown and permission was NOT granted
+    public void error(@NonNull VpnException e) {
+
     }
-})){
-    //will show vpn permissions dialog
-}else{
-    //already have vpn permissions, no need to request
-}
+});
 ```
 
+ 
+# Client network list (aka CNL)
 
-# Categorization service (aka Fireshield)
+Unified SDK provides ability to automatically start/stop vpn session when user changes network.
+List of network conditions are configured on dashboard. Open `https://developer.anchorfree.com/`, under your project select **Settings**->**Client Networks**
+Configure list of network conditions(ssid, bssid, authorization, type) and actions(start/stop).
 
-Hydra SDK provides ability to categorize domains goes through VPN and perform specified action on them.
+After vpn connection first start sdk will download configuration from server.
+When user is not running active vpn session, sdk will show notification configured by CNL state of `NotificationConfigBuilder`
+
+``` java
+NotificationConfig.Builder builder = NotificationConfig.newBuilder();
+builder.inCnl("Title","Message");
+```
+
+If no notification title/message configured it will use defauult one: 
+- `title` - CNL
+- `message` - Waiting
+
+Rules matching:
+
+When device changes network connection SDK will look through configured networks in CNL list and match current configuration with server
+
+If network type is set to WiFi:
+- if ssid and bsid are empty - it will match any Wifi network
+- if authentication is `Does not matter` - it will match open and protected networks
+- If you want to match network by SSID and/or BSSID on android 8.1+ (API 27) you need to setup and request runtime permission for use location.
+
+```xml
+ACCESS_COARSE_LOCATION
+```
+ 
+In case of missing permission, SDK will not be able to get network SSID and BSSID.
+
+When user changes network when has vpn session up and running, and new network was matched with CNL rules with action **Disabled**, 
+sdk will not reconnect to this network and throw `CnlBlockedException` in `VpnStateListener#vpnError` callback. 
+ 
+# Categorization service (aka Fireshield) (Hydra transport only)
+
+Unified SDK provides ability to categorize domains goes through VPN and perform specified action on them.
 To configure you need to create instance of **FireshieldConfig** and pass it to **SessionConfig.Builder** when starting vpn session
 
 ```java
-HydraSdk.startVPN(new SessionConfig.Builder()
-                .withVirtualLocation(HydraSdk.COUNTRY_OPTIMAL)
+final SessionInfo session = new SessionConfig.Builder()
+                .withVirtualLocation(UnifiedSDK.COUNTRY_OPTIMAL)
                 .withReason(TrackingConstants.GprReasons.M_UI)
                 .withFireshieldConfig(createFireshieldConfig())
-                .build(), new Callback<ServerCredentials>() {
-                @Override
-                public void success(@NonNull ServerCredentials serverCredentials) {
-                    //VPN connected
-                }
+                .build();
+sdk.getVPN().start(session, new CompletableCallback() {
+    @Override
+    public void complete() {
+        
+    }
 
-                @Override
-                public void failure(@NonNull HydraException e) {
-                    //Failed to connect vpn
-                }
-            });
+    @Override
+    public void error(@NonNull VpnException e) {
+
+    }
+});
 ```
 
 ## Create fireshield config
@@ -539,8 +618,63 @@ FireshieldConfig createFireshieldConfig(){
         return builder.build();
 }
 
+
+## Receive information about categorized domains
+
+SDK will fire callback when transport detect access to configure rule.
+
+```java
+UnifiedSDK.addVpnCallListener(new VpnCallback() {
+    @Override
+    public void onVpnCall(@NonNull Parcelable parcelable) {
+        if (parcelable instanceof HydraResource){
+            // handle categorization information
+        }
+    }
+});
 ```
 
+SDK provides access to some categorization stats
+
+```java
+
+final FireshieldStats stats = new FireshieldStatus();
+//get total scanned connections count
+stats.getScannedConnectionsCount(new Callback<Integer>() {
+    @Override
+    public void success(@NonNull Integer integer) {
+        
+    }
+
+    @Override
+    public void failure(@NonNull VpnException e) {
+
+    }
+});
+//get current session scanned connections count
+stats.getSessionScannedConnectionsCount();
+
+//reset total scanned connections count
+stats.resetScannedConnectionsCount();
+```
+
+# Traffic proxy Rules (Hydra transport)
+
+Its possible to configure how Hydra will operate with dns and other traffic.
+To configure it use `addDnsRule and `addProxyRule` of `SessionConfig.Builder` when starting vpn session.
+
+To bypass local network traffic and let local network resource accessible you can configure ip mask rule
+```java
+final SessionConfig builder = new SessionConfig.Builder();
+builder.addProxyRule(TrafficRule.Builder.bypass().fromIp("192.168.1.0", 24)); //all traffic to net 192.168.1.0 will go outside vpn tunnel
+```
+
+To block all dns requests to domains in project assets file
+
+```java
+final SessionConfig builder = new SessionConfig.Builder();
+builder.addDnsRule(TrafficRule.Builder.block().fromAssets("blocklist.txt"));
+``` 
 # OpenVPN transport support
 
 To add openvpn transport support:
@@ -552,43 +686,43 @@ To add openvpn transport support:
 com.github.AnchorFreePartner.hydra-sdk-android:caketube:{VERSION_NAME}
 ```
 
-2) Register transports with sdk config
+2) Register both or one transport with sdk config
 
 ```
-HydraSDKConfig config = HydraSDKConfig.newBuilder()
-//other configuration
-.registerTransport(CaketubeTransport.TRANSPORT_ID_TCP, CaketubeTransportFactory.class, CaketubeCredentialsSource.class)
-.registerTransport(CaketubeTransport.TRANSPORT_ID_UDP, CaketubeTransportFactory.class, CaketubeCredentialsSource.class)
-.registerTransport(HydraTransport.TRANSPORT_ID,HydraTransportFactory.class, HydraCredentialsSource.class)
-.build()
+List<TransportConfig> transports = new ArrayList<>();
+transports.add(HydraTransportConfig.create());
+transports.add(OpenVpnTransportConfig.tcp());
+UnifiedSDK.update(transportConfigs, callback);
 ```
 
 3) Specify transport on vpn start
 ```
-HydraSdk.startVPN(new SessionConfig.Builder()
-                .withVirtualLocation(HydraSdk.COUNTRY_OPTIMAL)
+final SessionInfo session = new SessionConfig.Builder()
+                .withVirtualLocation(UnifiedSDK.COUNTRY_OPTIMAL)
                 .withReason(TrackingConstants.GprReasons.M_UI)
                 .withTransport(CaketubeTransport.TRANSPORT_ID_TCP)
-                .build(), new Callback<ServerCredentials>() {
-                @Override
-                public void success(@NonNull ServerCredentials serverCredentials) {
-                    //VPN connected
-                }
+                .build();
+sdk.getVPN().start(session, new CompletableCallback() {
+    @Override
+    public void complete() {
+        
+    }
 
-                @Override
-                public void failure(@NonNull HydraException e) {
-                    //Failed to connect vpn
-                }
-            });
+    @Override
+    public void error(@NonNull VpnException e) {
+
+    }
+});
 ```
 
 # Exceptions
 
-All exceptions sdk can throw extends **com.anchorfree.hydrasdk.exceptions.HydraException**
+All exceptions sdk can throw extends **com.anchorfree.vpnsdk.exceptions.VpnException**
+
 
 There are couple of main derivatives of this exception
 
-- **ApiHydraException**
+### **PartnerApiException**
 
   Thrown in case of server api errors.
 
@@ -596,50 +730,54 @@ There are couple of main derivatives of this exception
 
   **getContent** - response content
 
-  Possible values for getContent:
-  - ApiException.CODE_NOT_AUTHORIZED("NOT_AUTHORIZED") - user is not authorized. Need to call HydraSdk.login
-  - ApiException.CODE_SESSIONS_EXCEED("SESSIONS_EXCEED") - Session limit is achieved in accordance with the ToS
-  - ApiException.CODE_DEVICES_EXCEED("DEVICES_EXCEED") - Devices limit is achieved in accordance with the ToS
-  - ApiException.CODE_OAUTH_ERROR("OAUTH_ERROR") - Returns in all cases when an authentication error occurred through OAuth-server
-  - ApiException.CODE_TRAFFIC_EXCEED("TRAFFIC_EXCEED") - Ended limitation traffic activated in accordance with the terms of the license
-  - ApiException.CODE_SERVER_UNAVAILABLE("SERVER_UNAVAILABLE") - Server temporary unavailable or server not found
-  - ApiException.CODE_INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR") - Internal server error
-  - ApiException.USER_SUSPENDED("USER_SUSPENDED") - User Suspended
-  - ApiException.CODE_PARSE_EXCEPTION("PARSE_EXCEPTION") - Failed to parse server response
+Possible values for getContent:
 
-- **NetworkRelatedException**
+- `CODE_NOT_AUTHORIZED` - user is not authorized. Need to call HydraSdk.login
+- `CODE_SESSIONS_EXCEED` - Session limit is achieved in accordance with the ToS
+- `CODE_DEVICES_EXCEED` - Devices limit is achieved in accordance with the ToS
+- `CODE_OAUTH_ERROR` - Returns in all cases when an authentication error occurred through OAuth-server
+- `CODE_TRAFFIC_EXCEED` - Ended limitation traffic activated in accordance with the terms of the license
+- `CODE_SERVER_UNAVAILABLE` - Server temporary unavailable or server not found
+- `CODE_INTERNAL_SERVER_ERROR` - Internal server error
+- `USER_SUSPENDED` - User Suspended
+- `CODE_PARSE_EXCEPTION` - Failed to parse server response
 
-  Thrown in case of network problem communicating to server
+### **VpnTransportException**
 
-- **VPNException**
-
-  Thrown when error happen in vpn
+  Thrown when error happen in vpn transport
 
   **getCode** - code of error
 
-  Possible values for getCode
-  - VPNException.VPN_FD_NULL_NO_PERMISSIONS(-4) - Android fatal error. VpnService.Builder.establish returns null. Not possible to continue
-  - VPNException.REVOKED(-5) - Use revoked vpn permission
-  - VPNException.VPN_PERMISSION_DENIED_BY_USER(-7) - Use not granted vpn permission in dialog
-  - VPNException.CANCELLED(-10) - Start was cancelled
-  - VPNException.HYDRA_ERROR_START_TIMEOUT(-11) - Timeout of start
-  - VPNException.HYDRA_ERROR_BROKEN(181) - VPN connection broken
-  - VPNException.HYDRA_ERROR_CONNECT(182) - Hydra fails to connect to server
-  - VPNException.HYDRA_DCN_BLOCKED_BW(191) - Hydra server reported traffic exceed. Connection interrupted
-  - VPNException.HYDRA_DCN_BLOCKED_AUTH(196) - Hydra server reported auth failed
+  - `HydraVpnTransportException` - is thrown by **Hydra** transport
+  - `CaketubeTransportException` - is thrown by **OpenVPN** transport
+   
+  Possible values for getCode on **Hydra** transport    
+  - `HydraVpnTransportException.HYDRA_ERROR_BROKEN` - VPN connection broken
+  - `HydraVpnTransportException.HYDRA_ERROR_CONNECT` - Hydra fails to connect to server
+  - `HydraVpnTransportException.HYDRA_DCN_BLOCKED_BW` - Hydra server reported traffic exceed. Connection interrupted
+  - `HydraVpnTransportException.HYDRA_DCN_BLOCKED_AUTH` - Hydra server reported auth failed
+  
+  Possible values for getCode on **OpenVPN** transport
+  - `CaketubeTransportException.CONNECTION_BROKEN_ERROR` - server interrupted connection
+  - `CaketubeTransportException.CONNECTION_FAILED_ERROR` - failed to connect to server
+  - `CaketubeTransportException.CONNECTION_AUTH_FAILURE` - server reported auth failed
+  
+### **NetworkRelatedException**
 
-- **WrongStateException**
+  Thrown in case of network problem communicating to server
 
-  Thrown when calling startVpn or stopVpn in wrong sdk state
+### **WrongStateException**
 
-- **InternalException**
+  Thrown when calling `start` or `stop` in wrong sdk state
 
-    Thrown for any other unexpected cases. In **getCause** you can get original source exception
+### **InternalException**
 
+  Thrown for any other unexpected cases. In **getCause** you can get original source exception
 
-Note: In case your device is running Android 5.0 or 5.0.1 you must restart it after receiving VPN_FD_NULL_NO_PERMISSIONS.
-Reference: https://issuetracker.google.com/issues/37011385
+### **CnlBlockedException**
 
+  Thrown when connecting to network that has **Disabled** state in CNL config.
+      
 # Sample App
 
 You can find source code of sample app with integrated sdk on [GitHub](https://github.com/AnchorFreePartner/hydrasdk-demo-android)
@@ -648,23 +786,6 @@ You can find source code of sample app with integrated sdk on [GitHub](https://g
 
 Have problems integrating the sdk or found any issue, feel free to submit bug to [GitHub](https://github.com/AnchorFreePartner/hydrasdk-demo-android/issues/new)
 
-## Collecting Debug information before submitting sdk issue
-
-After reproducing the issue, call **HydraSdk.collectDebugInfo** and attach result to your issue
-
-```java
-HydraSdk.collectDebugInfo(new Callback<String>() {
-    @Override
-    public void success(String debugInfo) {
-        //attach value of debugInfo to your issue description
-    }
-
-    @Override
-    public void failure(HydraException e) {
-
-    }
-});
-```
 
 # API changes history
 
@@ -786,6 +907,10 @@ Fix for internal account migration from older versions
 2) Internal fixes
 3) Fireshield runtime whitelist
 
+## 3.0.0
+
+1) Complete sdk refactoring
+
 # SDK version migration
 
 ## 1.0.1 - 2.2.4
@@ -828,3 +953,34 @@ Fix for internal account migration from older versions
 ## 2.4.1
 
 - no changes required
+
+## 2.4.1 - 3.0.0
+
+Use UnifiedSDK.getInstance(ClientInfo) to get sdk instance
+HydraSdk.countries - UnifiedSDK.getInstance().getBackend().countries
+HydraSdk.addTrafficListener - UnifiedSDK.addTrafficListener
+HydraSdk.addVpnListener - UnifiedSDK.addVpnStateListener
+HydraSdk.removeTrafficListener - UnifiedSDK.removeTrafficListener
+HydraSdk.removeVpnListener - UnifiedSDK.removeVpnStateListener 
+HydraSdk.deletePurchase - UnifiedSDK.getInstance().getBackend().deletePurchase
+HydraSdk.getStartVpnTimestamp - UnifiedSDK.getInstance().getVPN().getStartTimestamp
+HydraSdk.getVpnState - UnifiedSDK.getVpnState
+HydraSdk.getConnectionStatus - UnifiedSDK.getConnectionStatus
+HydraSdk.remainingTraffic - UnifiedSDK.getInstance().getBackend().remainingTraffic
+HydraSdk.restartVpn - UnifiedSDK.getInstance().getVPN().restart
+DnsRule - TrafficRule
+HydraSdk.setLoggingLevel - UnifiedSDK.setLoggingLevel
+HydraSdk.isPausedForReconnection - removed. Use UnifiedSDK.getVpnState
+HydraSdk.collectDebugInfo - removed
+HydraSdk.purchase - UnifiedSDK.getInstance().getBackend().purchase
+HydraSdk.getDeviceId - UnifiedSDK.getInstance().getInfo
+HydraSdk.currentUser - UnifiedSDK.getInstance().getBackend().currentUser
+HydraSdk.getSessionInfo - UnifiedSDK.getStatus
+HydraSdk.getAccessToken - UnifiedSDK.getInstance().getBackend().getAccessToken
+HydraSdk.requestVpnPermission - VpnPermissions.request
+HydraSdk.getConnectionAttemptId - removed, use UnifiedSDK.getStatus
+HydraSdk.getLoggingLevel - removed
+HydraSdk.isABISupported - removed
+HydraSdk.addVpnCallListener - UnifiedSDK.addVpnCallListener
+HydraSdk.removeVpnCallListener - UnifiedSDK.removeVpnCallListener
+HydraSdk.updateConfig - UnifiedSDK.getInstance().getVPN().updateConfig

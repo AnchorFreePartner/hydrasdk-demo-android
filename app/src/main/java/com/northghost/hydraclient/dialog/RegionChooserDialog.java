@@ -3,6 +3,7 @@ package com.northghost.hydraclient.dialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,13 +15,13 @@ import android.view.Window;
 import android.widget.ProgressBar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import com.anchorfree.hydrasdk.HydraSdk;
-import com.anchorfree.hydrasdk.api.data.Country;
-import com.anchorfree.hydrasdk.callbacks.Callback;
-import com.anchorfree.hydrasdk.exceptions.HydraException;
+import com.anchorfree.partner.api.data.Country;
+import com.anchorfree.partner.api.response.AvailableCountries;
+import com.anchorfree.sdk.UnifiedSDK;
+import com.anchorfree.vpnsdk.callbacks.Callback;
+import com.anchorfree.vpnsdk.exceptions.VpnException;
 import com.northghost.hydraclient.R;
 import com.northghost.hydraclient.adapter.RegionListAdapter;
-import java.util.List;
 
 public class RegionChooserDialog extends DialogFragment implements RegionListAdapter.RegionListAdapterInterface {
 
@@ -72,15 +73,16 @@ public class RegionChooserDialog extends DialogFragment implements RegionListAda
 
     private void loadServers() {
         showProgress();
-        HydraSdk.countries(new Callback<List<Country>>() {
+
+        UnifiedSDK.getInstance().getBackend().countries(new Callback<AvailableCountries>() {
             @Override
-            public void success(List<Country> countries) {
+            public void success(@NonNull final AvailableCountries countries) {
                 hideProress();
-                regionAdapter.setRegions(countries);
+                regionAdapter.setRegions(countries.getCountries());
             }
 
             @Override
-            public void failure(HydraException e) {
+            public void failure(VpnException e) {
                 hideProress();
                 dismiss();
             }
