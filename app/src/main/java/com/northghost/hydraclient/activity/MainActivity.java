@@ -27,10 +27,12 @@ import com.anchorfree.vpnsdk.exceptions.NetworkRelatedException;
 import com.anchorfree.vpnsdk.exceptions.VpnException;
 import com.anchorfree.vpnsdk.exceptions.VpnPermissionDeniedException;
 import com.anchorfree.vpnsdk.exceptions.VpnPermissionRevokedException;
+import com.anchorfree.vpnsdk.transporthydra.HydraTransport;
 import com.anchorfree.vpnsdk.transporthydra.HydraVpnTransportException;
 import com.anchorfree.vpnsdk.vpnservice.ConnectionStatus;
 import com.anchorfree.vpnsdk.vpnservice.VPNState;
 import com.anchorfree.vpnsdk.vpnservice.credentials.AppPolicy;
+import com.northghost.caketube.CaketubeTransport;
 import com.northghost.hydraclient.MainApplication;
 import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.dialog.RegionChooserDialog;
@@ -142,13 +144,19 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
             @Override
             public void success(@NonNull Boolean aBoolean) {
                 if (aBoolean) {
+                    List<String> fallbackOrder = new ArrayList<>();
+                    fallbackOrder.add(HydraTransport.TRANSPORT_ID);
+                    fallbackOrder.add(CaketubeTransport.TRANSPORT_ID_TCP);
+                    fallbackOrder.add(CaketubeTransport.TRANSPORT_ID_UDP);
                     showConnectProgress();
                     List<String> bypassDomains = new LinkedList<>();
                     bypassDomains.add("*facebook.com");
                     bypassDomains.add("*wtfismyip.com");
                     UnifiedSDK.getInstance().getVPN().start(new SessionConfig.Builder()
                             .withReason(TrackingConstants.GprReasons.M_UI)
-                            .withVirtualLocation(selectedCountry)
+                            .withTransportFallback(fallbackOrder)
+                            .withTransport(HydraTransport.TRANSPORT_ID)
+                            .withVirtualLocation(UnifiedSDK.COUNTRY_OPTIMAL)
                             .addDnsRule(TrafficRule.Builder.bypass().fromDomains(bypassDomains))
                             .build(), new CompletableCallback() {
                         @Override

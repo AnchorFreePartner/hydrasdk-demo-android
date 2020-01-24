@@ -9,13 +9,15 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 import com.anchorfree.partner.api.ClientInfo;
+import com.anchorfree.sdk.HydraTransportConfig;
 import com.anchorfree.sdk.NotificationConfig;
+import com.anchorfree.sdk.TransportConfig;
 import com.anchorfree.sdk.UnifiedSDK;
 import com.anchorfree.sdk.UnifiedSDKConfig;
-//import com.anchorfree.hydrasdk.HydraSDKConfig;
-//import com.anchorfree.hydrasdk.HydraSdk;
-//import com.anchorfree.hydrasdk.api.ClientInfo;
-//import com.anchorfree.hydrasdk.vpnservice.connectivity.NotificationConfig;
+import com.anchorfree.vpnsdk.callbacks.CompletableCallback;
+import com.northghost.caketube.OpenVpnTransportConfig;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainApplication extends Application {
 
@@ -28,6 +30,7 @@ public class MainApplication extends Application {
     }
 
     UnifiedSDK unifiedSDK;
+
     public void initHydraSdk() {
         createNotificationChannel();
         SharedPreferences prefs = getPrefs();
@@ -35,7 +38,11 @@ public class MainApplication extends Application {
                 .baseUrl(prefs.getString(BuildConfig.STORED_HOST_URL_KEY, BuildConfig.BASE_HOST))
                 .carrierId(prefs.getString(BuildConfig.STORED_CARRIER_ID_KEY, BuildConfig.BASE_CARRIER_ID))
                 .build();
-
+        List<TransportConfig> transportConfigList = new ArrayList<>();
+        transportConfigList.add(HydraTransportConfig.create());
+        transportConfigList.add(OpenVpnTransportConfig.tcp());
+        transportConfigList.add(OpenVpnTransportConfig.udp());
+        UnifiedSDK.update(transportConfigList, CompletableCallback.EMPTY);
         UnifiedSDKConfig config = UnifiedSDKConfig.newBuilder().idfaEnabled(false).build();
         unifiedSDK = UnifiedSDK.getInstance(clientInfo, config);
 

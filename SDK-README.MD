@@ -675,6 +675,8 @@ To block all dns requests to domains in project assets file
 final SessionConfig builder = new SessionConfig.Builder();
 builder.addDnsRule(TrafficRule.Builder.block().fromAssets("blocklist.txt"));
 ``` 
+
+
 # OpenVPN transport support
 
 To add openvpn transport support:
@@ -714,6 +716,36 @@ sdk.getVPN().start(session, new CompletableCallback() {
     }
 });
 ```
+
+# Transport fallback
+
+When SDK configured to use multiple transports, it can be configured to fallback to another transport in case of connection error.
+
+``` java
+    List<String> fallbackOrder = new ArrayList<>();
+    fallbackOrder.add(HydraTransport.TRANSPORT_ID);
+    fallbackOrder.add(CaketubeTransport.TRANSPORT_ID_TCP);
+    fallbackOrder.add(CaketubeTransport.TRANSPORT_ID_UDP);
+    
+    UnifiedSDK.getInstance().getVPN().start(new SessionConfig.Builder()
+            .withReason(TrackingConstants.GprReasons.M_UI)
+            .withTransportFallback(fallbackOrder)
+            .withTransport(HydraTransport.TRANSPORT_ID)
+            .withVirtualLocation(UnifiedSDK.COUNTRY_OPTIMAL)        
+            .build(), new CompletableCallback() {
+        @Override
+        public void complete() {
+            
+        }
+    
+        @Override
+        public void error(@NonNull VpnException e) {
+            
+        }
+    });
+``` 
+
+with such configuration it will try **openvpn-tcp** transport in case **hydra** transport failed to connect, and **openvpn-udp** transport if **openvn-tcp** failed as well.
 
 # Exceptions
 
@@ -789,45 +821,79 @@ Have problems integrating the sdk or found any issue, feel free to submit bug to
 
 # API changes history
 
-## 0.28.3
-
-- Deprecated
-    - TrafficStats getTrafficStats()
-    - VPNState getVpnState()
-    - void current(@NonNull final Callback<User> callback)
-    - void startVPNForApps(@NonNull final List<String> allowedApps, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
-    - void startVPNExceptApps(@NonNull final List<String> disallowedApps, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
-    - boolean isLoggingEnabled()
-    - void setLoggingEnabled()
-    - boolean isVpnStarted()
-    - VPNState getVpnState()
-
-## 0.28.4
-
-- Changed
-    - HydraSDKConfig.Builder to HydraSDKConfigBuilder
-    - ApiCallback to Callback in all public HydraSdk calls
-    - ApiCompletableCallback to CompletableCallback in all public HydraSdk calls
-    - VPNException with VPNException.WRONG_STATE code to WrongStateException
-    - NotAuthorizedException to ApiHydraException with HttpsURLConnection.HTTP_UNAUTHORIZED code
-    - NetworkException to NetworkRelatedException
-    - SystemPermissionsErrorException to VPNException with VPNException.VPN_FD_NULL_NO_PERMISSIONS
-
-- Removed
-    - HttpException
-    - SystemPermissionsErrorException
-
-## 0.28.5
+## 3.1.0
 
 - Added
+    - SessionConfig.Builder#withTransportFallback - configure transport fallback on multiple transports configured
+- Fixed
+    - Always On disconnect issue
+    - Captive portal detection
+    - Security improvements    
 
-    - method **channelId** to **NotificationConfig** for notifications support on Android O+
+## 3.0.0
 
-## 0.28.7-alpha2
+- Complete sdk refactoring
 
-- Changed
+## 2.4.1
 
-    - ServerCredentials now have multiple servers we are trying to connect
+- Openvpn android q support
+- Internal fixes
+- Fireshield runtime whitelist
+
+## 2.4.0
+
+- Client network list
+- Private servers
+- Internal fixes
+
+## 2.3.1
+
+- Fix for internal account migration from older versions
+
+## 2.3.0
+
+- Added support for OpenVPN transport
+
+## 2.2.4
+
+- Internal analytics improvements
+
+## 2.2.0
+
+- Internal improvements
+
+## 2.2.1
+
+- Removed sticky vpn service on network loss and reconnection
+
+## 2.0.0
+
+- Internal refactoring
+- Removed all deprecated versions
+- startVPN/stopVPN errors are forwarded also to vpnError callback of HydraSdk.addVpnListener(). Callbacks on startVpn/stopVpn will be called when operation is finished
+- Cannot turn off notification for PAUSED state
+- new VpnState - PAUSED - sdk moves to this state when connection was lost due to network loss, and will be restored on network connected
+- vpnError callback now gets base HydraException
+
+## 1.2.1
+
+- updated vpn transport lib
+
+## 1.2.0
+
+- remote domain bypass lists integrated
+
+## 1.1.0
+
+- Supports VPN Always on feature
+
+## 1.0.2
+
+- No significant changes
+
+## 1.0.1
+
+- No significant changes
 
 ## 1.0.0
 
@@ -844,74 +910,98 @@ Have problems integrating the sdk or found any issue, feel free to submit bug to
     - addBlacklistDomain
     - addBlacklistDomains
     - addBypassDomains
+    
+## 0.28.7-alpha2
 
-## 1.0.1
+- Changed
+    - ServerCredentials now have multiple servers we are trying to connect
+    
+## 0.28.5
 
-No changes
+- Added
+    - method **channelId** to **NotificationConfig** for notifications support on Android O+
+        
+## 0.28.4
 
-## 1.0.2
+- Changed
+    - HydraSDKConfig.Builder to HydraSDKConfigBuilder
+    - ApiCallback to Callback in all public HydraSdk calls
+    - ApiCompletableCallback to CompletableCallback in all public HydraSdk calls
+    - VPNException with VPNException.WRONG_STATE code to WrongStateException
+    - NotAuthorizedException to ApiHydraException with HttpsURLConnection.HTTP_UNAUTHORIZED code
+    - NetworkException to NetworkRelatedException
+    - SystemPermissionsErrorException to VPNException with VPNException.VPN_FD_NULL_NO_PERMISSIONS
 
-No changes
+- Removed
+    - HttpException
+    - SystemPermissionsErrorException
 
-## 1.1.0
 
-1) Supports VPN Always on feature
+## 0.28.3
 
-## 1.2.0
-
-1) remote domain bypass lists integrated
-
-## 1.2.1
-
-1) updated vpn transport lib
-
-## 2.0.0
-
-Internal refactoring
-
-1) Removed all deprecated versions
-2) startVPN/stopVPN errors are forwarded also to vpnError callback of HydraSdk.addVpnListener(). Callbacks on startVpn/stopVpn will be called when operation is finished
-3) Cannot turn off notification for PAUSED state
-4) new VpnState - PAUSED - sdk moves to this state when connection was lost due to network loss, and will be restored on network connected
-5) vpnError callback now gets base HydraException
-
-## 2.2.0
-
-Internal improvements
-
-## 2.2.1
-
-Removed sticky vpn service on network loss and reconnection
-
-## 2.2.4
-
-Internal analytics improvements
-
-## 2.3.0
-
-Added support for OpenVPN transport
-
-## 2.3.1
-
-Fix for internal account migration from older versions
-
-## 2.4.0
-
-1) Client network list
-2) Private servers
-3) Internal fixes
-
-## 2.4.1
-
-1) Openvpn android q support
-2) Internal fixes
-3) Fireshield runtime whitelist
-
-## 3.0.0
-
-1) Complete sdk refactoring
+- Deprecated
+    - TrafficStats getTrafficStats()
+    - VPNState getVpnState()
+    - void current(@NonNull final Callback<User> callback)
+    - void startVPNForApps(@NonNull final List<String> allowedApps, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
+    - void startVPNExceptApps(@NonNull final List<String> disallowedApps, @TrackingConstants.GprReason @NonNull final String reason, @NonNull final Callback<ServerCredentials> callback)
+    - boolean isLoggingEnabled()
+    - void setLoggingEnabled()
+    - boolean isVpnStarted()
+    - VPNState getVpnState()
 
 # SDK version migration
+
+## 3.0.0 - 3.1.0
+
+- No changes required
+
+## 2.4.1 - 3.0.0
+
+- Use UnifiedSDK.getInstance(ClientInfo) to get sdk instance
+- HydraSdk.countries - UnifiedSDK.getInstance().getBackend().countries
+- HydraSdk.addTrafficListener - UnifiedSDK.addTrafficListener
+- HydraSdk.addVpnListener - UnifiedSDK.addVpnStateListener
+- HydraSdk.removeTrafficListener - UnifiedSDK.removeTrafficListener
+- HydraSdk.removeVpnListener - UnifiedSDK.removeVpnStateListener 
+- HydraSdk.deletePurchase - UnifiedSDK.getInstance().getBackend().deletePurchase
+- HydraSdk.getStartVpnTimestamp - UnifiedSDK.getInstance().getVPN().getStartTimestamp
+- HydraSdk.getVpnState - UnifiedSDK.getVpnState
+- HydraSdk.getConnectionStatus - UnifiedSDK.getConnectionStatus
+- HydraSdk.remainingTraffic - UnifiedSDK.getInstance().getBackend().remainingTraffic
+- HydraSdk.restartVpn - UnifiedSDK.getInstance().getVPN().restart
+- DnsRule - TrafficRule
+- HydraSdk.setLoggingLevel - UnifiedSDK.setLoggingLevel
+- HydraSdk.isPausedForReconnection - removed. Use UnifiedSDK.getVpnState
+- HydraSdk.collectDebugInfo - removed
+- HydraSdk.purchase - UnifiedSDK.getInstance().getBackend().purchase
+- HydraSdk.getDeviceId - UnifiedSDK.getInstance().getInfo
+- HydraSdk.currentUser - UnifiedSDK.getInstance().getBackend().currentUser
+- HydraSdk.getSessionInfo - UnifiedSDK.getStatus
+- HydraSdk.getAccessToken - UnifiedSDK.getInstance().getBackend().getAccessToken
+- HydraSdk.requestVpnPermission - VpnPermissions.request
+- HydraSdk.getConnectionAttemptId - removed, use UnifiedSDK.getStatus
+- HydraSdk.getLoggingLevel - removed
+- HydraSdk.isABISupported - removed
+- HydraSdk.addVpnCallListener - UnifiedSDK.addVpnCallListener
+- HydraSdk.removeVpnCallListener - UnifiedSDK.removeVpnCallListener
+- HydraSdk.updateConfig - UnifiedSDK.getInstance().getVPN().updateConfig
+
+## 2.4.0 - 2.4.1
+
+- no changes required
+
+## 2.3.1 - 2.4.0
+
+- no changes required
+
+## 2.3.0 - 2.3.1
+
+- no changes required
+
+## 2.2.4 - 2.3.0
+
+- no changes required 
 
 ## 1.0.1 - 2.2.4
 
@@ -938,49 +1028,10 @@ Fix for internal account migration from older versions
 - HydraSdk.isPausedForReconnection() removed use HydraSdk.isPausedForReconnection(Callback<Boolean>) instead
 - HydraSdk.logout() removed, use HydraSdk.logout(CompletableCallback) instead
 
-## 2.2.4 - 2.3.0
 
-- no changes required 
+ 
 
-## 2.3.0 - 2.3.1
 
-- no changes required 
 
-## 2.3.1 - 2.4.0
 
-- no changes required
 
-## 2.4.1
-
-- no changes required
-
-## 2.4.1 - 3.0.0
-
-Use UnifiedSDK.getInstance(ClientInfo) to get sdk instance
-HydraSdk.countries - UnifiedSDK.getInstance().getBackend().countries
-HydraSdk.addTrafficListener - UnifiedSDK.addTrafficListener
-HydraSdk.addVpnListener - UnifiedSDK.addVpnStateListener
-HydraSdk.removeTrafficListener - UnifiedSDK.removeTrafficListener
-HydraSdk.removeVpnListener - UnifiedSDK.removeVpnStateListener 
-HydraSdk.deletePurchase - UnifiedSDK.getInstance().getBackend().deletePurchase
-HydraSdk.getStartVpnTimestamp - UnifiedSDK.getInstance().getVPN().getStartTimestamp
-HydraSdk.getVpnState - UnifiedSDK.getVpnState
-HydraSdk.getConnectionStatus - UnifiedSDK.getConnectionStatus
-HydraSdk.remainingTraffic - UnifiedSDK.getInstance().getBackend().remainingTraffic
-HydraSdk.restartVpn - UnifiedSDK.getInstance().getVPN().restart
-DnsRule - TrafficRule
-HydraSdk.setLoggingLevel - UnifiedSDK.setLoggingLevel
-HydraSdk.isPausedForReconnection - removed. Use UnifiedSDK.getVpnState
-HydraSdk.collectDebugInfo - removed
-HydraSdk.purchase - UnifiedSDK.getInstance().getBackend().purchase
-HydraSdk.getDeviceId - UnifiedSDK.getInstance().getInfo
-HydraSdk.currentUser - UnifiedSDK.getInstance().getBackend().currentUser
-HydraSdk.getSessionInfo - UnifiedSDK.getStatus
-HydraSdk.getAccessToken - UnifiedSDK.getInstance().getBackend().getAccessToken
-HydraSdk.requestVpnPermission - VpnPermissions.request
-HydraSdk.getConnectionAttemptId - removed, use UnifiedSDK.getStatus
-HydraSdk.getLoggingLevel - removed
-HydraSdk.isABISupported - removed
-HydraSdk.addVpnCallListener - UnifiedSDK.addVpnCallListener
-HydraSdk.removeVpnCallListener - UnifiedSDK.removeVpnCallListener
-HydraSdk.updateConfig - UnifiedSDK.getInstance().getVPN().updateConfig
