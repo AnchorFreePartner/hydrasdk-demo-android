@@ -548,12 +548,18 @@ If network type is set to WiFi:
 ```xml
 ACCESS_COARSE_LOCATION
 ```
- 
+
+- If you want to match network by SSID and/or BSSID on android 10+ (API 29) you need to setup and request runtime permission for use location.
+
+```xml
+ACCESS_FINE_LOCATION
+```
+
 In case of missing permission, SDK will not be able to get network SSID and BSSID.
 
-When user changes network when has vpn session up and running, and new network was matched with CNL rules with action **Disabled**, 
-sdk will not reconnect to this network and throw `CnlBlockedException` in `VpnStateListener#vpnError` callback. 
- 
+When user changes network when has vpn session up and running, and new network was matched with CNL rules with action **Disabled**,
+sdk will not reconnect to this network and throw `CnlBlockedException` in `VpnStateListener#vpnError` callback.
+
 # Categorization service (aka Fireshield) (Hydra transport only)
 
 Unified SDK provides ability to categorize domains goes through VPN and perform specified action on them.
@@ -568,7 +574,7 @@ final SessionInfo session = new SessionConfig.Builder()
 sdk.getVPN().start(session, new CompletableCallback() {
     @Override
     public void complete() {
-        
+
     }
 
     @Override
@@ -643,7 +649,7 @@ final FireshieldStats stats = new FireshieldStatus();
 stats.getScannedConnectionsCount(new Callback<Integer>() {
     @Override
     public void success(@NonNull Integer integer) {
-        
+
     }
 
     @Override
@@ -674,18 +680,24 @@ To block all dns requests to domains in project assets file
 ```java
 final SessionConfig builder = new SessionConfig.Builder();
 builder.addDnsRule(TrafficRule.Builder.block().fromAssets("blocklist.txt"));
-``` 
-
-
+```
 # OpenVPN transport support
 
-To add openvpn transport support:
+If your project targetSdk is 29 and you use Google App Bundle for application distribution. Add
 
+```
+android.bundle.enableUncompressedNativeLibs=false
+```
+
+to your **gradle.properties** to make OpenVPN transport work on Android Q. If you are not using Google App Bundle this step is not required
+
+
+To add openvpn transport support:
 
 1) Add openvpn depencency to **build.gradle**
 
 ```
-com.github.AnchorFreePartner.hydra-sdk-android:caketube:{VERSION_NAME}
+com.github.AnchorFreePartner.hydra-sdk-android:openvpn:{VERSION_NAME}
 ```
 
 2) Register both or one transport with sdk config
@@ -707,7 +719,7 @@ final SessionInfo session = new SessionConfig.Builder()
 sdk.getVPN().start(session, new CompletableCallback() {
     @Override
     public void complete() {
-        
+
     }
 
     @Override
@@ -716,36 +728,6 @@ sdk.getVPN().start(session, new CompletableCallback() {
     }
 });
 ```
-
-# Transport fallback
-
-When SDK configured to use multiple transports, it can be configured to fallback to another transport in case of connection error.
-
-``` java
-    List<String> fallbackOrder = new ArrayList<>();
-    fallbackOrder.add(HydraTransport.TRANSPORT_ID);
-    fallbackOrder.add(CaketubeTransport.TRANSPORT_ID_TCP);
-    fallbackOrder.add(CaketubeTransport.TRANSPORT_ID_UDP);
-    
-    UnifiedSDK.getInstance().getVPN().start(new SessionConfig.Builder()
-            .withReason(TrackingConstants.GprReasons.M_UI)
-            .withTransportFallback(fallbackOrder)
-            .withTransport(HydraTransport.TRANSPORT_ID)
-            .withVirtualLocation(UnifiedSDK.COUNTRY_OPTIMAL)        
-            .build(), new CompletableCallback() {
-        @Override
-        public void complete() {
-            
-        }
-    
-        @Override
-        public void error(@NonNull VpnException e) {
-            
-        }
-    });
-``` 
-
-with such configuration it will try **openvpn-tcp** transport in case **hydra** transport failed to connect, and **openvpn-udp** transport if **openvn-tcp** failed as well.
 
 # Exceptions
 
@@ -820,6 +802,19 @@ Have problems integrating the sdk or found any issue, feel free to submit bug to
 
 
 # API changes history
+
+## 3.1.1
+
+- Fixes
+    - Documentation on android 10 connect openvpn
+
+- Added
+    - UnifiedSDKConfigBuilder#runCallbacksOn
+    - UnifiedSDK#update(CallbackMode)
+
+- Deprecated
+    - UnifiedSDKConfigBuilder#idfaEnabled
+
 
 ## 3.1.0
 
