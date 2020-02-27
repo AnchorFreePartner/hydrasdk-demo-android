@@ -156,7 +156,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                             .withReason(TrackingConstants.GprReasons.M_UI)
                             .withTransportFallback(fallbackOrder)
                             .withTransport(HydraTransport.TRANSPORT_ID)
-                            .withVirtualLocation(UnifiedSDK.COUNTRY_OPTIMAL)
+                            .withVirtualLocation(selectedCountry)
                             .addDnsRule(TrafficRule.Builder.bypass().fromDomains(bypassDomains))
                             .build(), new CompletableCallback() {
                         @Override
