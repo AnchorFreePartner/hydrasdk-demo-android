@@ -3,4 +3,5 @@
     <color name="primary">#3F51B5</color>
     <color name="primary_dark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <bool name="vpn_process_enabled">false</bool>
 </resources>

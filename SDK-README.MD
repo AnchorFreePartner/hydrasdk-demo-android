@@ -206,6 +206,20 @@ public class MyApplication extends Application {
    }
 }
 ```
+## Defer VPN service initialization
+
+Add boolean resource to disable vpn service
+
+```
+<bool name="vpn_process_enabled">false</bool>
+```
+
+To enable service later:
+
+```
+PackageManager pm = context.getPackageManager();
+pm.setComponentEnabledSetting(new ComponentName(context, AFVpnService.class), PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+```
 
 ## Authentication
 
@@ -517,7 +531,26 @@ VpnPermissions.request(new CompletableCallback() {
 });
 ```
 
- 
+# SDK reconnection logic on network switch
+
+By default sdk will automatically handle network reconnection when user switches between network.
+
+If VPN is ON and user disable network connection SDK gets to **PAUSED** state. After network connection is enabled, sdk automatically connects with last successful config.
+
+The same behaviour happen in case of transport error during the connection. Except of unrecoverable exceptions:
+
+- `CODE_NOT_AUTHORIZED` - user is not authorized. Need to call HydraSdk.login
+- `CODE_SESSIONS_EXCEED` - Session limit is achieved in accordance with the ToS
+- `CODE_DEVICES_EXCEED` - Devices limit is achieved in accordance with the ToS
+- `CODE_OAUTH_ERROR` - Returns in all cases when an authentication error occurred through OAuth-server
+- `CODE_TRAFFIC_EXCEED` - Ended limitation traffic activated in accordance with the terms of the license
+- `USER_SUSPENDED` - User Suspended
+
+To control this behaviour use
+```
+ UnifiedSDK.setReconnectionEnabled(false);
+```
+
 # Client network list (aka CNL)
 
 Unified SDK provides ability to automatically start/stop vpn session when user changes network.
@@ -802,6 +835,17 @@ Have problems integrating the sdk or found any issue, feel free to submit bug to
 
 
 # API changes history
+
+## 3.1.2
+
+- Added
+  - SessionConfig#keepVpnOnReconnect
+  - UnifiedSDK#setReconnectionEnabled(boolean)
+
+- Fixes
+  - Fix relogin on NOT_AUTHORIZED error
+  - rare crashes
+  - analytics crashes
 
 ## 3.1.1
 
