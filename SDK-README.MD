@@ -836,6 +836,13 @@ Have problems integrating the sdk or found any issue, feel free to submit bug to
 
 # API changes history
 
+## 3.2.0
+
+- Fixes
+  - Blast transport initialization
+  - rare crashes
+  - analytics fix
+
 ## 3.1.2
 
 - Added
