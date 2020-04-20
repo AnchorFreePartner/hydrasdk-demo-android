@@ -150,8 +150,8 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                     fallbackOrder.add(CaketubeTransport.TRANSPORT_ID_UDP);
                     showConnectProgress();
                     List<String> bypassDomains = new LinkedList<>();
-                    bypassDomains.add("*facebook.com");
-                    bypassDomains.add("*wtfismyip.com");
+                    bypassDomains.add("*domain1.com");
+                    bypassDomains.add("*domain2.com");
                     UnifiedSDK.getInstance().getVPN().start(new SessionConfig.Builder()
                             .withReason(TrackingConstants.GprReasons.M_UI)
                             .withTransportFallback(fallbackOrder)
