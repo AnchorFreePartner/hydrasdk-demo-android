@@ -761,6 +761,108 @@ sdk.getVPN().start(session, new CompletableCallback() {
     }
 });
 ```
+# Custom sdk dependendencies
+
+You can control some parts of sdk internal logic by overriding dependencies used by sdk
+
+1. Define raw resource e.g **sdk_deps.json**
+2. Setup meta-data in **AndroidManifest.json**
+```xml
+<meta-data
+            android:name="com.anchorfree.vpnsdk.deps"
+            android:resource="@raw/sdk_deps"/>
+```
+
+3. Ensure custom dependency classes is not renamed or removed by ProGuard or similar software
+
+- Content of **sdk_deps.json**
+
+General structure of dependencies config looks like
+
+```json
+{
+  "dependency 1 key": {
+    "type": "class 1 name for dependency to use"
+  },
+  "dependency 2 key": {
+    "type": "class 2 name for dependency to use"
+  }
+}
+```
+
+## Possible dependencies overrides
+
+### Additional configuration of OkHttpClient used in sdk
+----
+
+1. Define class that implements **OkHttpNetworkLayer.HttpClientConfigurer**
+
+```java
+@Keep
+public class SampleOkHttpConfigurer implements OkHttpNetworkLayer.HttpClientConfigurer {
+    @Override
+    public void configure(@NonNull final OkHttpClient.Builder builder) {
+        //perform custom configuration of OkHttpClient.Builder
+    }
+}
+```
+
+2. Setup SDK dependency override in **sdk_deps**
+
+```json
+ {
+     "okHttpConfigurer": {
+        "type": "com.sdk.sample.SampleOkHttpConfigurer"
+     }
+ }
+```
+
+### Custom backend URL rotator
+----
+
+1. Define class that implements **UrlRotator**
+
+```java
+public class SampleUrlRotator implements UrlRotator {
+    @Override
+    public void failure(String httpUrl, PartnerRequestException error) {
+        //mark url as failed
+    }
+
+    @Override
+    public void success(String httpUrl) {
+        //mark url as success
+    }
+
+    @Override
+    public String provide() {
+        // return url for backend calls
+        return null;
+    }
+}
+```
+
+2. Define class that implements **UrlRotatorFactory**
+
+```java
+@Keep
+public class SampleUrlRotatorFactory implements UrlRotatorFactory {
+    @Override
+    public BackendUrlRotator create(Context context, ClientInfo clientInfo) {
+        return new SampleUrlRotator();
+    }
+}
+```
+
+3. Setup SDK dependency override in **sdk_deps**
+
+```json
+ {
+     "urlRotator": {
+        "type": "com.sdk.sample.SampleUrlRotatorFactory"
+     }
+ }
+```
 
 # Exceptions
 
@@ -835,6 +937,15 @@ Have problems integrating the sdk or found any issue, feel free to submit bug to
 
 
 # API changes history
+
+## 3.3.2
+
+- Added
+  - SDK override dependencies (refer to documentation section **Custom sdk dependendencies**)
+
+- Deprecated
+  - ClientInfo#Builder.baseUrl
+
 
 ## 3.2.0
 
