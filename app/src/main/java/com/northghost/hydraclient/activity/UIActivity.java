@@ -1,23 +1,29 @@
 package com.northghost.hydraclient.activity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import com.anchorfree.partner.api.ClientInfo;
 import com.anchorfree.partner.api.response.RemainingTraffic;
 import com.anchorfree.sdk.UnifiedSDK;
 import com.anchorfree.vpnsdk.callbacks.Callback;
 import com.anchorfree.vpnsdk.exceptions.VpnException;
 import com.anchorfree.vpnsdk.vpnservice.VPNState;
+import com.northghost.hydraclient.BuildConfig;
 import com.northghost.hydraclient.R;
 import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.utils.Converter;
@@ -59,6 +65,9 @@ public abstract class UIActivity extends AppCompatActivity {
     @BindView(R.id.selected_server)
     TextView selectedServerTextView;
 
+    @BindView(R.id.url) EditText url;
+    @BindView(R.id.carrier) EditText carrier;
+    UnifiedSDK unifiedSDK;
     private Handler mUIHandler = new Handler(Looper.getMainLooper());
     final Runnable mUIUpdateRunnable = new Runnable() {
         @Override
@@ -75,6 +84,30 @@ public abstract class UIActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+
+        initSDK();
+    }
+
+    private void initSDK() {
+        final SharedPreferences prefs = getPrefs();
+        final String url = prefs.getString(BuildConfig.STORED_HOST_URL_KEY, BuildConfig.BASE_HOST);
+        final String carrier = prefs.getString(BuildConfig.STORED_CARRIER_ID_KEY, "");
+        this.url.setText(url);
+        this.carrier.setText(carrier);
+        if (!TextUtils.isEmpty(url) && !TextUtils.isEmpty(carrier)) {
+            ClientInfo clientInfo = ClientInfo.newBuilder()
+                    .baseUrl(url)
+                    .carrierId(carrier)
+                    .build();
+            unifiedSDK = UnifiedSDK.getInstance(clientInfo);
+            loginBtnTextView.setEnabled(true);
+        } else {
+            loginBtnTextView.setEnabled(false);
+        }
+    }
+
+    public SharedPreferences getPrefs() {
+        return getSharedPreferences(BuildConfig.SHARED_PREFS, Context.MODE_PRIVATE);
     }
 
     @Override
@@ -103,21 +136,11 @@ public abstract class UIActivity extends AppCompatActivity {
 
     @OnClick(R.id.login_btn)
     public void onLoginBtnClick(View v) {
-        isLoggedIn(new Callback<Boolean>() {
-            @Override
-            public void success(@NonNull Boolean aBoolean) {
-                if (aBoolean) {
-                    logOutFromVnp();
-                } else {
-                    LoginDialog.newInstance().show(getSupportFragmentManager(), LoginDialog.TAG);
-                }
-            }
-
-            @Override
-            public void failure(@NonNull VpnException e) {
-
-            }
-        });
+        if (unifiedSDK == null) {
+            Toast.makeText(this, "SDK is not configured", Toast.LENGTH_LONG).show();
+            return;
+        }
+        loginToVpn();
     }
 
     protected abstract void isLoggedIn(Callback<Boolean> callback);
@@ -126,8 +149,22 @@ public abstract class UIActivity extends AppCompatActivity {
 
     protected abstract void logOutFromVnp();
 
+    @OnClick(R.id.init_btn)
+    public void onInitClick(View v) {
+        final SharedPreferences prefs = getPrefs();
+        prefs.edit()
+                .putString(BuildConfig.STORED_HOST_URL_KEY, url.getText().toString())
+                .putString(BuildConfig.STORED_CARRIER_ID_KEY, carrier.getText().toString())
+                .apply();
+        initSDK();
+    }
+
     @OnClick(R.id.connect_btn)
     public void onConnectBtnClick(View v) {
+        if (unifiedSDK == null) {
+            Toast.makeText(this, "SDK is not configured", Toast.LENGTH_LONG).show();
+            return;
+        }
         isConnected(new Callback<Boolean>() {
             @Override
             public void success(@NonNull Boolean aBoolean) {
@@ -153,6 +190,10 @@ public abstract class UIActivity extends AppCompatActivity {
 
     @OnClick(R.id.optimal_server_btn)
     public void onServerChooserClick(View v) {
+        if (unifiedSDK == null) {
+            Toast.makeText(this, "SDK is not configured", Toast.LENGTH_LONG).show();
+            return;
+        }
         chooseServer();
     }
 
@@ -231,10 +272,6 @@ public abstract class UIActivity extends AppCompatActivity {
             }
         });
 
-
-
-
-
         getCurrentServer(new Callback<String>() {
             @Override
             public void success(@NonNull final String currentServer) {
@@ -253,7 +290,6 @@ public abstract class UIActivity extends AppCompatActivity {
                 selectedServerTextView.setText("UNKNOWN");
             }
         });
-
     }
 
     protected void updateTrafficStats(long outBytes, long inBytes) {

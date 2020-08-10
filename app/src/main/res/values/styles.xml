@@ -9,7 +9,6 @@
         <item name="colorAccent">@color/primary</item>
         <item name="colorSwitchThumbNormal">@android:color/white</item>
         <item name="android:windowBackground">@android:color/white</item>
-        <item name="android:colorBackground">@android:color/white</item>
 
         <item name="android:dialogTheme">@style/AppDialogTheme</item>
         <item name="android:alertDialogTheme">@style/AppAlertTheme</item>

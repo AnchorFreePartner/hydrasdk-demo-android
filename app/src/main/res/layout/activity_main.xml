@@ -13,7 +13,39 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:theme="@style/ToolbarTheme"/>
-
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Backend URL:"
+            android:textColor="@android:color/black"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:id="@+id/url"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Carrier:"
+            android:textColor="@android:color/black"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:textColor="@android:color/black"
+            android:layout_height="wrap_content"
+            android:id="@+id/carrier"/>
+        <TextView
+            android:id="@+id/init_btn"
+            style="@style/DefaultBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="150dp"
+            android:text="Init"/>
+    </LinearLayout>
     <LinearLayout
         style="@style/ButtonLayout"
         android:layout_width="match_parent"

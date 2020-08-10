@@ -62,7 +62,7 @@ public class LoginDialog extends DialogFragment {
         SharedPreferences prefs = ((MainApplication) getActivity().getApplication()).getPrefs();
 
         hostUrlEditText.setText(prefs.getString(BuildConfig.STORED_HOST_URL_KEY, BuildConfig.BASE_HOST));
-        carrierIdEditText.setText(prefs.getString(BuildConfig.STORED_CARRIER_ID_KEY, BuildConfig.BASE_CARRIER_ID));
+        carrierIdEditText.setText(prefs.getString(BuildConfig.STORED_CARRIER_ID_KEY, ""));
 
         // Show soft keyboard automatically and request focus to field
         hostUrlEditText.requestFocus();
@@ -89,7 +89,6 @@ public class LoginDialog extends DialogFragment {
         String hostUrl = hostUrlEditText.getText().toString();
         if (hostUrl.equals("")) hostUrl = BuildConfig.BASE_HOST;
         String carrierId = carrierIdEditText.getText().toString();
-        if (carrierId.equals("")) carrierId = BuildConfig.BASE_CARRIER_ID;
 
         loginConfirmationInterface.setLoginParams(hostUrl, carrierId);
         loginConfirmationInterface.loginUser();

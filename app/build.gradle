@@ -16,7 +16,6 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "BASE_HOST", "\"https://backend.northghost.com\""
-        buildConfigField "String", "BASE_CARRIER_ID", "\"afdemo\""
         buildConfigField "String", "BASE_OAUTH_METHOD", "\"anonymous\""
 
         buildConfigField "String", "SHARED_PREFS", "\"NORTHGHOST_SHAREDPREFS\""
