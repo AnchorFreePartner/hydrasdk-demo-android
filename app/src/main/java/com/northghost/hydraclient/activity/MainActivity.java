@@ -109,18 +109,19 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
         UnifiedSDK.getInstance().getBackend().logout(new CompletableCallback() {
             @Override
             public void complete() {
-
+                hideLoginProgress();
+                updateUI();
             }
 
             @Override
             public void error(VpnException e) {
-
+                hideLoginProgress();
+                updateUI();
             }
         });
         selectedCountry = "";
 
-        hideLoginProgress();
-        updateUI();
+
     }
 
     @Override

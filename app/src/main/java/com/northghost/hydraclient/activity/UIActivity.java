@@ -140,7 +140,11 @@ public abstract class UIActivity extends AppCompatActivity {
             Toast.makeText(this, "SDK is not configured", Toast.LENGTH_LONG).show();
             return;
         }
-        loginToVpn();
+        if (UnifiedSDK.getInstance().getBackend().isLoggedIn()) {
+            logOutFromVnp();
+        }else{
+            loginToVpn();
+        }
     }
 
     protected abstract void isLoggedIn(Callback<Boolean> callback);
