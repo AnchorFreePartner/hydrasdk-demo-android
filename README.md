@@ -22,11 +22,13 @@ Minimum Android SDK version 15
 
 ![add locations](assets/add-location.png)
 
-6. Login to the app using **project_id** from dashboard
+6. Put the **project_id** from dashboard to the app
 
 ![app login](assets/app-login.png)
 
-7. Click "Connect"
+7. Click "Init"
+8. Click "Login"
+9. Click "Connect"
 
 # Documentation
 
