@@ -99,6 +99,8 @@ public abstract class UIActivity extends AppCompatActivity {
                     .baseUrl(url)
                     .carrierId(carrier)
                     .build();
+
+            UnifiedSDK.clearInstances();
             unifiedSDK = UnifiedSDK.getInstance(clientInfo);
             loginBtnTextView.setEnabled(true);
         } else {
