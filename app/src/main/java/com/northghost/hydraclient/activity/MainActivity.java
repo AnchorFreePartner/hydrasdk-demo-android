@@ -3,6 +3,7 @@ package com.northghost.hydraclient.activity;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import com.anchorfree.partner.api.ClientInfo;
 import com.anchorfree.partner.api.auth.AuthMethod;
 import com.anchorfree.partner.api.data.Country;
 import com.anchorfree.partner.api.response.RemainingTraffic;
@@ -355,6 +356,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     //fake method to support migration documentation and list all available methods
     public void sdkMethodsList() {
         final UnifiedSDK instance = UnifiedSDK.getInstance();
+        ClientInfo.newBuilder().addUrl("").carrierId("test").addUrls(new ArrayList<>()).build();
         instance.getBackend().deletePurchase(0, CompletableCallback.EMPTY);
         instance.getVPN().getStartTimestamp(new Callback<Long>() {
             @Override

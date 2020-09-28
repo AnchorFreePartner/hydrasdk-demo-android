@@ -938,10 +938,18 @@ Have problems integrating the sdk or found any issue, feel free to submit bug to
 
 # API changes history
 
+## 3.3.3
+
+- Fixes
+ - Analytics improvements
+ - DNS leak
+
 ## 3.3.2
 
 - Added
   - SDK override dependencies (refer to documentation section **Custom sdk dependendencies**)
+  - ClientInfo#Builder.addUrl
+  - ClientInfo#Builder.addUrls
 
 - Deprecated
   - ClientInfo#Builder.baseUrl
