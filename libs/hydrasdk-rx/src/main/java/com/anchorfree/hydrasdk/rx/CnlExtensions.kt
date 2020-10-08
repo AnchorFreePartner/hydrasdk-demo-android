@@ -5,17 +5,29 @@ import com.anchorfree.sdk.CnlConfig
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 
-fun CNL.loadList(): Single<List<CnlConfig>> = Single.create {
-    val listener = RxSingleCallback<List<CnlConfig>>(it)
-    this.loadList(listener)
+fun CNL.asReactive(): CnlRx = CnlRxImpl(this)
+
+interface CnlRx {
+    fun loadList(): Single<List<CnlConfig>>
+
+    fun updateList(configs: List<CnlConfig>): Completable
+
+    fun clear(): Completable
 }
 
-fun CNL.updateList(configs: List<CnlConfig>): Completable = Completable.create {
-    val listener = RxCompletableCallback(it)
-    this.updateList(configs, listener)
-}
+private class CnlRxImpl(private val cnl: CNL) : CnlRx {
+    override fun loadList(): Single<List<CnlConfig>> = Single.create {
+        val listener = RxSingleCallback<List<CnlConfig>>(it)
+        cnl.loadList(listener)
+    }
 
-fun CNL.clear(): Completable = Completable.create {
-    val listener = RxCompletableCallback(it)
-    this.clear(listener)
+    override fun updateList(configs: List<CnlConfig>): Completable = Completable.create {
+        val listener = RxCompletableCallback(it)
+        cnl.updateList(configs, listener)
+    }
+
+    override fun clear(): Completable = Completable.create {
+        val listener = RxCompletableCallback(it)
+        cnl.clear(listener)
+    }
 }

@@ -1,10 +1,7 @@
 package com.anchorfree.hydrasdk.rx
 
 import android.os.Parcelable
-import com.anchorfree.vpnsdk.callbacks.Callback
-import com.anchorfree.vpnsdk.callbacks.CompletableCallback
-import com.anchorfree.vpnsdk.callbacks.TrafficListener
-import com.anchorfree.vpnsdk.callbacks.VpnStateListener
+import com.anchorfree.vpnsdk.callbacks.*
 import com.anchorfree.vpnsdk.exceptions.VpnException
 import com.anchorfree.vpnsdk.vpnservice.VPNState
 import io.reactivex.rxjava3.core.CompletableEmitter
