@@ -1,10 +1,13 @@
 buildscript {
+    ext.kotlin_version = '1.4.10'
     repositories {
         jcenter()
         maven { url 'https://maven.google.com' }
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -16,6 +19,7 @@ allprojects {
             credentials { username "48a9b4c06b5dabbc03328ddcdbb7dfd8fab253ae" }
         }
         maven { url 'https://maven.google.com' }
+        google()
     }
 }
 

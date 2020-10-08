@@ -1,8 +1,10 @@
 package com.northghost.hydraclient.activity;
 
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import com.anchorfree.partner.api.ClientInfo;
 import com.anchorfree.partner.api.auth.AuthMethod;
 import com.anchorfree.partner.api.data.Country;
@@ -37,6 +39,7 @@ import com.northghost.caketube.CaketubeTransport;
 import com.northghost.hydraclient.MainApplication;
 import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.dialog.RegionChooserDialog;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

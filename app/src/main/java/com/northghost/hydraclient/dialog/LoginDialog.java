@@ -4,20 +4,23 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+
 import com.northghost.hydraclient.BuildConfig;
 import com.northghost.hydraclient.MainApplication;
 import com.northghost.hydraclient.R;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class LoginDialog extends DialogFragment {
 

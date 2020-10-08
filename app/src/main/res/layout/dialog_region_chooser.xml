@@ -13,9 +13,9 @@
         android:id="@+id/regions_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
+        android:layout_centerInParent="true" />
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/regions_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,6 +23,6 @@
         android:scrollbars="vertical"
         android:visibility="invisible"
         tools:listitem="@layout/region_list_item"
-        tools:visibility="visible"/>/>
+        tools:visibility="visible" />/>
 
 </RelativeLayout>

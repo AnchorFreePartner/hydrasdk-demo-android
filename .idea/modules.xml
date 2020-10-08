@@ -3,9 +3,13 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HydraSdk-hydrasdk-demo-android.iml" filepath="$PROJECT_DIR$/HydraSdk-hydrasdk-demo-android.iml" group="hydrasdk-demo-android" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/StudioProjects-hydrasdk-demo-android.iml" filepath="$PROJECT_DIR$/.idea/modules/StudioProjects-hydrasdk-demo-android.iml" group="hydrasdk-demo-android" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/StudioProjects-hydrasdk-demo-android-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/StudioProjects-hydrasdk-demo-android-app.iml" group="hydrasdk-demo-android/app" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/hydrasdk-demo-android.iml" filepath="$PROJECT_DIR$/hydrasdk-demo-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/hydrasdk-demo-android-app.iml" filepath="$PROJECT_DIR$/app/hydrasdk-demo-android-app.iml" group="hydrasdk-demo-android/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hydrasdk-rx/hydrasdk-rx.iml" filepath="$PROJECT_DIR$/.idea/modules/hydrasdk-rx/hydrasdk-rx.iml" group="hydrasdk-demo-android/libs/hydrasdk-rx" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libs/libs.iml" filepath="$PROJECT_DIR$/.idea/modules/libs/libs.iml" group="hydrasdk-demo-android/libs" />
     </modules>
   </component>
 </project>
