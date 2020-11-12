@@ -14,6 +14,8 @@ import com.anchorfree.sdk.SessionConfig;
 import com.anchorfree.sdk.SessionInfo;
 import com.anchorfree.sdk.UnifiedSDK;
 import com.anchorfree.sdk.VpnPermissions;
+import com.anchorfree.sdk.exceptions.CnlBlockedException;
+import com.anchorfree.sdk.exceptions.InvalidTransportException;
 import com.anchorfree.sdk.exceptions.PartnerApiException;
 import com.anchorfree.sdk.fireshield.FireshieldCategory;
 import com.anchorfree.sdk.fireshield.FireshieldConfig;
@@ -24,16 +26,35 @@ import com.anchorfree.vpnsdk.callbacks.TrafficListener;
 import com.anchorfree.vpnsdk.callbacks.VpnCallback;
 import com.anchorfree.vpnsdk.callbacks.VpnStateListener;
 import com.anchorfree.vpnsdk.compat.CredentialsCompat;
+import com.anchorfree.vpnsdk.exceptions.BrokenRemoteProcessException;
+import com.anchorfree.vpnsdk.exceptions.ConnectionCancelledException;
+import com.anchorfree.vpnsdk.exceptions.ConnectionTimeoutException;
+import com.anchorfree.vpnsdk.exceptions.CorruptedConfigException;
+import com.anchorfree.vpnsdk.exceptions.CredentialsLoadException;
+import com.anchorfree.vpnsdk.exceptions.GenericPermissionException;
+import com.anchorfree.vpnsdk.exceptions.InternalException;
+import com.anchorfree.vpnsdk.exceptions.NetworkChangeVpnException;
 import com.anchorfree.vpnsdk.exceptions.NetworkRelatedException;
+import com.anchorfree.vpnsdk.exceptions.NoCredsSourceException;
+import com.anchorfree.vpnsdk.exceptions.NoNetworkException;
+import com.anchorfree.vpnsdk.exceptions.NoVpnTransportsException;
+import com.anchorfree.vpnsdk.exceptions.ServiceBindFailedException;
+import com.anchorfree.vpnsdk.exceptions.StopCancelledException;
+import com.anchorfree.vpnsdk.exceptions.TrackableException;
 import com.anchorfree.vpnsdk.exceptions.VpnException;
 import com.anchorfree.vpnsdk.exceptions.VpnPermissionDeniedException;
+import com.anchorfree.vpnsdk.exceptions.VpnPermissionNotGrantedExeption;
 import com.anchorfree.vpnsdk.exceptions.VpnPermissionRevokedException;
+import com.anchorfree.vpnsdk.exceptions.VpnTransportException;
+import com.anchorfree.vpnsdk.exceptions.WrongStateException;
 import com.anchorfree.vpnsdk.transporthydra.HydraTransport;
 import com.anchorfree.vpnsdk.transporthydra.HydraVpnTransportException;
 import com.anchorfree.vpnsdk.vpnservice.ConnectionStatus;
 import com.anchorfree.vpnsdk.vpnservice.VPNState;
 import com.anchorfree.vpnsdk.vpnservice.credentials.AppPolicy;
+import com.anchorfree.vpnsdk.vpnservice.credentials.CaptivePortalException;
 import com.northghost.caketube.CaketubeTransport;
+import com.northghost.caketube.exceptions.CaketubeTransportException;
 import com.northghost.hydraclient.MainApplication;
 import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.dialog.RegionChooserDialog;
@@ -121,8 +142,6 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
             }
         });
         selectedCountry = "";
-
-
     }
 
     @Override
@@ -335,21 +354,21 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                 } else {
                     showMessage("Error in VPN transport");
                 }
-            } else {
-                showMessage("Error in VPN Service");
+            } else if (e instanceof PartnerApiException) {
+                switch (((PartnerApiException) e).getContent()) {
+                    case PartnerApiException.CODE_NOT_AUTHORIZED:
+                        showMessage("User unauthorized");
+                        break;
+                    case PartnerApiException.CODE_TRAFFIC_EXCEED:
+                        showMessage("Server unavailable");
+                        break;
+                    default:
+                        showMessage("Other error. Check PartnerApiException constants");
+                        break;
+                }
             }
-        } else if (e instanceof PartnerApiException) {
-            switch (((PartnerApiException) e).getContent()) {
-                case PartnerApiException.CODE_NOT_AUTHORIZED:
-                    showMessage("User unauthorized");
-                    break;
-                case PartnerApiException.CODE_TRAFFIC_EXCEED:
-                    showMessage("Server unavailable");
-                    break;
-                default:
-                    showMessage("Other error. Check PartnerApiException constants");
-                    break;
-            }
+        } else {
+            showMessage("Error in VPN Service");
         }
     }
 
@@ -404,7 +423,8 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
         });
         instance.getVPN().restart(new SessionConfig.Builder()
                 .withReason(TrackingConstants.GprReasons.M_UI)
-                .addDnsRule(TrafficRule.Builder.block().fromAssets(""))
+                .addDnsRule(TrafficRule.Builder.blockDns().fromAssets(""))
+                .addProxyRule(TrafficRule.Builder.blockPkt().fromAssets(""))
                 .addDnsRule(TrafficRule.Builder.bypass().fromAssets(""))
                 .addDnsRule(TrafficRule.Builder.proxy().fromAssets(""))
                 .addDnsRule(TrafficRule.Builder.vpn().fromAssets(""))
@@ -516,13 +536,23 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
 
         instance.getVPN().updateConfig(new SessionConfig.Builder()
                 .withReason(TrackingConstants.GprReasons.M_UI)
-                .addDnsRule(TrafficRule.Builder.block().fromAssets(""))
+                .addDnsRule(TrafficRule.Builder.blockDns().fromAssets(""))
+                .addDnsRule(TrafficRule.Builder.blockPkt().fromAssets(""))
                 .addDnsRule(TrafficRule.Builder.bypass().fromAssets(""))
                 .addDnsRule(TrafficRule.Builder.proxy().fromAssets(""))
                 .addDnsRule(TrafficRule.Builder.vpn().fromAssets(""))
                 .addDnsRule(TrafficRule.Builder.vpn().fromDomains(new ArrayList<>()))
                 .addDnsRule(TrafficRule.Builder.vpn().fromFile(""))
                 .addDnsRule(TrafficRule.Builder.vpn().fromResource(0))
+                .addDnsRule(TrafficRule.Builder.vpn().fromIp("", 0))
+                .addDnsRule(TrafficRule.Builder.vpn().fromIp("", 0, 0))
+                .addDnsRule(TrafficRule.Builder.vpn().fromIp("", 0, 0, 0))
+                .addDnsRule(TrafficRule.Builder.vpn().tcp())
+                .addDnsRule(TrafficRule.Builder.vpn().tcp(0))
+                .addDnsRule(TrafficRule.Builder.vpn().tcp(0, 0))
+                .addDnsRule(TrafficRule.Builder.vpn().udp())
+                .addDnsRule(TrafficRule.Builder.vpn().udp(0))
+                .addDnsRule(TrafficRule.Builder.vpn().udp(0, 0))
                 .exceptApps(new ArrayList<>())
                 .withTransport("")
                 .withSessionId("")
@@ -548,5 +578,75 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
 
             }
         });
+        //exceptions
+        Class[] ex = new Class[] {
+                VpnException.class,
+                BrokenRemoteProcessException.class,
+                CaketubeTransportException.class,
+                CaptivePortalException.class,
+                CnlBlockedException.class,
+                ConnectionCancelledException.class,
+                ConnectionTimeoutException.class,
+                CorruptedConfigException.class,
+                CredentialsLoadException.class,
+                GenericPermissionException.class,
+                HydraVpnTransportException.class,
+                InternalException.class,
+                InvalidTransportException.class,
+                NetworkChangeVpnException.class,
+                NetworkRelatedException.class,
+                NoCredsSourceException.class,
+                NoNetworkException.class,
+                NoVpnTransportsException.class,
+                PartnerApiException.class,
+                ServiceBindFailedException.class,
+                StopCancelledException.class,
+                TrackableException.class,
+                VpnPermissionDeniedException.class,
+                VpnPermissionRevokedException.class,
+                VpnPermissionNotGrantedExeption.class,
+                VpnTransportException.class,
+                WrongStateException.class
+        };
+        String[] serrors = new String[] {
+                PartnerApiException.CODE_PARSE_EXCEPTION,
+                PartnerApiException.CODE_SESSIONS_EXCEED,
+                PartnerApiException.CODE_DEVICES_EXCEED,
+                PartnerApiException.CODE_INVALID,
+                PartnerApiException.CODE_OAUTH_ERROR,
+                PartnerApiException.CODE_TRAFFIC_EXCEED,
+                PartnerApiException.CODE_NOT_AUTHORIZED,
+                PartnerApiException.CODE_SERVER_UNAVAILABLE,
+                PartnerApiException.CODE_INTERNAL_SERVER_ERROR,
+                PartnerApiException.CODE_USER_SUSPENDED,
+        };
+        Integer[] errors = new Integer[] {
+                CaketubeTransportException.CONNECTION_BROKEN_ERROR,
+                CaketubeTransportException.CONNECTION_FAILED_ERROR,
+                CaketubeTransportException.CONNECTION_AUTH_FAILURE,
+                HydraVpnTransportException.HYDRA_CONNECTION_LOST,
+                HydraVpnTransportException.TRAFFIC_EXCEED,
+                HydraVpnTransportException.HYDRA_CANNOT_CONNECT,
+                HydraVpnTransportException.HYDRA_ERROR_CONFIG,
+                HydraVpnTransportException.HYDRA_ERROR_UNKNOWN,
+                HydraVpnTransportException.HYDRA_ERROR_CONFIGURATION,
+                HydraVpnTransportException.HYDRA_ERROR_BROKEN,
+                HydraVpnTransportException.HYDRA_ERROR_INTERNAL,
+                HydraVpnTransportException.HYDRA_ERROR_SERVER_AUTH,
+                HydraVpnTransportException.HYDRA_ERROR_CANT_SEND,
+                HydraVpnTransportException.HYDRA_ERROR_TIME_SKEW,
+                HydraVpnTransportException.HYDRA_DCN_MIN,
+                HydraVpnTransportException.HYDRA_DCN_SRV_SWITCH,
+                HydraVpnTransportException.HYDRA_DCN_BLOCKED_BW,
+                HydraVpnTransportException.HYDRA_DCN_BLOCKED_ABUSE,
+                HydraVpnTransportException.HYDRA_DCN_BLOCKED_MALWARE,
+                HydraVpnTransportException.HYDRA_DCN_BLOCKED_MISC,
+                HydraVpnTransportException.HYDRA_DCN_REQ_BY_CLIAPP,
+                HydraVpnTransportException.HYDRA_DCN_BLOCKED_AUTH,
+                HydraVpnTransportException.HYDRA_DCN_MAX,
+                HydraVpnTransportException.HYDRA_NOTIFY_AUTH_OK,
+                HydraVpnTransportException.HYDRA_CONFIG_MALFORMED,
+                VpnTransportException.TRANSPORT_ERROR_START_TIMEOUT,
+        };
     }
 }

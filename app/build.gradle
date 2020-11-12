@@ -46,8 +46,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.github.AnchorFreePartner.hydra-sdk-android:sdk:3.3.3'
-    compile 'com.github.AnchorFreePartner.hydra-sdk-android:openvpn:3.3.3'
+    compile 'com.github.AnchorFreePartner.hydra-sdk-android:sdk:3.4.0'
+    compile 'com.github.AnchorFreePartner.hydra-sdk-android:openvpn:3.4.0'
 
     compile "com.android.support:appcompat-v7:${androidSupportLibraryVersion}"
     compile "com.android.support:cardview-v7:${androidSupportLibraryVersion}"
