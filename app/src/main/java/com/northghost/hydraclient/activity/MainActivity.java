@@ -213,7 +213,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
             @Override
             public void complete() {
                 hideConnectProgress();
-                stopUIUpdateTask();
+                stopUIUpdateTask(true);
             }
 
             @Override

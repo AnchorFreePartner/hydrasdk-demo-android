@@ -25,7 +25,6 @@ import com.anchorfree.vpnsdk.exceptions.VpnException;
 import com.anchorfree.vpnsdk.vpnservice.VPNState;
 import com.northghost.hydraclient.BuildConfig;
 import com.northghost.hydraclient.R;
-import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.utils.Converter;
 
 public abstract class UIActivity extends AppCompatActivity {
@@ -133,7 +132,7 @@ public abstract class UIActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        stopUIUpdateTask();
+        stopUIUpdateTask(false);
     }
 
     @OnClick(R.id.login_btn)
@@ -208,13 +207,15 @@ public abstract class UIActivity extends AppCompatActivity {
     protected abstract void getCurrentServer(Callback<String> callback);
 
     protected void startUIUpdateTask() {
-        stopUIUpdateTask();
+        stopUIUpdateTask(true);
         mUIHandler.post(mUIUpdateRunnable);
     }
 
-    protected void stopUIUpdateTask() {
+    protected void stopUIUpdateTask(boolean b) {
         mUIHandler.removeCallbacks(mUIUpdateRunnable);
-        updateUI();
+        if (b) {
+            updateUI();
+        }
     }
 
     protected abstract void checkRemainingTraffic();
