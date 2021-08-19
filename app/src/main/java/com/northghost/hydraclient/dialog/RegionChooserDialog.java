@@ -13,8 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ProgressBar;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import com.anchorfree.partner.api.data.Country;
 import com.anchorfree.partner.api.response.AvailableCountries;
 import com.anchorfree.sdk.UnifiedSDK;
@@ -22,16 +20,11 @@ import com.anchorfree.vpnsdk.callbacks.Callback;
 import com.anchorfree.vpnsdk.exceptions.VpnException;
 import com.northghost.hydraclient.R;
 import com.northghost.hydraclient.adapter.RegionListAdapter;
+import com.northghost.hydraclient.databinding.DialogRegionChooserBinding;
 
 public class RegionChooserDialog extends DialogFragment implements RegionListAdapter.RegionListAdapterInterface {
 
     public static final String TAG = RegionChooserDialog.class.getSimpleName();
-
-    @BindView(R.id.regions_recycler_view)
-    RecyclerView regionsRecyclerView;
-
-    @BindView(R.id.regions_progress)
-    ProgressBar regionsProgressBar;
 
     private RegionListAdapter regionAdapter;
     private RegionChooserInterface regionChooserInterface;
@@ -39,6 +32,7 @@ public class RegionChooserDialog extends DialogFragment implements RegionListAda
     public RegionChooserDialog() {
     }
 
+    DialogRegionChooserBinding binding;
     public static RegionChooserDialog newInstance() {
         RegionChooserDialog frag = new RegionChooserDialog();
         Bundle args = new Bundle();
@@ -55,18 +49,24 @@ public class RegionChooserDialog extends DialogFragment implements RegionListAda
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.dialog_region_chooser, container);
+        binding = DialogRegionChooserBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onDestroyView() {
+        binding = null;
+        super.onDestroyView();
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
 
-        regionsRecyclerView.setHasFixedSize(true);
-        regionsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.regionsRecyclerView.setHasFixedSize(true);
+        binding.regionsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         regionAdapter = new RegionListAdapter(this);
-        regionsRecyclerView.setAdapter(regionAdapter);
+        binding.regionsRecyclerView.setAdapter(regionAdapter);
 
         loadServers();
     }
@@ -90,13 +90,13 @@ public class RegionChooserDialog extends DialogFragment implements RegionListAda
     }
 
     private void showProgress() {
-        regionsProgressBar.setVisibility(View.VISIBLE);
-        regionsRecyclerView.setVisibility(View.INVISIBLE);
+        binding.regionsProgress.setVisibility(View.VISIBLE);
+        binding.regionsRecyclerView.setVisibility(View.INVISIBLE);
     }
 
     private void hideProress() {
-        regionsProgressBar.setVisibility(View.GONE);
-        regionsRecyclerView.setVisibility(View.VISIBLE);
+        binding.regionsProgress.setVisibility(View.GONE);
+        binding.regionsRecyclerView.setVisibility(View.VISIBLE);
     }
 
     @Override

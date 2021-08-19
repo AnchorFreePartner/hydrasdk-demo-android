@@ -14,9 +14,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import com.anchorfree.partner.api.ClientInfo;
 import com.anchorfree.partner.api.response.RemainingTraffic;
 import com.anchorfree.sdk.UnifiedSDK;
@@ -25,47 +22,13 @@ import com.anchorfree.vpnsdk.exceptions.VpnException;
 import com.anchorfree.vpnsdk.vpnservice.VPNState;
 import com.northghost.hydraclient.BuildConfig;
 import com.northghost.hydraclient.R;
+import com.northghost.hydraclient.databinding.ActivityMainBinding;
 import com.northghost.hydraclient.utils.Converter;
 
 public abstract class UIActivity extends AppCompatActivity {
 
     protected static final String TAG = MainActivity.class.getSimpleName();
-
-    @BindView(R.id.main_toolbar)
-    protected Toolbar toolbar;
-
-    @BindView(R.id.login_btn)
-    TextView loginBtnTextView;
-
-    @BindView(R.id.login_state)
-    TextView loginStateTextView;
-
-    @BindView(R.id.login_progress)
-    ProgressBar loginProgressBar;
-
-    @BindView(R.id.connect_btn)
-    TextView connectBtnTextView;
-
-    @BindView(R.id.connection_state)
-    TextView connectionStateTextView;
-
-    @BindView(R.id.connection_progress)
-    ProgressBar connectionProgressBar;
-
-    @BindView(R.id.traffic_stats)
-    TextView trafficStats;
-
-    @BindView(R.id.traffic_limit)
-    TextView trafficLimitTextView;
-
-    @BindView(R.id.optimal_server_btn)
-    TextView currentServerBtn;
-
-    @BindView(R.id.selected_server)
-    TextView selectedServerTextView;
-
-    @BindView(R.id.url) EditText url;
-    @BindView(R.id.carrier) EditText carrier;
+    private ActivityMainBinding binding;
     UnifiedSDK unifiedSDK;
     private Handler mUIHandler = new Handler(Looper.getMainLooper());
     final Runnable mUIUpdateRunnable = new Runnable() {
@@ -80,19 +43,23 @@ public abstract class UIActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-        setSupportActionBar(toolbar);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        setSupportActionBar(binding.mainToolbar);
 
         initSDK();
+        binding.loginBtn.setOnClickListener(this::onLoginBtnClick);
+        binding.initBtn.setOnClickListener(this::onInitClick);
+        binding.connectBtn.setOnClickListener(this::onConnectBtnClick);
+        binding.optimalServerBtn.setOnClickListener(this::onServerChooserClick);
     }
 
     private void initSDK() {
         final SharedPreferences prefs = getPrefs();
         final String url = prefs.getString(BuildConfig.STORED_HOST_URL_KEY, BuildConfig.BASE_HOST);
         final String carrier = prefs.getString(BuildConfig.STORED_CARRIER_ID_KEY, "");
-        this.url.setText(url);
-        this.carrier.setText(carrier);
+        this.binding.url.setText(url);
+        this.binding.carrier.setText(carrier);
         if (!TextUtils.isEmpty(url) && !TextUtils.isEmpty(carrier)) {
             ClientInfo clientInfo = ClientInfo.newBuilder()
                     .baseUrl(url)
@@ -101,9 +68,9 @@ public abstract class UIActivity extends AppCompatActivity {
 
             UnifiedSDK.clearInstances();
             unifiedSDK = UnifiedSDK.getInstance(clientInfo);
-            loginBtnTextView.setEnabled(true);
+            binding.loginBtn.setEnabled(true);
         } else {
-            loginBtnTextView.setEnabled(false);
+            binding.loginBtn.setEnabled(false);
         }
     }
 
@@ -135,7 +102,7 @@ public abstract class UIActivity extends AppCompatActivity {
         stopUIUpdateTask(false);
     }
 
-    @OnClick(R.id.login_btn)
+
     public void onLoginBtnClick(View v) {
         if (unifiedSDK == null) {
             Toast.makeText(this, "SDK is not configured", Toast.LENGTH_LONG).show();
@@ -154,17 +121,15 @@ public abstract class UIActivity extends AppCompatActivity {
 
     protected abstract void logOutFromVnp();
 
-    @OnClick(R.id.init_btn)
     public void onInitClick(View v) {
         final SharedPreferences prefs = getPrefs();
         prefs.edit()
-                .putString(BuildConfig.STORED_HOST_URL_KEY, url.getText().toString())
-                .putString(BuildConfig.STORED_CARRIER_ID_KEY, carrier.getText().toString())
+                .putString(BuildConfig.STORED_HOST_URL_KEY, binding.url.getText().toString())
+                .putString(BuildConfig.STORED_CARRIER_ID_KEY, binding.carrier.getText().toString())
                 .apply();
         initSDK();
     }
 
-    @OnClick(R.id.connect_btn)
     public void onConnectBtnClick(View v) {
         if (unifiedSDK == null) {
             Toast.makeText(this, "SDK is not configured", Toast.LENGTH_LONG).show();
@@ -193,7 +158,6 @@ public abstract class UIActivity extends AppCompatActivity {
 
     protected abstract void disconnectFromVnp();
 
-    @OnClick(R.id.optimal_server_btn)
     public void onServerChooserClick(View v) {
         if (unifiedSDK == null) {
             Toast.makeText(this, "SDK is not configured", Toast.LENGTH_LONG).show();
@@ -225,37 +189,37 @@ public abstract class UIActivity extends AppCompatActivity {
             @Override
             public void success(@NonNull VPNState vpnState) {
 
-                trafficStats.setVisibility(vpnState == VPNState.CONNECTED ? View.VISIBLE : View.INVISIBLE);
-                trafficLimitTextView.setVisibility(vpnState == VPNState.CONNECTED ? View.VISIBLE : View.INVISIBLE);
+                binding.trafficStats.setVisibility(vpnState == VPNState.CONNECTED ? View.VISIBLE : View.INVISIBLE);
+                binding.trafficLimit.setVisibility(vpnState == VPNState.CONNECTED ? View.VISIBLE : View.INVISIBLE);
 
                 switch (vpnState) {
                     case IDLE: {
-                        connectBtnTextView.setEnabled(true);
-                        connectBtnTextView.setText(R.string.connect);
-                        connectionStateTextView.setText(R.string.disconnected);
+                        binding.connectBtn.setEnabled(true);
+                        binding.connectBtn.setText(R.string.connect);
+                        binding.connectionState.setText(R.string.disconnected);
                         hideConnectProgress();
                         break;
                     }
                     case CONNECTED: {
-                        connectBtnTextView.setEnabled(true);
-                        connectBtnTextView.setText(R.string.disconnect);
-                        connectionStateTextView.setText(R.string.connected);
+                        binding.connectBtn.setEnabled(true);
+                        binding.connectBtn.setText(R.string.disconnect);
+                        binding.connectionState.setText(R.string.connected);
                         hideConnectProgress();
                         break;
                     }
                     case CONNECTING_VPN:
                     case CONNECTING_CREDENTIALS:
                     case CONNECTING_PERMISSIONS: {
-                        connectBtnTextView.setText(R.string.connecting);
-                        connectionStateTextView.setText(R.string.connecting);
-                        connectBtnTextView.setEnabled(false);
+                        binding.connectBtn.setText(R.string.connecting);
+                        binding.connectionState.setText(R.string.connecting);
+                        binding.connectBtn.setEnabled(false);
                         showConnectProgress();
                         break;
                     }
                     case PAUSED: {
-                        connectBtnTextView.setEnabled(false);
-                        connectBtnTextView.setText(R.string.paused);
-                        connectionStateTextView.setText(R.string.paused);
+                        binding.connectBtn.setEnabled(false);
+                        binding.connectBtn.setText(R.string.paused);
+                        binding.connectionState.setText(R.string.paused);
                         break;
                     }
                 }
@@ -269,8 +233,8 @@ public abstract class UIActivity extends AppCompatActivity {
         UnifiedSDK.getInstance().getBackend().isLoggedIn(new Callback<Boolean>() {
             @Override
             public void success(@NonNull Boolean isLoggedIn) {
-                loginBtnTextView.setText(isLoggedIn ? R.string.log_out : R.string.log_in);
-                loginStateTextView.setText(isLoggedIn ? R.string.logged_in : R.string.logged_out);
+                binding.loginBtn.setText(isLoggedIn ? R.string.log_out : R.string.log_in);
+                binding.loginState.setText(isLoggedIn ? R.string.logged_in : R.string.logged_out);
             }
 
             @Override
@@ -285,16 +249,16 @@ public abstract class UIActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        currentServerBtn.setText(currentServer != null ? R.string.current_server : R.string.optimal_server);
-                        selectedServerTextView.setText(currentServer != null ? currentServer : "UNKNOWN");
+                        binding.optimalServerBtn.setText(currentServer != null ? R.string.current_server : R.string.optimal_server);
+                        binding.selectedServer.setText(currentServer != null ? currentServer : "UNKNOWN");
                     }
                 });
             }
 
             @Override
             public void failure(@NonNull VpnException e) {
-                currentServerBtn.setText(R.string.optimal_server);
-                selectedServerTextView.setText("UNKNOWN");
+                binding.optimalServerBtn.setText(R.string.optimal_server);
+                binding.selectedServer.setText("UNKNOWN");
             }
         });
     }
@@ -303,38 +267,38 @@ public abstract class UIActivity extends AppCompatActivity {
         String outString = Converter.humanReadableByteCountOld(outBytes, false);
         String inString = Converter.humanReadableByteCountOld(inBytes, false);
 
-        trafficStats.setText(getResources().getString(R.string.traffic_stats, outString, inString));
+        binding.trafficStats.setText(getResources().getString(R.string.traffic_stats, outString, inString));
     }
 
     protected void updateRemainingTraffic(RemainingTraffic remainingTrafficResponse) {
         if (remainingTrafficResponse.isUnlimited()) {
-            trafficLimitTextView.setText("UNLIMITED available");
+            binding.trafficLimit.setText("UNLIMITED available");
         } else {
             String trafficUsed = Converter.megabyteCount(remainingTrafficResponse.getTrafficUsed()) + "Mb";
             String trafficLimit = Converter.megabyteCount(remainingTrafficResponse.getTrafficLimit()) + "Mb";
 
-            trafficLimitTextView.setText(getResources().getString(R.string.traffic_limit, trafficUsed, trafficLimit));
+            binding.trafficLimit.setText(getResources().getString(R.string.traffic_limit, trafficUsed, trafficLimit));
         }
     }
 
     protected void showLoginProgress() {
-        loginProgressBar.setVisibility(View.VISIBLE);
-        loginStateTextView.setVisibility(View.GONE);
+        binding.loginProgress.setVisibility(View.VISIBLE);
+        binding.loginState.setVisibility(View.GONE);
     }
 
     protected void hideLoginProgress() {
-        loginProgressBar.setVisibility(View.GONE);
-        loginStateTextView.setVisibility(View.VISIBLE);
+        binding.loginProgress.setVisibility(View.GONE);
+        binding.loginState.setVisibility(View.VISIBLE);
     }
 
     protected void showConnectProgress() {
-        connectionProgressBar.setVisibility(View.VISIBLE);
-        connectionStateTextView.setVisibility(View.GONE);
+        binding.connectionProgress.setVisibility(View.VISIBLE);
+        binding.connectionState.setVisibility(View.GONE);
     }
 
     protected void hideConnectProgress() {
-        connectionProgressBar.setVisibility(View.GONE);
-        connectionStateTextView.setVisibility(View.VISIBLE);
+        binding.connectionProgress.setVisibility(View.GONE);
+        binding.connectionState.setVisibility(View.VISIBLE);
     }
 
     protected void showMessage(String msg) {

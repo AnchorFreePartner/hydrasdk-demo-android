@@ -5,10 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import com.anchorfree.partner.api.data.Country;
 import com.northghost.hydraclient.R;
+import com.northghost.hydraclient.databinding.RegionListItemBinding;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +23,9 @@ public class RegionListAdapter extends RecyclerView.Adapter<RegionListAdapter.Vi
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.region_list_item, parent, false);
-        ViewHolder vh = new ViewHolder(v);
+        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+        RegionListItemBinding binding = RegionListItemBinding.inflate(layoutInflater, parent, false);
+        ViewHolder vh = new ViewHolder(binding);
         return vh;
     }
 
@@ -32,16 +33,11 @@ public class RegionListAdapter extends RecyclerView.Adapter<RegionListAdapter.Vi
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Country country = regions.get(position);
         if (country.getCountry() != null) {
-            holder.regionTitle.setText(regions.get(position).getCountry());
+            holder.binding.regionTitle.setText(regions.get(position).getCountry());
         } else {
-            holder.regionTitle.setText("unknown(null)");
+            holder.binding.regionTitle.setText("unknown(null)");
         }
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                listAdapterInterface.onCountrySelected(regions.get(holder.getAdapterPosition()));
-            }
-        });
+        holder.itemView.setOnClickListener(view -> listAdapterInterface.onCountrySelected(regions.get(holder.getAdapterPosition())));
     }
 
     @Override
@@ -51,12 +47,12 @@ public class RegionListAdapter extends RecyclerView.Adapter<RegionListAdapter.Vi
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.region_title)
-        TextView regionTitle;
 
-        public ViewHolder(View v) {
-            super(v);
-            ButterKnife.bind(this, v);
+        private com.northghost.hydraclient.databinding.RegionListItemBinding binding;
+
+        public ViewHolder(RegionListItemBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
     }
 

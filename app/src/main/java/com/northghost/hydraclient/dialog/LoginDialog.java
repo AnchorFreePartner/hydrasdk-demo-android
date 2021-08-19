@@ -12,22 +12,14 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import com.northghost.hydraclient.BuildConfig;
 import com.northghost.hydraclient.MainApplication;
 import com.northghost.hydraclient.R;
+import com.northghost.hydraclient.databinding.DialogLoginBinding;
 
 public class LoginDialog extends DialogFragment {
 
     public static final String TAG = LoginDialog.class.getSimpleName();
-
-    @BindView(R.id.host_url_ed)
-    EditText hostUrlEditText;
-
-    @BindView(R.id.carrier_id_ed)
-    EditText carrierIdEditText;
 
     LoginConfirmationInterface loginConfirmationInterface;
 
@@ -48,24 +40,32 @@ public class LoginDialog extends DialogFragment {
         return dialog;
     }
 
+    DialogLoginBinding binding;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.dialog_login, container);
+        binding = DialogLoginBinding.inflate(inflater, container,false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onDestroyView() {
+        binding = null;
+        super.onDestroyView();
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
 
         SharedPreferences prefs = ((MainApplication) getActivity().getApplication()).getPrefs();
 
-        hostUrlEditText.setText(prefs.getString(BuildConfig.STORED_HOST_URL_KEY, BuildConfig.BASE_HOST));
-        carrierIdEditText.setText(prefs.getString(BuildConfig.STORED_CARRIER_ID_KEY, ""));
+        binding.hostUrlEd.setText(prefs.getString(BuildConfig.STORED_HOST_URL_KEY, BuildConfig.BASE_HOST));
+        binding.carrierIdEd.setText(prefs.getString(BuildConfig.STORED_CARRIER_ID_KEY, ""));
 
         // Show soft keyboard automatically and request focus to field
-        hostUrlEditText.requestFocus();
+        binding.hostUrlEd.requestFocus();
+        binding.loginBtn.setOnClickListener(this::onLoginBtnClick);
         getDialog().getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
@@ -84,11 +84,10 @@ public class LoginDialog extends DialogFragment {
         loginConfirmationInterface = null;
     }
 
-    @OnClick(R.id.login_btn)
     public void onLoginBtnClick(View v) {
-        String hostUrl = hostUrlEditText.getText().toString();
+        String hostUrl = binding.hostUrlEd.getText().toString();
         if (hostUrl.equals("")) hostUrl = BuildConfig.BASE_HOST;
-        String carrierId = carrierIdEditText.getText().toString();
+        String carrierId = binding.carrierIdEd.getText().toString();
 
         loginConfirmationInterface.setLoginParams(hostUrl, carrierId);
         loginConfirmationInterface.loginUser();
