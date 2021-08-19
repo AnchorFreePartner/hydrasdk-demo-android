@@ -1,21 +1,20 @@
 buildscript {
+    ext.kotlin_version = '1.5.21'
     repositories {
-        jcenter()
-        maven { url 'https://maven.google.com' }
+        google()
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:4.0.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
 allprojects {
     repositories {
-        jcenter()
-        maven {
-            url "https://jitpack.io"
-            credentials { username "48a9b4c06b5dabbc03328ddcdbb7dfd8fab253ae" }
-        }
-        maven { url 'https://maven.google.com' }
+        maven { url "https://jitpack.io" }
+        mavenCentral()
+        google()
     }
 }
 

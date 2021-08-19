@@ -1,19 +1,16 @@
 apply plugin: 'com.android.application'
-
-ext {
-    androidSupportLibraryVersion = "28.0.0"
-}
+//apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
 
     defaultConfig {
         applicationId "com.northghost.hydraclient"
         minSdkVersion 15
-        targetSdkVersion 28
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
         buildConfigField "String", "BASE_HOST", "\"https://backend.northghost.com\""
         buildConfigField "String", "BASE_OAUTH_METHOD", "\"anonymous\""
@@ -41,18 +38,20 @@ android {
         sourceCompatibility 1.8
         targetCompatibility 1.8
     }
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.core:core-ktx:1.6.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.5.21"
 
-    compile 'com.github.AnchorFreePartner.hydra-sdk-android:sdk:3.4.0'
-    compile 'com.github.AnchorFreePartner.hydra-sdk-android:openvpn:3.4.0'
+    implementation 'com.github.AnchorFreePartner.hydra-sdk-android:sdk-core:3.4.10'
+    implementation 'com.github.AnchorFreePartner.hydra-sdk-android:hydra:3.4.10'
+    implementation 'com.github.AnchorFreePartner.hydra-sdk-android:openvpn:3.4.10'
 
-    compile "com.android.support:appcompat-v7:${androidSupportLibraryVersion}"
-    compile "com.android.support:cardview-v7:${androidSupportLibraryVersion}"
-    compile "com.android.support:recyclerview-v7:${androidSupportLibraryVersion}"
-
-    compile 'com.jakewharton:butterknife:8.8.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
 }

@@ -1,7 +1,7 @@
 package com.northghost.hydraclient.activity;
 
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 import com.anchorfree.partner.api.ClientInfo;
 import com.anchorfree.partner.api.auth.AuthMethod;
