@@ -1,16 +1,17 @@
 package com.northghost.hydraclient.adapter;
 
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import com.anchorfree.partner.api.data.Country;
-import com.northghost.hydraclient.R;
+
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.northghost.hydraclient.databinding.RegionListItemBinding;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import unified.vpn.sdk.Country;
+
 
 public class RegionListAdapter extends RecyclerView.Adapter<RegionListAdapter.ViewHolder> {
 

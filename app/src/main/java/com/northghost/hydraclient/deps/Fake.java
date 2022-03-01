@@ -4,55 +4,12 @@ import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-
-import com.anchorfree.partner.api.ClientInfo;
-import com.anchorfree.partner.api.auth.AuthMethod;
-import com.anchorfree.partner.api.data.ConnectionType;
-import com.anchorfree.partner.api.data.CredentialsRequest;
-import com.anchorfree.reporting.TrackingConstants;
-import com.anchorfree.sdk.Backend;
-import com.anchorfree.sdk.SdkInfo;
-import com.anchorfree.sdk.SessionConfig;
-import com.anchorfree.sdk.UnifiedSDK;
-import com.anchorfree.sdk.VPN;
-import com.anchorfree.sdk.VpnPermissions;
-import com.anchorfree.sdk.exceptions.CnlBlockedException;
-import com.anchorfree.sdk.exceptions.InvalidTransportException;
-import com.anchorfree.sdk.exceptions.PartnerApiException;
-import com.anchorfree.sdk.fireshield.FireshieldCategory;
-import com.anchorfree.sdk.fireshield.FireshieldConfig;
-import com.anchorfree.sdk.rules.TrafficRule;
-import com.anchorfree.vpnsdk.callbacks.Callback;
-import com.anchorfree.vpnsdk.callbacks.CompletableCallback;
-import com.anchorfree.vpnsdk.exceptions.BrokenRemoteProcessException;
-import com.anchorfree.vpnsdk.exceptions.ConnectionCancelledException;
-import com.anchorfree.vpnsdk.exceptions.ConnectionTimeoutException;
-import com.anchorfree.vpnsdk.exceptions.CorruptedConfigException;
-import com.anchorfree.vpnsdk.exceptions.CredentialsLoadException;
-import com.anchorfree.vpnsdk.exceptions.GenericPermissionException;
-import com.anchorfree.vpnsdk.exceptions.InternalException;
-import com.anchorfree.vpnsdk.exceptions.NetworkChangeVpnException;
-import com.anchorfree.vpnsdk.exceptions.NetworkRelatedException;
-import com.anchorfree.vpnsdk.exceptions.NoCredsSourceException;
-import com.anchorfree.vpnsdk.exceptions.NoNetworkException;
-import com.anchorfree.vpnsdk.exceptions.NoVpnTransportsException;
-import com.anchorfree.vpnsdk.exceptions.ServiceBindFailedException;
-import com.anchorfree.vpnsdk.exceptions.StopCancelledException;
-import com.anchorfree.vpnsdk.exceptions.TrackableException;
-import com.anchorfree.vpnsdk.exceptions.VpnException;
-import com.anchorfree.vpnsdk.exceptions.VpnPermissionDeniedException;
-import com.anchorfree.vpnsdk.exceptions.VpnPermissionNotGrantedExeption;
-import com.anchorfree.vpnsdk.exceptions.VpnPermissionRevokedException;
-import com.anchorfree.vpnsdk.exceptions.VpnTransportException;
-import com.anchorfree.vpnsdk.exceptions.WrongStateException;
-import com.anchorfree.vpnsdk.transporthydra.HydraVpnTransportException;
-import com.anchorfree.vpnsdk.vpnservice.VpnParams;
-import com.anchorfree.vpnsdk.vpnservice.credentials.AppPolicy;
-import com.anchorfree.vpnsdk.vpnservice.credentials.CaptivePortalException;
-import com.northghost.caketube.exceptions.CaketubeTransportException;
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import unified.vpn.sdk.*;
 
 public class Fake {
     //fake method to support migration documentation and list all available methods
@@ -64,7 +21,9 @@ public class Fake {
         backend(instance);
         cnl(instance);
         vpn(instance);
-
+        config(instance);
+        final String id1 = OpenVpnTransport.TRANSPORT_ID_TCP;
+        final String id2 = OpenVpnTransport.TRANSPORT_ID_UDP;
         UnifiedSDK.getVpnState(Callback.EMPTY);
         UnifiedSDK.getConnectionStatus(Callback.EMPTY);
         UnifiedSDK.setLoggingLevel(Log.VERBOSE);
@@ -89,8 +48,7 @@ public class Fake {
         //exceptions
         Class[] ex = new Class[]{
                 VpnException.class,
-                BrokenRemoteProcessException.class,
-                CaketubeTransportException.class,
+                OpenVpnTransportException.class,
                 CaptivePortalException.class,
                 CnlBlockedException.class,
                 ConnectionCancelledException.class,
@@ -104,10 +62,7 @@ public class Fake {
                 NetworkChangeVpnException.class,
                 NetworkRelatedException.class,
                 NoCredsSourceException.class,
-                NoNetworkException.class,
-                NoVpnTransportsException.class,
                 PartnerApiException.class,
-                ServiceBindFailedException.class,
                 StopCancelledException.class,
                 TrackableException.class,
                 VpnPermissionDeniedException.class,
@@ -129,13 +84,9 @@ public class Fake {
                 PartnerApiException.CODE_USER_SUSPENDED,
         };
         Integer[] errors = new Integer[]{
-                CaketubeTransportException.CONNECTION_BROKEN_ERROR,
-                CaketubeTransportException.CONNECTION_FAILED_ERROR,
-                CaketubeTransportException.CONNECTION_AUTH_FAILURE,
-                HydraVpnTransportException.HYDRA_CONNECTION_LOST,
-                HydraVpnTransportException.TRAFFIC_EXCEED,
-                HydraVpnTransportException.HYDRA_CANNOT_CONNECT,
-                HydraVpnTransportException.HYDRA_ERROR_CONFIG,
+                OpenVpnTransportException.CONNECTION_BROKEN_ERROR,
+                OpenVpnTransportException.CONNECTION_FAILED_ERROR,
+                OpenVpnTransportException.CONNECTION_AUTH_FAILURE,
                 HydraVpnTransportException.HYDRA_ERROR_UNKNOWN,
                 HydraVpnTransportException.HYDRA_ERROR_CONFIGURATION,
                 HydraVpnTransportException.HYDRA_ERROR_BROKEN,
@@ -158,12 +109,23 @@ public class Fake {
         };
     }
 
+    private void config(UnifiedSDK instance) {
+        RemoteConfig config = instance.getRemoteConfig();
+        ObservableSubscription s = config.listen(new ObservableListener() {
+            @Override
+            public void onChange(@Nullable String s) {
+
+            }
+        });
+        config.get("",new Object());
+    }
+
     private void vpn(UnifiedSDK instance) {
-        VPN vpn = instance.getVPN();
+        Vpn vpn = instance.getVpn();
         vpn.getStartTimestamp(Callback.EMPTY);
-        instance.getVPN().stop(TrackingConstants.GprReasons.M_UI, CompletableCallback.EMPTY);
-        instance.getVPN().restart(getSessionConfig(), CompletableCallback.EMPTY);
-        instance.getVPN().updateConfig(getSessionConfig(), CompletableCallback.EMPTY);
+        vpn.stop(TrackingConstants.GprReasons.M_UI, CompletableCallback.EMPTY);
+        vpn.restart(getSessionConfig(), CompletableCallback.EMPTY);
+        vpn.updateConfig(getSessionConfig(), CompletableCallback.EMPTY);
     }
 
     private SessionConfig getSessionConfig() {
@@ -195,6 +157,8 @@ public class Fake {
                 .withTransport("")
                 .withSessionId("")
                 .forApps(new ArrayList<>())
+                .withLocation("")
+                .withCountry("")
                 .withVirtualLocation("")
                 .withPolicy(AppPolicy.newBuilder().build())
                 .withFireshieldConfig(new FireshieldConfig.Builder()
@@ -214,12 +178,23 @@ public class Fake {
         backend.credentials(new CredentialsRequest.Builder()
                 .withConnectionType(ConnectionType.HYDRA_TCP)
                 .withCountry("")
+                .withLocation("")
                 .withExtras(new HashMap<>())
                 .withPrivateGroup("")
                 .build(), Callback.EMPTY);
-        backend.credentials("", ConnectionType.HYDRA_TCP, "", Callback.EMPTY);
         backend.currentUser(Callback.EMPTY);
         backend.countries(ConnectionType.HYDRA_TCP, Callback.EMPTY);
+        backend.locations(ConnectionType.HYDRA_TCP, new Callback<AvailableLocations>() {
+            @Override
+            public void success(@NonNull AvailableLocations availableLocations) {
+
+            }
+
+            @Override
+            public void failure(@NonNull VpnException e) {
+
+            }
+        });
         backend.getAccessToken();
         backend.getAccessToken(Callback.EMPTY);
         backend.isLoggedIn();

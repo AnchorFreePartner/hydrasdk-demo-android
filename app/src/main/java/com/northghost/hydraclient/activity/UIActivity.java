@@ -5,25 +5,19 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
-import com.anchorfree.partner.api.ClientInfo;
-import com.anchorfree.partner.api.response.RemainingTraffic;
-import com.anchorfree.sdk.UnifiedSDK;
-import com.anchorfree.vpnsdk.callbacks.Callback;
-import com.anchorfree.vpnsdk.exceptions.VpnException;
-import com.anchorfree.vpnsdk.vpnservice.VPNState;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.northghost.hydraclient.BuildConfig;
 import com.northghost.hydraclient.R;
 import com.northghost.hydraclient.databinding.ActivityMainBinding;
 import com.northghost.hydraclient.utils.Converter;
+
+import unified.vpn.sdk.*;
 
 public abstract class UIActivity extends AppCompatActivity {
 
@@ -62,7 +56,7 @@ public abstract class UIActivity extends AppCompatActivity {
         this.binding.carrier.setText(carrier);
         if (!TextUtils.isEmpty(url) && !TextUtils.isEmpty(carrier)) {
             ClientInfo clientInfo = ClientInfo.newBuilder()
-                    .baseUrl(url)
+                    .addUrl(url)
                     .carrierId(carrier)
                     .build();
 
@@ -185,12 +179,12 @@ public abstract class UIActivity extends AppCompatActivity {
     protected abstract void checkRemainingTraffic();
 
     protected void updateUI() {
-        UnifiedSDK.getVpnState(new Callback<VPNState>() {
+        UnifiedSDK.getVpnState(new Callback<VpnState>() {
             @Override
-            public void success(@NonNull VPNState vpnState) {
+            public void success(@NonNull VpnState vpnState) {
 
-                binding.trafficStats.setVisibility(vpnState == VPNState.CONNECTED ? View.VISIBLE : View.INVISIBLE);
-                binding.trafficLimit.setVisibility(vpnState == VPNState.CONNECTED ? View.VISIBLE : View.INVISIBLE);
+                binding.trafficStats.setVisibility(vpnState == VpnState.CONNECTED ? View.VISIBLE : View.INVISIBLE);
+                binding.trafficLimit.setVisibility(vpnState == VpnState.CONNECTED ? View.VISIBLE : View.INVISIBLE);
 
                 switch (vpnState) {
                     case IDLE: {

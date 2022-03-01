@@ -8,12 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
-import com.anchorfree.sdk.HydraTransportConfig;
-import com.anchorfree.sdk.NotificationConfig;
-import com.anchorfree.sdk.TransportConfig;
-import com.anchorfree.sdk.UnifiedSDK;
-import com.anchorfree.vpnsdk.callbacks.CompletableCallback;
-import com.northghost.caketube.OpenVpnTransportConfig;
+import unified.vpn.sdk.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +32,7 @@ public class MainApplication extends Application {
         transportConfigList.add(OpenVpnTransportConfig.udp());
         UnifiedSDK.update(transportConfigList, CompletableCallback.EMPTY);
 
-        NotificationConfig notificationConfig = NotificationConfig.newBuilder()
+        SdkNotificationConfig notificationConfig = SdkNotificationConfig.newBuilder()
                 .title(getResources().getString(R.string.app_name))
                 .channelId(CHANNEL_ID)
                 .build();

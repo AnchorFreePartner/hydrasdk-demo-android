@@ -3,22 +3,17 @@ package com.northghost.hydraclient.dialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.ProgressBar;
-import com.anchorfree.partner.api.data.Country;
-import com.anchorfree.partner.api.response.AvailableCountries;
-import com.anchorfree.sdk.UnifiedSDK;
-import com.anchorfree.vpnsdk.callbacks.Callback;
-import com.anchorfree.vpnsdk.exceptions.VpnException;
-import com.northghost.hydraclient.R;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
+import unified.vpn.sdk.*;
 import com.northghost.hydraclient.adapter.RegionListAdapter;
 import com.northghost.hydraclient.databinding.DialogRegionChooserBinding;
 

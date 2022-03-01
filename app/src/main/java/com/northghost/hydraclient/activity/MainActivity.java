@@ -4,29 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.anchorfree.partner.api.auth.AuthMethod;
-import com.anchorfree.partner.api.data.Country;
-import com.anchorfree.partner.api.response.RemainingTraffic;
-import com.anchorfree.partner.api.response.User;
-import com.anchorfree.reporting.TrackingConstants;
-import com.anchorfree.sdk.SessionConfig;
-import com.anchorfree.sdk.SessionInfo;
-import com.anchorfree.sdk.UnifiedSDK;
-import com.anchorfree.sdk.exceptions.PartnerApiException;
-import com.anchorfree.sdk.rules.TrafficRule;
-import com.anchorfree.vpnsdk.callbacks.Callback;
-import com.anchorfree.vpnsdk.callbacks.CompletableCallback;
-import com.anchorfree.vpnsdk.callbacks.TrafficListener;
-import com.anchorfree.vpnsdk.callbacks.VpnStateListener;
-import com.anchorfree.vpnsdk.compat.CredentialsCompat;
-import com.anchorfree.vpnsdk.exceptions.NetworkRelatedException;
-import com.anchorfree.vpnsdk.exceptions.VpnException;
-import com.anchorfree.vpnsdk.exceptions.VpnPermissionDeniedException;
-import com.anchorfree.vpnsdk.exceptions.VpnPermissionRevokedException;
-import com.anchorfree.vpnsdk.transporthydra.HydraTransport;
-import com.anchorfree.vpnsdk.transporthydra.HydraVpnTransportException;
-import com.anchorfree.vpnsdk.vpnservice.VPNState;
-import com.northghost.caketube.CaketubeTransport;
+import unified.vpn.sdk.*;
 import com.northghost.hydraclient.MainApplication;
 import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.dialog.RegionChooserDialog;
@@ -61,7 +39,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     }
 
     @Override
-    public void vpnStateChanged(VPNState vpnState) {
+    public void vpnStateChanged(VpnState vpnState) {
         updateUI();
     }
 
@@ -119,10 +97,10 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
 
     @Override
     protected void isConnected(Callback<Boolean> callback) {
-        UnifiedSDK.getVpnState(new Callback<VPNState>() {
+        UnifiedSDK.getVpnState(new Callback<VpnState>() {
             @Override
-            public void success(@NonNull VPNState vpnState) {
-                callback.success(vpnState == VPNState.CONNECTED);
+            public void success(@NonNull VpnState vpnState) {
+                callback.success(vpnState == VpnState.CONNECTED);
             }
 
             @Override
@@ -140,13 +118,13 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                 if (aBoolean) {
                     List<String> fallbackOrder = new ArrayList<>();
                     fallbackOrder.add(HydraTransport.TRANSPORT_ID);
-                    fallbackOrder.add(CaketubeTransport.TRANSPORT_ID_TCP);
-                    fallbackOrder.add(CaketubeTransport.TRANSPORT_ID_UDP);
+                    fallbackOrder.add(OpenVpnTransport.TRANSPORT_ID_TCP);
+                    fallbackOrder.add(OpenVpnTransport.TRANSPORT_ID_UDP);
                     showConnectProgress();
                     List<String> bypassDomains = new LinkedList<>();
                     bypassDomains.add("*domain1.com");
                     bypassDomains.add("*domain2.com");
-                    UnifiedSDK.getInstance().getVPN().start(new SessionConfig.Builder()
+                    UnifiedSDK.getInstance().getVpn().start(new SessionConfig.Builder()
                             .withReason(TrackingConstants.GprReasons.M_UI)
                             .withTransportFallback(fallbackOrder)
                             .withTransport(HydraTransport.TRANSPORT_ID)
@@ -182,7 +160,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     @Override
     protected void disconnectFromVnp() {
         showConnectProgress();
-        UnifiedSDK.getInstance().getVPN().stop(TrackingConstants.GprReasons.M_UI, new CompletableCallback() {
+        UnifiedSDK.getInstance().getVpn().stop(TrackingConstants.GprReasons.M_UI, new CompletableCallback() {
             @Override
             public void complete() {
                 hideConnectProgress();
@@ -220,14 +198,14 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
 
     @Override
     protected void getCurrentServer(final Callback<String> callback) {
-        UnifiedSDK.getVpnState(new Callback<VPNState>() {
+        UnifiedSDK.getVpnState(new Callback<VpnState>() {
             @Override
-            public void success(@NonNull VPNState state) {
-                if (state == VPNState.CONNECTED) {
+            public void success(@NonNull VpnState state) {
+                if (state == VpnState.CONNECTED) {
                     UnifiedSDK.getStatus(new Callback<SessionInfo>() {
                         @Override
                         public void success(@NonNull SessionInfo sessionInfo) {
-                            callback.success(CredentialsCompat.getServerCountry(sessionInfo.getCredentials()));
+                            callback.success(sessionInfo.getCredentials().getFirstServerIp());
                         }
 
                         @Override
@@ -280,12 +258,12 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
         selectedCountry = item.getCountry();
         updateUI();
 
-        UnifiedSDK.getVpnState(new Callback<VPNState>() {
+        UnifiedSDK.getVpnState(new Callback<VpnState>() {
             @Override
-            public void success(@NonNull VPNState state) {
-                if (state == VPNState.CONNECTED) {
+            public void success(@NonNull VpnState state) {
+                if (state == VpnState.CONNECTED) {
                     showMessage("Reconnecting to VPN with " + selectedCountry);
-                    UnifiedSDK.getInstance().getVPN().stop(TrackingConstants.GprReasons.M_UI, new CompletableCallback() {
+                    UnifiedSDK.getInstance().getVpn().stop(TrackingConstants.GprReasons.M_UI, new CompletableCallback() {
                         @Override
                         public void complete() {
                             connectToVpn();
