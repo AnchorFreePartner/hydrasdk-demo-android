@@ -23,7 +23,7 @@ public abstract class UIActivity extends AppCompatActivity {
 
     protected static final String TAG = MainActivity.class.getSimpleName();
     private ActivityMainBinding binding;
-    UnifiedSDK unifiedSDK;
+    UnifiedSdk unifiedSDK;
     private Handler mUIHandler = new Handler(Looper.getMainLooper());
     final Runnable mUIUpdateRunnable = new Runnable() {
         @Override
@@ -60,8 +60,8 @@ public abstract class UIActivity extends AppCompatActivity {
                     .carrierId(carrier)
                     .build();
 
-            UnifiedSDK.clearInstances();
-            unifiedSDK = UnifiedSDK.getInstance(clientInfo);
+            UnifiedSdk.clearInstances();
+            unifiedSDK = UnifiedSdk.getInstance(clientInfo);
             binding.loginBtn.setEnabled(true);
         } else {
             binding.loginBtn.setEnabled(false);
@@ -102,7 +102,7 @@ public abstract class UIActivity extends AppCompatActivity {
             Toast.makeText(this, "SDK is not configured", Toast.LENGTH_LONG).show();
             return;
         }
-        if (UnifiedSDK.getInstance().getBackend().isLoggedIn()) {
+        if (UnifiedSdk.getInstance().getBackend().isLoggedIn()) {
             logOutFromVnp();
         }else{
             loginToVpn();
@@ -179,7 +179,7 @@ public abstract class UIActivity extends AppCompatActivity {
     protected abstract void checkRemainingTraffic();
 
     protected void updateUI() {
-        UnifiedSDK.getVpnState(new Callback<VpnState>() {
+        UnifiedSdk.getVpnState(new Callback<VpnState>() {
             @Override
             public void success(@NonNull VpnState vpnState) {
 
@@ -224,7 +224,7 @@ public abstract class UIActivity extends AppCompatActivity {
 
             }
         });
-        UnifiedSDK.getInstance().getBackend().isLoggedIn(new Callback<Boolean>() {
+        UnifiedSdk.getInstance().getBackend().isLoggedIn(new Callback<Boolean>() {
             @Override
             public void success(@NonNull Boolean isLoggedIn) {
                 binding.loginBtn.setText(isLoggedIn ? R.string.log_out : R.string.log_in);

@@ -47,9 +47,9 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.6.10"
 
-    implementation 'com.github.AnchorFreePartner.hydra-sdk-android:sdk-core:86623b2'
-    implementation 'com.github.AnchorFreePartner.hydra-sdk-android:hydra:86623b2'
-    implementation 'com.github.AnchorFreePartner.hydra-sdk-android:openvpn:86623b2'
+    implementation 'com.github.AnchorFreePartner.hydra-sdk-android:sdk-core:4.0.0'
+    implementation 'com.github.AnchorFreePartner.hydra-sdk-android:hydra:4.0.0'
+    implementation 'com.github.AnchorFreePartner.hydra-sdk-android:openvpn:4.0.0'
 
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'androidx.cardview:cardview:1.0.0'

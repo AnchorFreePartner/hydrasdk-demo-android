@@ -69,7 +69,7 @@ public class RegionChooserDialog extends DialogFragment implements RegionListAda
     private void loadServers() {
         showProgress();
 
-        UnifiedSDK.getInstance().getBackend().countries(new Callback<AvailableCountries>() {
+        UnifiedSdk.getInstance().getBackend().countries(new Callback<AvailableCountries>() {
             @Override
             public void success(@NonNull final AvailableCountries countries) {
                 hideProress();

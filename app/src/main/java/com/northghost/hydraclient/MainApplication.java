@@ -30,15 +30,15 @@ public class MainApplication extends Application {
         transportConfigList.add(HydraTransportConfig.create());
         transportConfigList.add(OpenVpnTransportConfig.tcp());
         transportConfigList.add(OpenVpnTransportConfig.udp());
-        UnifiedSDK.update(transportConfigList, CompletableCallback.EMPTY);
+        UnifiedSdk.update(transportConfigList, CompletableCallback.EMPTY);
 
         SdkNotificationConfig notificationConfig = SdkNotificationConfig.newBuilder()
                 .title(getResources().getString(R.string.app_name))
                 .channelId(CHANNEL_ID)
                 .build();
-        UnifiedSDK.update(notificationConfig);
+        UnifiedSdk.update(notificationConfig);
 
-        UnifiedSDK.setLoggingLevel(Log.VERBOSE);
+        UnifiedSdk.setLoggingLevel(Log.VERBOSE);
     }
 
     public void setNewHostAndCarrier(String hostUrl, String carrierId) {

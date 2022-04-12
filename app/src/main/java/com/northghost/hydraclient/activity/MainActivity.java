@@ -21,15 +21,15 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     @Override
     protected void onStart() {
         super.onStart();
-        UnifiedSDK.addTrafficListener(this);
-        UnifiedSDK.addVpnStateListener(this);
+        UnifiedSdk.addTrafficListener(this);
+        UnifiedSdk.addVpnStateListener(this);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        UnifiedSDK.removeVpnStateListener(this);
-        UnifiedSDK.removeTrafficListener(this);
+        UnifiedSdk.removeVpnStateListener(this);
+        UnifiedSdk.removeTrafficListener(this);
     }
 
     @Override
@@ -51,14 +51,14 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
 
     @Override
     protected void isLoggedIn(Callback<Boolean> callback) {
-        UnifiedSDK.getInstance().getBackend().isLoggedIn(callback);
+        UnifiedSdk.getInstance().getBackend().isLoggedIn(callback);
     }
 
     @Override
     protected void loginToVpn() {
         showLoginProgress();
         AuthMethod authMethod = AuthMethod.anonymous();
-        UnifiedSDK.getInstance().getBackend().login(authMethod, new Callback<User>() {
+        UnifiedSdk.getInstance().getBackend().login(authMethod, new Callback<User>() {
             @Override
             public void success(User user) {
                 hideLoginProgress();
@@ -79,7 +79,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     protected void logOutFromVnp() {
         showLoginProgress();
 
-        UnifiedSDK.getInstance().getBackend().logout(new CompletableCallback() {
+        UnifiedSdk.getInstance().getBackend().logout(new CompletableCallback() {
             @Override
             public void complete() {
                 hideLoginProgress();
@@ -97,7 +97,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
 
     @Override
     protected void isConnected(Callback<Boolean> callback) {
-        UnifiedSDK.getVpnState(new Callback<VpnState>() {
+        UnifiedSdk.getVpnState(new Callback<VpnState>() {
             @Override
             public void success(@NonNull VpnState vpnState) {
                 callback.success(vpnState == VpnState.CONNECTED);
@@ -124,7 +124,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                     List<String> bypassDomains = new LinkedList<>();
                     bypassDomains.add("*domain1.com");
                     bypassDomains.add("*domain2.com");
-                    UnifiedSDK.getInstance().getVpn().start(new SessionConfig.Builder()
+                    UnifiedSdk.getInstance().getVpn().start(new SessionConfig.Builder()
                             .withReason(TrackingConstants.GprReasons.M_UI)
                             .withTransportFallback(fallbackOrder)
                             .withTransport(HydraTransport.TRANSPORT_ID)
@@ -160,7 +160,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     @Override
     protected void disconnectFromVnp() {
         showConnectProgress();
-        UnifiedSDK.getInstance().getVpn().stop(TrackingConstants.GprReasons.M_UI, new CompletableCallback() {
+        UnifiedSdk.getInstance().getVpn().stop(TrackingConstants.GprReasons.M_UI, new CompletableCallback() {
             @Override
             public void complete() {
                 hideConnectProgress();
@@ -198,11 +198,11 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
 
     @Override
     protected void getCurrentServer(final Callback<String> callback) {
-        UnifiedSDK.getVpnState(new Callback<VpnState>() {
+        UnifiedSdk.getVpnState(new Callback<VpnState>() {
             @Override
             public void success(@NonNull VpnState state) {
                 if (state == VpnState.CONNECTED) {
-                    UnifiedSDK.getStatus(new Callback<SessionInfo>() {
+                    UnifiedSdk.getStatus(new Callback<SessionInfo>() {
                         @Override
                         public void success(@NonNull SessionInfo sessionInfo) {
                             callback.success(sessionInfo.getCredentials().getFirstServerIp());
@@ -227,7 +227,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
 
     @Override
     protected void checkRemainingTraffic() {
-        UnifiedSDK.getInstance().getBackend().remainingTraffic(new Callback<RemainingTraffic>() {
+        UnifiedSdk.getInstance().getBackend().remainingTraffic(new Callback<RemainingTraffic>() {
             @Override
             public void success(RemainingTraffic remainingTraffic) {
                 updateRemainingTraffic(remainingTraffic);
@@ -258,12 +258,12 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
         selectedCountry = item.getCountry();
         updateUI();
 
-        UnifiedSDK.getVpnState(new Callback<VpnState>() {
+        UnifiedSdk.getVpnState(new Callback<VpnState>() {
             @Override
             public void success(@NonNull VpnState state) {
                 if (state == VpnState.CONNECTED) {
                     showMessage("Reconnecting to VPN with " + selectedCountry);
-                    UnifiedSDK.getInstance().getVpn().stop(TrackingConstants.GprReasons.M_UI, new CompletableCallback() {
+                    UnifiedSdk.getInstance().getVpn().stop(TrackingConstants.GprReasons.M_UI, new CompletableCallback() {
                         @Override
                         public void complete() {
                             connectToVpn();

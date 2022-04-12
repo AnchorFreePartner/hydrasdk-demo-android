@@ -14,7 +14,7 @@ import unified.vpn.sdk.*;
 public class Fake {
     //fake method to support migration documentation and list all available methods
     public void sdkMethodsList() {
-        final UnifiedSDK instance = UnifiedSDK.getInstance();
+        final UnifiedSdk instance = UnifiedSdk.getInstance();
         ClientInfo.newBuilder().addUrl("").carrierId("test").addUrls(new ArrayList<>()).build();
         instance.getCarrierId();
 
@@ -24,17 +24,17 @@ public class Fake {
         config(instance);
         final String id1 = OpenVpnTransport.TRANSPORT_ID_TCP;
         final String id2 = OpenVpnTransport.TRANSPORT_ID_UDP;
-        UnifiedSDK.getVpnState(Callback.EMPTY);
-        UnifiedSDK.getConnectionStatus(Callback.EMPTY);
-        UnifiedSDK.setLoggingLevel(Log.VERBOSE);
-        UnifiedSDK.getStatus(Callback.EMPTY);
+        UnifiedSdk.getVpnState(Callback.EMPTY);
+        UnifiedSdk.getConnectionStatus(Callback.EMPTY);
+        UnifiedSdk.setLoggingLevel(Log.VERBOSE);
+        UnifiedSdk.getStatus(Callback.EMPTY);
         VpnPermissions.request(CompletableCallback.EMPTY);
 
-        UnifiedSDK.addVpnCallListener(parcelable -> {
+        UnifiedSdk.addVpnCallListener(parcelable -> {
 
         });
-        UnifiedSDK.removeVpnCallListener(null);
-        UnifiedSDK.getInstance().getInfo(new Callback<SdkInfo>() {
+        UnifiedSdk.removeVpnCallListener(null);
+        UnifiedSdk.getInstance().getInfo(new Callback<SdkInfo>() {
             @Override
             public void success(@NonNull SdkInfo sdkInfo) {
                 String deviceId = sdkInfo.getDeviceId();
@@ -109,7 +109,7 @@ public class Fake {
         };
     }
 
-    private void config(UnifiedSDK instance) {
+    private void config(UnifiedSdk instance) {
         RemoteConfig config = instance.getRemoteConfig();
         ObservableSubscription s = config.listen(new ObservableListener() {
             @Override
@@ -120,7 +120,7 @@ public class Fake {
         config.get("",new Object());
     }
 
-    private void vpn(UnifiedSDK instance) {
+    private void vpn(UnifiedSdk instance) {
         Vpn vpn = instance.getVpn();
         vpn.getStartTimestamp(Callback.EMPTY);
         vpn.stop(TrackingConstants.GprReasons.M_UI, CompletableCallback.EMPTY);
@@ -172,7 +172,7 @@ public class Fake {
                 .build();
     }
 
-    private void backend(UnifiedSDK instance) {
+    private void backend(UnifiedSdk instance) {
         Backend backend = instance.getBackend();
         backend.credentials(Callback.EMPTY);
         backend.credentials(new CredentialsRequest.Builder()
@@ -210,7 +210,7 @@ public class Fake {
         backend.currentUser(Callback.EMPTY);
     }
 
-    private void cnl(UnifiedSDK instance) {
+    private void cnl(UnifiedSdk instance) {
         instance.getCnl().clear(CompletableCallback.EMPTY);
         instance.getCnl().loadList(Callback.EMPTY);
         instance.getCnl().updateList(new ArrayList<>(), CompletableCallback.EMPTY);
