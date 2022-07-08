@@ -1,0 +1,12 @@
+{
+    "repo_name": "hydrasdk-demo-android",
+    "github_org": "AnchorFreePartner",
+    "environment": ["prod"],
+    "jira_project": "Platform",
+    "jira_domain": "https://intxprivacynow.atlassian.net/",
+    "jira_issue_type": "task",
+    "team_company": "Aura",
+    "team_name": "partner",
+    "team_email": "partner-dev@aura.com",
+    "team_slack": "#partner_security_alerts"
+}
