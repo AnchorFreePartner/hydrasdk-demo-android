@@ -3,10 +3,10 @@
     "github_org": "AnchorFreePartner",
     "environment": ["prod"],
     "jira_project": "DP",
-    "jira_domain": "https://intxprivacynow.atlassian.net/",
+    "jira_domain": "https://anchorfree.atlassian.net/",
     "jira_issue_type": "task",
-    "team_company": "Aura",
+    "team_company": "Pango",
     "team_name": "partner",
-    "team_email": "partner-dev@aura.com",
+    "team_email": "partner-dev@pango.co",
     "team_slack": "#partner_security_alerts"
 }
