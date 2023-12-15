@@ -122,9 +122,9 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
 //                    fallbackOrder.add(OpenVpnTransport.TRANSPORT_ID_TCP);
 //                    fallbackOrder.add(OpenVpnTransport.TRANSPORT_ID_UDP);
                     showConnectProgress();
-                    List<String> bypassDomains = new LinkedList<>();
-                    bypassDomains.add("*domain1.com");
-                    bypassDomains.add("*domain2.com");
+//                    List<String> bypassDomains = new LinkedList<>();
+//                    bypassDomains.add("*domain1.com");
+//                    bypassDomains.add("*domain2.com");
                     final ArrayList<String> domains = new ArrayList<>();
                     domains.add("ip.me");
                     UnifiedSdk.getInstance().getVpn().start(new SessionConfig.Builder()
@@ -141,7 +141,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                                     .build())
 
                             .withLocation(selectedCountry)
-                            .addDnsRule(TrafficRule.dns().bypass().fromDomains(bypassDomains))
+//                            .addDnsRule(TrafficRule.dns().bypass().fromDomains(bypassDomains))
                             .build(), new CompletableCallback() {
                         @Override
                         public void complete() {
