@@ -19,6 +19,9 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <meta-data
+            android:name="unified.vpn.sdk.deps"
+            android:resource="@raw/sdk_deps"/>
     </application>
 
 </manifest>

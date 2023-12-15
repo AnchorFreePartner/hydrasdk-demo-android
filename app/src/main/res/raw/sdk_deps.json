@@ -1,0 +1,5 @@
+{
+  "logger": {
+    "type": "com.northghost.hydraclient.CustomLogger"
+  }
+}

@@ -22,8 +22,8 @@ public class Fake {
         cnl(instance);
         vpn(instance);
         config(instance);
-        final String id1 = OpenVpnTransport.TRANSPORT_ID_TCP;
-        final String id2 = OpenVpnTransport.TRANSPORT_ID_UDP;
+//        final String id1 = OpenVpnTransport.TRANSPORT_ID_TCP;
+//        final String id2 = OpenVpnTransport.TRANSPORT_ID_UDP;
         UnifiedSdk.getVpnState(Callback.EMPTY);
         UnifiedSdk.getConnectionStatus(Callback.EMPTY);
         UnifiedSdk.setLoggingLevel(Log.VERBOSE);
@@ -48,7 +48,7 @@ public class Fake {
         //exceptions
         Class[] ex = new Class[]{
                 VpnException.class,
-                OpenVpnTransportException.class,
+//                OpenVpnTransportException.class,
                 CaptivePortalException.class,
                 CnlBlockedException.class,
                 ConnectionCancelledException.class,
@@ -84,9 +84,9 @@ public class Fake {
                 PartnerApiException.CODE_USER_SUSPENDED,
         };
         Integer[] errors = new Integer[]{
-                OpenVpnTransportException.CONNECTION_BROKEN_ERROR,
-                OpenVpnTransportException.CONNECTION_FAILED_ERROR,
-                OpenVpnTransportException.CONNECTION_AUTH_FAILURE,
+//                OpenVpnTransportException.CONNECTION_BROKEN_ERROR,
+//                OpenVpnTransportException.CONNECTION_FAILED_ERROR,
+//                OpenVpnTransportException.CONNECTION_AUTH_FAILURE,
                 HydraVpnTransportException.HYDRA_ERROR_UNKNOWN,
                 HydraVpnTransportException.HYDRA_ERROR_CONFIGURATION,
                 HydraVpnTransportException.HYDRA_ERROR_BROKEN,
