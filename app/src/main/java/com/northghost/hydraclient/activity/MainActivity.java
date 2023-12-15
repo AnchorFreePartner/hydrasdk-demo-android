@@ -5,6 +5,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import unified.vpn.sdk.*;
+
 import com.northghost.hydraclient.MainApplication;
 import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.dialog.RegionChooserDialog;
@@ -124,10 +125,20 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                     List<String> bypassDomains = new LinkedList<>();
                     bypassDomains.add("*domain1.com");
                     bypassDomains.add("*domain2.com");
+                    final ArrayList<String> domains = new ArrayList<>();
+                    domains.add("ip.me");
                     UnifiedSdk.getInstance().getVpn().start(new SessionConfig.Builder()
                             .withReason(TrackingConstants.GprReasons.M_UI)
                             .withTransportFallback(fallbackOrder)
                             .withTransport(HydraTransport.TRANSPORT_ID)
+                            .withFireshieldConfig(new FireshieldConfig.Builder()
+                                    .addService(FireshieldConfig.Services.IP)
+                                    .addService(FireshieldConfig.Services.BITDEFENDER)
+                                    .addCategory(FireshieldCategory.Builder.proxy(FireshieldConfig.Categories.SAFE))
+                                    .addCategory(FireshieldCategory.Builder.proxy(FireshieldConfig.Categories.UNSAFE))
+                                    .addCategory(FireshieldCategory.Builder.bypass("safeCategory"))
+                                    .addCategoryRule(FireshieldCategoryRule.Builder.fromDomains("safeCategory", domains))
+                                    .build())
                             .withVirtualLocation(selectedCountry)
                             .addDnsRule(TrafficRule.Builder.bypass().fromDomains(bypassDomains))
                             .build(), new CompletableCallback() {
