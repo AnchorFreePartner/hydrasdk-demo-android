@@ -28,8 +28,8 @@ public class MainApplication extends Application {
 
         List<TransportConfig> transportConfigList = new ArrayList<>();
         transportConfigList.add(HydraTransportConfig.create());
-        transportConfigList.add(OpenVpnTransportConfig.tcp());
-        transportConfigList.add(OpenVpnTransportConfig.udp());
+//        transportConfigList.add(OpenVpnTransportConfig.tcp());
+//        transportConfigList.add(OpenVpnTransportConfig.udp());
         UnifiedSdk.update(transportConfigList, CompletableCallback.EMPTY);
 
         SdkNotificationConfig notificationConfig = SdkNotificationConfig.newBuilder()
