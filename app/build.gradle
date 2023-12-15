@@ -55,7 +55,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.aar'])
     implementation 'com.github.AnchorFreePartner.hydra-sdk-android:sdk-core:4.7.0'
     implementation 'com.github.AnchorFreePartner.hydra-sdk-android:hydra:4.7.0'
-//    implementation 'com.github.AnchorFreePartner.hydra-sdk-android:openvpn:4.2.0'
+    implementation 'com.github.AnchorFreePartner.hydra-sdk-android:openvpn:4.7.0'
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.cardview:cardview:1.0.0'
