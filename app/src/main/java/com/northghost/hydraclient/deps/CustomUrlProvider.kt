@@ -1,12 +1,12 @@
 package com.northghost.hydraclient.deps
 
 import android.content.Context
-import com.anchorfree.partner.UrlRotator
-import com.anchorfree.partner.UrlRotatorFactory
-import com.anchorfree.partner.api.ClientInfo
-import com.anchorfree.partner.exceptions.PartnerRequestException
+import unified.vpn.sdk.ClientInfo
+import unified.vpn.sdk.PartnerRequestException
+import unified.vpn.sdk.UrlRotator
+import unified.vpn.sdk.UrlRotatorFactory
 
-class CustomUrlProvider:UrlRotator {
+class CustomUrlProvider: UrlRotator {
     override fun failure(p0: String, p1: PartnerRequestException) {
         TODO("Not yet implemented")
     }
@@ -24,7 +24,7 @@ class CustomUrlProvider:UrlRotator {
     }
 }
 
-class CustomUrlRotatorFactory:UrlRotatorFactory{
+class CustomUrlRotatorFactory: UrlRotatorFactory {
     override fun create(p0: Context, p1: ClientInfo): UrlRotator {
         TODO("Not yet implemented")
     }
