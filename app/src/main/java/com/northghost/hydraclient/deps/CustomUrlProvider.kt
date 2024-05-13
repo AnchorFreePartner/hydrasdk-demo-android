@@ -11,7 +11,7 @@ class CustomUrlProvider: UrlRotator {
         TODO("Not yet implemented")
     }
 
-    override fun success(p0: String) {
+    override fun success(p0: String, p1: Any?) {
         TODO("Not yet implemented")
     }
 
