@@ -5,7 +5,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import unified.vpn.sdk.*;
-
 import com.northghost.hydraclient.MainApplication;
 import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.dialog.RegionChooserDialog;
@@ -139,7 +138,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                                     .addCategory(FireshieldCategory.Builder.bypass("safeCategory"))
                                     .addCategoryRule(FireshieldCategoryRule.Builder.fromDomains("safeCategory", domains))
                                     .build())
-                            .withVirtualLocation(selectedCountry)
+                            .withLocation(selectedCountry)
                             .addDnsRule(TrafficRule.Builder.bypass().fromDomains(bypassDomains))
                             .build(), new CompletableCallback() {
                         @Override
