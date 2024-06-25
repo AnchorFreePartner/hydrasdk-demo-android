@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 import unified.vpn.sdk.*;
 
+/** @noinspection deprecation*/
 public class Fake {
     //fake method to support migration documentation and list all available methods
     public void sdkMethodsList() {
