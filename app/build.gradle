@@ -12,7 +12,7 @@ android {
         versionName "1.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
-        buildConfigField "String", "BASE_HOST", "\"https://backend.northghost.com\""
+        buildConfigField "String", "BASE_HOST", "\"https://api-prod.northghost.com \""
         buildConfigField "String", "BASE_OAUTH_METHOD", "\"anonymous\""
 
         buildConfigField "String", "SHARED_PREFS", "\"NORTHGHOST_SHAREDPREFS\""
@@ -35,8 +35,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility 17
+        targetCompatibility 17
     }
     buildFeatures {
         viewBinding true
@@ -53,9 +53,10 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.21"
     implementation fileTree(dir: 'libs', include: ['*.aar'])
-    implementation 'com.github.AnchorFreePartner.hydra-sdk-android:sdk-core:4.7.0'
-    implementation 'com.github.AnchorFreePartner.hydra-sdk-android:hydra:4.7.0'
-    implementation 'com.github.AnchorFreePartner.hydra-sdk-android:openvpn:4.7.0'
+    implementation 'co.pango:sdk-core:4.9.3'
+    implementation 'co.pango:sdk-hydra:4.9.3'
+    implementation 'co.pango:sdk-openvpn:4.9.3'
+    implementation 'co.pango:sdk-wireguard:4.9.3'
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.cardview:cardview:1.0.0'
