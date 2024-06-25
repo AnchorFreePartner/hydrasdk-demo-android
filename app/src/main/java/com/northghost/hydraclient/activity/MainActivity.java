@@ -138,8 +138,9 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                                     .addCategory(FireshieldCategory.Builder.bypass("safeCategory"))
                                     .addCategoryRule(FireshieldCategoryRule.Builder.fromDomains("safeCategory", domains))
                                     .build())
+
                             .withVirtualLocation(selectedCountry)
-//                            .addDnsRule(TrafficRule.Builder.bypass().fromDomains(bypassDomains))
+                            .addDnsRule(TrafficRule.Builder.bypass().fromDomains(bypassDomains))
                             .build(), new CompletableCallback() {
                         @Override
                         public void complete() {
