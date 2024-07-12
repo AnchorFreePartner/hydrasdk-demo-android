@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import unified.vpn.sdk.*;
 import com.northghost.hydraclient.MainApplication;
+import com.northghost.hydraclient.adapter.RegionListAdapter;
 import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.dialog.RegionChooserDialog;
 
@@ -118,8 +119,8 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                 if (aBoolean) {
                     List<String> fallbackOrder = new ArrayList<>();
                     fallbackOrder.add(HydraTransport.TRANSPORT_ID);
-                    fallbackOrder.add(OpenVpnTransport.TRANSPORT_ID_TCP);
-                    fallbackOrder.add(OpenVpnTransport.TRANSPORT_ID_UDP);
+//                    fallbackOrder.add(OpenVpnTransport.TRANSPORT_ID_TCP);
+//                    fallbackOrder.add(OpenVpnTransport.TRANSPORT_ID_UDP);
                     showConnectProgress();
                     List<String> bypassDomains = new LinkedList<>();
                     bypassDomains.add("*domain1.com");
@@ -138,8 +139,9 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                                     .addCategory(FireshieldCategory.Builder.bypass("safeCategory"))
                                     .addCategoryRule(FireshieldCategoryRule.Builder.fromDomains("safeCategory", domains))
                                     .build())
+
                             .withLocation(selectedCountry)
-                            .addDnsRule(TrafficRule.Builder.bypass().fromDomains(bypassDomains))
+                            .addDnsRule(TrafficRule.dns().bypass().fromDomains(bypassDomains))
                             .build(), new CompletableCallback() {
                         @Override
                         public void complete() {
@@ -263,9 +265,9 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     }
 
     @Override
-    public void onRegionSelected(Country item) {
+    public void onRegionSelected(RegionListAdapter.Region item) {
 
-        selectedCountry = item.getCountry();
+        selectedCountry = item.getName();
         updateUI();
 
         UnifiedSdk.getVpnState(new Callback<VpnState>() {

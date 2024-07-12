@@ -69,11 +69,11 @@ public class RegionChooserDialog extends DialogFragment implements RegionListAda
     private void loadServers() {
         showProgress();
 
-        UnifiedSdk.getInstance().getBackend().countries(new Callback<AvailableCountries>() {
+        UnifiedSdk.getInstance().getBackend().locations(ConnectionType.HYDRA_TCP, new Callback<AvailableLocations>() {
             @Override
-            public void success(@NonNull final AvailableCountries countries) {
+            public void success(@NonNull final AvailableLocations countries) {
                 hideProress();
-                regionAdapter.setRegions(countries.getCountries());
+                regionAdapter.setRegions(countries.getLocations());
             }
 
             @Override
@@ -95,7 +95,7 @@ public class RegionChooserDialog extends DialogFragment implements RegionListAda
     }
 
     @Override
-    public void onCountrySelected(Country item) {
+    public void onCountrySelected(RegionListAdapter.Region item) {
         regionChooserInterface.onRegionSelected(item);
         dismiss();
     }
@@ -115,6 +115,6 @@ public class RegionChooserDialog extends DialogFragment implements RegionListAda
     }
 
     public interface RegionChooserInterface {
-        void onRegionSelected(Country item);
+        void onRegionSelected(RegionListAdapter.Region item);
     }
 }

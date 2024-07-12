@@ -11,11 +11,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import unified.vpn.sdk.Country;
+import unified.vpn.sdk.Location;
 
 
 public class RegionListAdapter extends RecyclerView.Adapter<RegionListAdapter.ViewHolder> {
+    public static class Region {
+        final String name;
 
-    private List<Country> regions;
+        public Region(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
+    private List<Region> regions;
     private RegionListAdapterInterface listAdapterInterface;
 
     public RegionListAdapter(RegionListAdapterInterface listAdapterInterface) {
@@ -32,9 +44,9 @@ public class RegionListAdapter extends RecyclerView.Adapter<RegionListAdapter.Vi
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        Country country = regions.get(position);
-        if (country.getCountry() != null) {
-            holder.binding.regionTitle.setText(regions.get(position).getCountry());
+        Region country = regions.get(position);
+        if (!country.name.isEmpty()) {
+            holder.binding.regionTitle.setText(regions.get(position).name);
         } else {
             holder.binding.regionTitle.setText("unknown(null)");
         }
@@ -57,14 +69,16 @@ public class RegionListAdapter extends RecyclerView.Adapter<RegionListAdapter.Vi
         }
     }
 
-    public void setRegions(List<Country> list) {
+    public void setRegions(List<Location> list) {
         regions = new ArrayList<>();
-        regions.add(new Country(""));
-        regions.addAll(list);
+        regions.add(new Region(""));
+        for (Location loc : list) {
+            regions.add(new Region(loc.getName()));
+        }
         notifyDataSetChanged();
     }
 
     public interface RegionListAdapterInterface {
-        void onCountrySelected(Country item);
+        void onCountrySelected(Region item);
     }
 }
