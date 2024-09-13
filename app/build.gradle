@@ -55,10 +55,10 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.21"
     implementation fileTree(dir: 'libs', include: ['*.aar'])
 
-    implementation 'co.pango:sdk-core:4.9.3'
-    implementation 'co.pango:sdk-hydra:4.9.3'
-    implementation 'co.pango:sdk-openvpn:4.9.3'
-    implementation 'co.pango:sdk-wireguard:4.9.3'
+    implementation 'co.pango:sdk-core:5.0.1'
+    implementation 'co.pango:sdk-hydra:5.0.1'
+    implementation 'co.pango:sdk-openvpn:5.0.1'
+    implementation 'co.pango:sdk-wireguard:5.0.1'
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.cardview:cardview:1.0.0'
