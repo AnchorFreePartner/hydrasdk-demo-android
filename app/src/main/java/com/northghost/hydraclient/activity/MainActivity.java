@@ -119,8 +119,8 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                 if (aBoolean) {
                     List<String> fallbackOrder = new ArrayList<>();
                     fallbackOrder.add(HydraTransport.TRANSPORT_ID);
-//                    fallbackOrder.add(OpenVpnTransport.TRANSPORT_ID_TCP);
-//                    fallbackOrder.add(OpenVpnTransport.TRANSPORT_ID_UDP);
+                    fallbackOrder.add(OpenVpnTransport.TRANSPORT_ID_TCP);
+                    fallbackOrder.add(OpenVpnTransport.TRANSPORT_ID_UDP);
                     showConnectProgress();
                     List<String> bypassDomains = new LinkedList<>();
                     bypassDomains.add("*domain1.com");
@@ -141,7 +141,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                                     .build())
 
                             .withLocation(selectedCountry)
-                            .addDnsRule(TrafficRule.dns().bypass().fromDomains(bypassDomains))
+//                            .addDnsRule(TrafficRule.dns().bypass().fromDomains(bypassDomains))
                             .build(), new CompletableCallback() {
                         @Override
                         public void complete() {

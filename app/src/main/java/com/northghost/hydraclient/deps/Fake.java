@@ -17,7 +17,6 @@ public class Fake {
     public void sdkMethodsList() {
         final UnifiedSdk instance = UnifiedSdk.getInstance();
         ClientInfo.newBuilder().addUrl("").carrierId("test").addUrls(new ArrayList<>()).build();
-        instance.getCarrierId();
 
         backend(instance);
         cnl(instance);
@@ -26,7 +25,6 @@ public class Fake {
 //        final String id1 = OpenVpnTransport.TRANSPORT_ID_TCP;
 //        final String id2 = OpenVpnTransport.TRANSPORT_ID_UDP;
         UnifiedSdk.getVpnState(Callback.EMPTY);
-        UnifiedSdk.getConnectionStatus(Callback.EMPTY);
         UnifiedSdk.setLoggingLevel(Log.VERBOSE);
         UnifiedSdk.getStatus(Callback.EMPTY);
         VpnPermissions.request(CompletableCallback.EMPTY);
@@ -132,24 +130,22 @@ public class Fake {
     private SessionConfig getSessionConfig() {
         return new SessionConfig.Builder()
                 .withReason(TrackingConstants.GprReasons.M_UI)
-                .addProxyRule(TrafficRule.Builder.blockDns().fromAssets(""))
-                .addDnsRule(TrafficRule.Builder.blockDns().fromAssets(""))
-                .addDnsRule(TrafficRule.Builder.blockPkt().fromAssets(""))
-                .addDnsRule(TrafficRule.Builder.bypass().fromAssets(""))
-                .addDnsRule(TrafficRule.Builder.proxy().fromAssets(""))
-                .addDnsRule(TrafficRule.Builder.vpn().fromAssets(""))
-                .addDnsRule(TrafficRule.Builder.vpn().fromDomains(new ArrayList<>()))
-                .addDnsRule(TrafficRule.Builder.vpn().fromFile(""))
-                .addDnsRule(TrafficRule.Builder.vpn().fromResource(0))
-                .addDnsRule(TrafficRule.Builder.vpn().fromIp("", 0))
-                .addDnsRule(TrafficRule.Builder.vpn().fromIp("", 0, 0))
-                .addDnsRule(TrafficRule.Builder.vpn().fromIp("", 0, 0, 0))
-                .addDnsRule(TrafficRule.Builder.vpn().tcp())
-                .addDnsRule(TrafficRule.Builder.vpn().tcp(0))
-                .addDnsRule(TrafficRule.Builder.vpn().tcp(0, 0))
-                .addDnsRule(TrafficRule.Builder.vpn().udp())
-                .addDnsRule(TrafficRule.Builder.vpn().udp(0))
-                .addDnsRule(TrafficRule.Builder.vpn().udp(0, 0))
+                .addDnsRule(TrafficRule.dns().block().fromAssets(""))
+                .addDnsRule(TrafficRule.dns().bypass().fromAssets(""))
+                .addDnsRule(TrafficRule.dns().proxyPeer().fromAssets(""))
+                .addDnsRule(TrafficRule.dns().vpn().fromAssets(""))
+                .addDnsRule(TrafficRule.dns().vpn().fromDomains(new ArrayList<>()))
+                .addDnsRule(TrafficRule.dns().vpn().fromFile(""))
+                .addDnsRule(TrafficRule.dns().vpn().fromResource(0))
+                .addProxyRule(TrafficRule.proxy().vpn().fromIp("", 0))
+                .addProxyRule(TrafficRule.proxy().vpn().fromIp("", 0, 0))
+                .addProxyRule(TrafficRule.proxy().vpn().fromIp("", 0, 0, 0))
+                .addProxyRule(TrafficRule.proxy().vpn().tcp())
+                .addProxyRule(TrafficRule.proxy().vpn().tcp(0))
+                .addProxyRule(TrafficRule.proxy().vpn().tcp(0, 0))
+                .addProxyRule(TrafficRule.proxy().vpn().udp())
+                .addProxyRule(TrafficRule.proxy().vpn().udp(0))
+                .addProxyRule(TrafficRule.proxy().vpn().udp(0, 0))
                 .exceptApps(new ArrayList<>())
                 .captivePortalBlockBypass(false)
                 .withVpnParams(VpnParams.newBuilder().build())
@@ -159,8 +155,6 @@ public class Fake {
                 .withSessionId("")
                 .forApps(new ArrayList<>())
                 .withLocation("")
-                .withCountry("")
-                .withVirtualLocation("")
                 .withPolicy(AppPolicy.newBuilder().build())
                 .withFireshieldConfig(new FireshieldConfig.Builder()
                         .addCategory(FireshieldCategory.Builder.block(""))
@@ -175,16 +169,7 @@ public class Fake {
 
     private void backend(UnifiedSdk instance) {
         Backend backend = instance.getBackend();
-        backend.credentials(Callback.EMPTY);
-        backend.credentials(new CredentialsRequest.Builder()
-                .withConnectionType(ConnectionType.HYDRA_TCP)
-                .withCountry("")
-                .withLocation("")
-                .withExtras(new HashMap<>())
-                .withPrivateGroup("")
-                .build(), Callback.EMPTY);
         backend.currentUser(Callback.EMPTY);
-        backend.countries(ConnectionType.HYDRA_TCP, Callback.EMPTY);
         backend.locations(ConnectionType.HYDRA_TCP, new Callback<AvailableLocations>() {
             @Override
             public void success(@NonNull AvailableLocations availableLocations) {
@@ -204,7 +189,6 @@ public class Fake {
         backend.login(AuthMethod.anonymous(), Bundle.EMPTY, Callback.EMPTY);
         backend.logout(CompletableCallback.EMPTY);
         backend.remainingTraffic(Callback.EMPTY);
-        backend.remoteConfig(Callback.EMPTY);
         backend.deletePurchase(0, CompletableCallback.EMPTY);
         backend.purchase("", CompletableCallback.EMPTY);
         backend.purchase("", "", CompletableCallback.EMPTY);
