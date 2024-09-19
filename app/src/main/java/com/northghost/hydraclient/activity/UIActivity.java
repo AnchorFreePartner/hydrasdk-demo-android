@@ -135,7 +135,7 @@ public abstract class UIActivity extends AppCompatActivity {
                 if (aBoolean) {
                     disconnectFromVnp();
                 } else {
-                    connectToVpn();
+                    connectToVpn(CompletableCallback.EMPTY);
                 }
             }
 
@@ -148,7 +148,7 @@ public abstract class UIActivity extends AppCompatActivity {
 
     protected abstract void isConnected(Callback<Boolean> callback);
 
-    protected abstract void connectToVpn();
+    protected abstract void connectToVpn(CompletableCallback callback);
 
     protected abstract void disconnectFromVnp();
 
