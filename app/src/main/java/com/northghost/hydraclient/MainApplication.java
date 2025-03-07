@@ -22,7 +22,6 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        checkPermission();
         initHydraSdk();
     }
 
@@ -79,13 +78,6 @@ public class MainApplication extends Application {
             // or other notification behaviors after this
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-    private void checkPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-                !getApplicationContext().getSystemService(AlarmManager.class).canScheduleExactAlarms()) {
-            startActivity(new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM));
         }
     }
 }

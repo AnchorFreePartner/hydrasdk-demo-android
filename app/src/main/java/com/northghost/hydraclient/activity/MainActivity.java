@@ -1,5 +1,8 @@
 package com.northghost.hydraclient.activity;
 
+import static com.northghost.hydraclient.extensions.ActivityExtensionsKt.scheduleAlarmPermissionGranted;
+import static com.northghost.hydraclient.extensions.ActivityExtensionsKt.showAlarmPermissionDialog;
+
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -113,6 +116,10 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
 
     @Override
     protected void connectToVpn(CompletableCallback callback) {
+        if (!scheduleAlarmPermissionGranted(this)) {
+            showAlarmPermissionDialog(this);
+            return;
+        }
         isLoggedIn(new Callback<Boolean>() {
             @Override
             public void success(@NonNull Boolean aBoolean) {
@@ -151,12 +158,11 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
         final ArrayList<String> domains = new ArrayList<>();
         domains.add("ip.me");
         List<String> fallbackOrder = new ArrayList<>();
-        fallbackOrder.add(HydraTransport.TRANSPORT_ID);
+        fallbackOrder.add(WireguardTransport.TRANSPORT_ID);
         fallbackOrder.add(OpenVpnTransport.TRANSPORT_ID_TCP);
         fallbackOrder.add(OpenVpnTransport.TRANSPORT_ID_UDP);
         SessionConfig.Builder config = new SessionConfig.Builder()
                 .withReason(TrackingConstants.GprReasons.M_UI)
-                .withTransportFallback(fallbackOrder)
                 .withTransport(HydraTransport.TRANSPORT_ID)
                 .withFireshieldConfig(new FireshieldConfig.Builder()
                         .addService(FireshieldConfig.Services.IP)

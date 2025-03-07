@@ -1,10 +1,15 @@
 package com.northghost.hydraclient.activity;
 
+import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -24,7 +29,7 @@ import unified.vpn.sdk.*;
 public abstract class UIActivity extends AppCompatActivity {
 
     protected static final String TAG = MainActivity.class.getSimpleName();
-    protected String patchAddress;
+    protected String patchAddress = "";
     private ActivityMainBinding binding;
     UnifiedSdk unifiedSDK;
     private Handler mUIHandler = new Handler(Looper.getMainLooper());
