@@ -47,5 +47,9 @@
     <string name="current_server">CURRENT_SERVER</string>
     <string name="connecting">Connecting</string>
     <string name="paused">Paused</string>
+    <string name="config_patch_address">Config patch address:</string>
+    <string name="carrier">Carrier:</string>
+    <string name="backend_url">Backend URL:</string>
+    <string name="init">Init</string>
 
 </resources>

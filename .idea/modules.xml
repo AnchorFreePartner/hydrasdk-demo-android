@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="ProjectModuleManager">
-    <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/hydrasdk-demo-android.iml" filepath="$PROJECT_DIR$/.idea/modules/hydrasdk-demo-android.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/hydrasdk-demo-android.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/hydrasdk-demo-android.app.iml" />
-    </modules>
-  </component>
-</project>

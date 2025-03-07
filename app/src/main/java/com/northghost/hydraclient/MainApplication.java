@@ -1,11 +1,14 @@
 package com.northghost.hydraclient;
 
+import android.app.AlarmManager;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import unified.vpn.sdk.*;
@@ -19,6 +22,7 @@ public class MainApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        checkPermission();
         initHydraSdk();
     }
 
@@ -28,8 +32,9 @@ public class MainApplication extends Application {
 
         List<TransportConfig> transportConfigList = new ArrayList<>();
         transportConfigList.add(HydraTransportConfig.create());
-//        transportConfigList.add(OpenVpnTransportConfig.tcp());
-//        transportConfigList.add(OpenVpnTransportConfig.udp());
+        transportConfigList.add(WireTransportConfig.create());
+        transportConfigList.add(OpenVpnTransportConfig.tcp());
+        transportConfigList.add(OpenVpnTransportConfig.udp());
         UnifiedSdk.update(transportConfigList, CompletableCallback.EMPTY);
 
         SdkNotificationConfig notificationConfig = SdkNotificationConfig.newBuilder()
@@ -74,6 +79,13 @@ public class MainApplication extends Application {
             // or other notification behaviors after this
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private void checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                !getApplicationContext().getSystemService(AlarmManager.class).canScheduleExactAlarms()) {
+            startActivity(new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM));
         }
     }
 }

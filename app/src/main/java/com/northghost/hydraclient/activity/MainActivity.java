@@ -5,15 +5,14 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import unified.vpn.sdk.*;
-
 import com.northghost.hydraclient.MainApplication;
 import com.northghost.hydraclient.adapter.RegionListAdapter;
 import com.northghost.hydraclient.dialog.LoginDialog;
 import com.northghost.hydraclient.dialog.RegionChooserDialog;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class MainActivity extends UIActivity implements TrafficListener, VpnStateListener,
         LoginDialog.LoginConfirmationInterface, RegionChooserDialog.RegionChooserInterface {
@@ -78,7 +77,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
     }
 
     @Override
-    protected void logOutFromVnp() {
+    protected void logOutFromVpn() {
         showLoginProgress();
 
         UnifiedSdk.getInstance().getBackend().logout(new CompletableCallback() {
@@ -155,7 +154,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
         fallbackOrder.add(HydraTransport.TRANSPORT_ID);
         fallbackOrder.add(OpenVpnTransport.TRANSPORT_ID_TCP);
         fallbackOrder.add(OpenVpnTransport.TRANSPORT_ID_UDP);
-        return new SessionConfig.Builder()
+        SessionConfig.Builder config = new SessionConfig.Builder()
                 .withReason(TrackingConstants.GprReasons.M_UI)
                 .withTransportFallback(fallbackOrder)
                 .withTransport(HydraTransport.TRANSPORT_ID)
@@ -168,13 +167,16 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                         .addCategoryRule(FireshieldCategoryRule.Builder.fromDomains("safeCategory", domains))
                         .build())
 
-                .withLocation(selectedCountry)
+                .withLocation(selectedCountry);
 //                            .addDnsRule(TrafficRule.dns().bypass().fromDomains(bypassDomains))
-                .build();
+        if (!patchAddress.isEmpty()) {
+            config = SdkConfigPatcherFactory.Companion.addPatcherToSessionConfig(config, patchAddress);
+        }
+        return config.build();
     }
 
     @Override
-    protected void disconnectFromVnp() {
+    protected void disconnectFromVpn() {
         showConnectProgress();
         UnifiedSdk.getInstance().getVpn().stop(TrackingConstants.GprReasons.M_UI, new CompletableCallback() {
             @Override
@@ -221,7 +223,7 @@ public class MainActivity extends UIActivity implements TrafficListener, VpnStat
                     UnifiedSdk.getStatus(new Callback<SessionInfo>() {
                         @Override
                         public void success(@NonNull SessionInfo sessionInfo) {
-                            callback.success(sessionInfo.getCredentials().getFirstServerIp());
+                            callback.success(Objects.requireNonNull(sessionInfo.getCredentials()).getFirstServerIp());
                         }
 
                         @Override

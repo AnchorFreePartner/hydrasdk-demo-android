@@ -21,7 +21,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Backend URL:"
+            android:text="@string/backend_url"
             android:textColor="@android:color/black"/>
         <EditText
             android:layout_width="match_parent"
@@ -31,7 +31,17 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Carrier:"
+            android:text="@string/config_patch_address"
+            android:textColor="@android:color/black"/>
+        <EditText
+            android:layout_width="match_parent"
+            android:textColor="@android:color/black"
+            android:layout_height="wrap_content"
+            android:id="@+id/et_server_override"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/carrier"
             android:textColor="@android:color/black"/>
         <EditText
             android:layout_width="match_parent"
@@ -44,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="150dp"
-            android:text="Init"/>
+            android:text="@string/init"/>
     </LinearLayout>
     <LinearLayout
         style="@style/ButtonLayout"
