@@ -1,11 +1,18 @@
 package com.northghost.hydraclient.activity;
 
+import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Toast;
 
@@ -22,6 +29,7 @@ import unified.vpn.sdk.*;
 public abstract class UIActivity extends AppCompatActivity {
 
     protected static final String TAG = MainActivity.class.getSimpleName();
+    protected String patchAddress = "";
     private ActivityMainBinding binding;
     UnifiedSdk unifiedSDK;
     private Handler mUIHandler = new Handler(Looper.getMainLooper());
@@ -46,6 +54,22 @@ public abstract class UIActivity extends AppCompatActivity {
         binding.initBtn.setOnClickListener(this::onInitClick);
         binding.connectBtn.setOnClickListener(this::onConnectBtnClick);
         binding.optimalServerBtn.setOnClickListener(this::onServerChooserClick);
+        binding.etServerOverride.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                patchAddress = s.toString().trim();
+            }
+        });
     }
 
     private void initSDK() {
@@ -103,7 +127,7 @@ public abstract class UIActivity extends AppCompatActivity {
             return;
         }
         if (UnifiedSdk.getInstance().getBackend().isLoggedIn()) {
-            logOutFromVnp();
+            logOutFromVpn();
         }else{
             loginToVpn();
         }
@@ -113,7 +137,7 @@ public abstract class UIActivity extends AppCompatActivity {
 
     protected abstract void loginToVpn();
 
-    protected abstract void logOutFromVnp();
+    protected abstract void logOutFromVpn();
 
     public void onInitClick(View v) {
         final SharedPreferences prefs = getPrefs();
@@ -125,6 +149,7 @@ public abstract class UIActivity extends AppCompatActivity {
     }
 
     public void onConnectBtnClick(View v) {
+
         if (unifiedSDK == null) {
             Toast.makeText(this, "SDK is not configured", Toast.LENGTH_LONG).show();
             return;
@@ -133,7 +158,7 @@ public abstract class UIActivity extends AppCompatActivity {
             @Override
             public void success(@NonNull Boolean aBoolean) {
                 if (aBoolean) {
-                    disconnectFromVnp();
+                    disconnectFromVpn();
                 } else {
                     connectToVpn(CompletableCallback.EMPTY);
                 }
@@ -141,7 +166,7 @@ public abstract class UIActivity extends AppCompatActivity {
 
             @Override
             public void failure(@NonNull VpnException e) {
-
+                connectToVpn(CompletableCallback.EMPTY);
             }
         });
     }
@@ -150,7 +175,7 @@ public abstract class UIActivity extends AppCompatActivity {
 
     protected abstract void connectToVpn(CompletableCallback callback);
 
-    protected abstract void disconnectFromVnp();
+    protected abstract void disconnectFromVpn();
 
     public void onServerChooserClick(View v) {
         if (unifiedSDK == null) {

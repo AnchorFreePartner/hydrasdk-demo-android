@@ -47,5 +47,12 @@
     <string name="current_server">CURRENT_SERVER</string>
     <string name="connecting">Connecting</string>
     <string name="paused">Paused</string>
+    <string name="config_patch_address">Config patch address:</string>
+    <string name="carrier">Carrier:</string>
+    <string name="backend_url">Backend URL:</string>
+    <string name="init">Init</string>
+    <string name="permission_dialog_message">"In order for Wireguard transport to be functional this app requires permission to schedule exact alarms. Please enable this permission in your device settings."</string>
+    <string name="permission_dialog_positive">"Go to setting"</string>
+    <string name="permission_dialog_negative">"Decilne"</string>
 
 </resources>
