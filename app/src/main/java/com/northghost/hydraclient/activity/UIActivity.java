@@ -1,5 +1,7 @@
 package com.northghost.hydraclient.activity;
 
+import static com.northghost.hydraclient.extensions.ActivityExtensionsKt.showDialogIfRooted;
+
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -48,7 +50,7 @@ public abstract class UIActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.mainToolbar);
-
+        showDialogIfRooted(this, this);
         initSDK();
         binding.loginBtn.setOnClickListener(this::onLoginBtnClick);
         binding.initBtn.setOnClickListener(this::onInitClick);
