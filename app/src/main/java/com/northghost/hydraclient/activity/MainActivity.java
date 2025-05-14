@@ -7,6 +7,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import co.pango.detectfrida.DetectFrida;
 import unified.vpn.sdk.*;
 import com.northghost.hydraclient.MainApplication;
 import com.northghost.hydraclient.adapter.RegionListAdapter;

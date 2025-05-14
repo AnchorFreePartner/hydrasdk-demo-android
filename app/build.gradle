@@ -70,4 +70,5 @@ dependencies {
     implementation libs.androidx.cardview
     implementation libs.androidx.recyclerview
     implementation libs.rootbeer.lib
+    implementation project(':detectfrida')
 }
