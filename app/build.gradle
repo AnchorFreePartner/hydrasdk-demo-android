@@ -55,19 +55,19 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.16.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:2.1.10"
+    implementation libs.androidx.core.ktx
+    implementation libs.kotlin.stdlib
     implementation fileTree(dir: 'libs', include: ['*.aar'])
 
-    implementation "co.pango:sdk-core:$pango_version"
-    implementation "co.pango:sdk-hydra:$pango_version"
-    implementation "co.pango:sdk-openvpn:$pango_version"
-    implementation "co.pango:sdk-wireguard:$pango_version"
-    implementation "co.pango:sdk-config-reader:$pango_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2"
+    implementation libs.sdk.core
+    implementation libs.sdk.hydra
+    implementation libs.sdk.openvpn
+    implementation libs.sdk.wireguard
+    implementation libs.sdk.config.reader
+    implementation libs.kotlinx.coroutines.android
 
-    implementation 'androidx.appcompat:appcompat:1.7.0'
-    implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.4.0'
-    implementation 'com.scottyab:rootbeer-lib:0.1.1'
+    implementation libs.androidx.appcompat
+    implementation libs.androidx.cardview
+    implementation libs.androidx.recyclerview
+    implementation libs.rootbeer.lib
 }
