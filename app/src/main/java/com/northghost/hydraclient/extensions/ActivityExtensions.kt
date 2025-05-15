@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.northghost.hydraclient.R
 import com.scottyab.rootbeer.RootBeer
 import kotlinx.coroutines.CoroutineScope
@@ -31,9 +32,9 @@ fun AppCompatActivity.scheduleAlarmPermissionGranted() = Build.VERSION.SDK_INT >
         applicationContext.getSystemService(AlarmManager::class.java)
             .canScheduleExactAlarms()
 
-fun AppCompatActivity.showDialogIfRooted(context: Context) {
-    CoroutineScope(Dispatchers.IO).launch{
-        val rootBeer = RootBeer(context)
+fun AppCompatActivity.showDialogIfRooted() {
+    lifecycleScope.launch{
+        val rootBeer = RootBeer(this@showDialogIfRooted)
         val  rootResult =
             listOf(
                 Pair("Root Management Apps", rootBeer.detectRootManagementApps()),
@@ -49,7 +50,7 @@ fun AppCompatActivity.showDialogIfRooted(context: Context) {
                 Pair("Magisk specific checks", rootBeer.checkForMagiskBinary()),
             ).filter { it.second }.joinToString(separator = "\n") { it.first }
         if (rootResult.isNotEmpty()) {
-            val builder = AlertDialog.Builder(context)
+            val builder = AlertDialog.Builder(this@showDialogIfRooted)
             builder.setTitle("Device is rooted").setMessage("Root status triggered via:${rootResult}").setNegativeButton("OK"){ dialog, _ ->
                 dialog.dismiss()
             }

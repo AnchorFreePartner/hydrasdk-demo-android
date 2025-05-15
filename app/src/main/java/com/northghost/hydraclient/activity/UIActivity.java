@@ -50,7 +50,7 @@ public abstract class UIActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.mainToolbar);
-        showDialogIfRooted(this, this);
+        showDialogIfRooted(this);
         initSDK();
         binding.loginBtn.setOnClickListener(this::onLoginBtnClick);
         binding.initBtn.setOnClickListener(this::onInitClick);
