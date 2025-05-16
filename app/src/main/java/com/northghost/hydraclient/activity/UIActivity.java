@@ -5,13 +5,10 @@ import static com.northghost.hydraclient.extensions.ActivityExtensionsKt.showDia
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
